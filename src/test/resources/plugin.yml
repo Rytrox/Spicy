@@ -1,0 +1,6 @@
+name: Libs
+version: 1.0
+author: Timeout
+description: 'Ein Test-Plugin für die Libs'
+
+main: de.timeout.libs.LibsTestPlugin

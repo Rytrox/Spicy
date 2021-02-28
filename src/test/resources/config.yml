@@ -1,0 +1,141 @@
+# Default Configuration for GoaSkyPvP
+# How to install this plugin correctly:
+#
+# ENGLISH:
+# 1. Set up MySQL. Write the correct settings into the Configuration
+# 2. Correct worldname. Write in section worldsettings.world the correct name of your world. This is case sensitive
+# 3. Set spawnpoint. Alternatively, you can also execute the command /spawn set in game
+# 4. Set fightzone. Alternatively, you can also execute the command /fightzone set in game
+#
+# DEUTSCH:
+# 1. MySQL-Daten eingeben. Gib die korrekten Verbindungsinformationen ein.
+# 2. Die korrekte Welt setzen. Trage bitte in den Reiter workdsettings.world den richtigen Weltnamen ein. Achte auf Groß- und Kleinschreibung
+# 3. Den Spawnpoint setzen. Alternativ kannst du auch den Befehl /spawn set im Spiel eingeben
+# 4. Fightzone setzen. Alternatiuv kannst du auch den Befehl /fightzone set im Spiel eingeben
+
+# Language of the Plugin
+language: de_DE
+
+# MySQL-Settings
+mysql:
+  host: 'localhost'
+  port: 3306
+  database: 'goaskypvp'
+  username: 'root'
+  password: 'password'
+
+# Amount of SkyCoins the killer receives
+kill_reward: 20
+
+worldsettings:
+  # the world of the plugin
+  world: 'world'
+
+  # SpawnPoint you get to
+  spawnpoint: # by either joining the Server, dying or using /spawn
+    x: 0
+    y: 200
+    z: 0
+    yaw: 0
+    pitch: 0
+  # Zone you can fight in
+  fightZone:
+    # height where the fightzone begins
+    fightline: 60
+  # Zone the SkyCoin-Pigs spawn in
+  voidKiller:
+    # height at which player die instantly
+    enabled: false
+    y: 0
+  pigZone:
+    # Activates/deactivates function
+    enabled: false
+    # Limit of SkyCoin-Pigs
+    limit: 10
+    # Amount of SkyCoins the player receives
+    reward: 100
+    # Name displayed above the SkyCoin-Pig
+    name: '&d[&6SkyCoin-Pig&d]'
+    # Defines interval (in seconds) at which the pigs spawn
+    # The plugin does not always find a location for the pig to spawn on
+    # For better performance it stops searching after some tries and informs about it in the console
+    # If the map has much air and less ground you should increase the rate by choosing a lower value
+    spawnInterval: 300
+    # Defines Zone with two vertices
+    area:
+      1:
+        x: -25
+        y: 20
+        z: -25
+      2:
+        x: 25
+        y: 60
+        z: 25
+  # Settings for Cooldown
+  fightcooldown:
+    # time in seconds till you can use commands
+    # after having started a fight
+    time: 15
+    # Characters for Animation
+    animation:
+      open: '&c['
+      close: '&c]'
+      remaining: '&c|'
+      past: '&a|'
+      finished: '&a[||||||||||]'
+
+npc:
+  # NPC follows Player with his head.
+  headrotation: true
+
+auctionhouse:
+  # how many items should a player be allowed to put in the auctionhouse at the same time (up to 18 items)
+  maxItems: 5
+  # time until item expires
+  expiredtimer:
+    # how many days after input left (until 6 days)
+    days: 2
+    # how many hours after input left (until 23 hours)
+    hours: 0
+    # how many minutes after input left (until 59 minutes)
+    minutes: 0
+
+scoreboard:
+  enabled: true
+  title: '&8[&6GoaSkyPvP&8] &7- &6Stats'
+  # you can use following spacers:
+  # [playername] real name of the player
+  # [displayname] displayed name of the player
+  # [customname] custom name of the player
+  # [skycoins] amount of skycoins the player has
+  # [kills] amount of kills the player has
+  # [deaths] amount of deaths the player has
+  # [k/d] calculated kill-death-ratio of the player
+  # [streak] kill streak the player has
+  scores:
+    - '&4Kills&8: &c[kills]'
+    - '&4Deaths&8: &c[deaths]'
+    - ''
+    - '&3K/D&8: &b[k/d]'
+    - '&cStreak&8: &c[streak]'
+    - ''
+    - '&7You have &e[skycoins] &6SkyCoins'
+    - '&7-----------------'
+    - '&aPlugin made by &9Rytrox'
+    - '&6Server&8: &eRytrox.de'
+
+fishing:
+  # chance of catching a magic key (in percent)
+  magic_key: 3
+
+# some ids of items
+# do not change these values manually
+# instead use the corresponding commands in-game
+rod:
+  normal: -1 # Comment behind a line!
+  premium: -1
+lottery:
+  # Normal Items are in Magic Lottery with lower chance
+  # by inserting 0 is this option disabled
+  # by inserting 1 is the chance the same as in the normal lottery
+  normalInMagic: 0.0
