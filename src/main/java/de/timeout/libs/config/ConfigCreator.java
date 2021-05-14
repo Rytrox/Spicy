@@ -1,6 +1,7 @@
 package de.timeout.libs.config;
 
 import java.io.*;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -68,7 +69,10 @@ public class ConfigCreator {
 	public File createFile(@NotNull Path filePath) throws IOException {
 		File configFile = pluginDataFolder.toPath().resolve(filePath).toFile();
 
-		if(configFile.getParentFile().mkdirs() || configFile.createNewFile()) 
+		// Create datafolder
+		Files.createDirectories(pluginDataFolder.toPath());
+
+		if(configFile.createNewFile())
 			logger.log(Level.INFO, "&7Created new file {0} in datafolder", configFile.getName());
 		
 		return configFile;

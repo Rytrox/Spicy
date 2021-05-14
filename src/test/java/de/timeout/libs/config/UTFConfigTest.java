@@ -12,6 +12,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Paths;
 
 import static org.junit.Assert.*;
@@ -39,6 +40,14 @@ public class UTFConfigTest {
 
         assertEquals("Hello World", config.getString("name.key1.value"));
         assertEquals(12, config.getInt("name.key1.number"));
+    }
+
+    @Test
+    public void shouldLoadEmptyConfiguration() throws IOException {
+        File test = Paths.get("src", "test", "resources", "empty.yml").toFile();
+        UTFConfig file = new UTFConfig(test);
+
+        assertNotNull(file);
     }
 
     @Test
