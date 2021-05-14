@@ -13,51 +13,19 @@ import java.util.Optional;
 
 public class SQLite implements SQL {
 
-    private final File file;
-
-    private Connection connection;
+    private final SQLiteDataSource source;
 
     public SQLite(@NotNull File databaseFile) {
-        this.file = databaseFile;
-    }
+        SQLiteDataSource properties = new SQLiteDataSource();
+        properties.setUrl(String.format("jdbc:sqlite:%s", databaseFile.getAbsolutePath()));
 
-    public boolean connect() throws SQLException {
-        return this.connect(null);
-    }
-
-    public boolean connect(@Nullable SQLiteDataSource properties) throws SQLException {
-        if(!isConnected()) {
-            properties = Optional.ofNullable(properties).orElse(new SQLiteDataSource());
-            properties.setUrl(String.format("jdbc:sqlite:%s", file.getAbsolutePath()));
-
-            DriverManager.registerDriver(new JDBC());
-            connection = properties.getConnection();
-
-            return connection != null;
-        }
-
-        return false;
+        this.source = properties;
     }
 
     @Override
-    public boolean isConnected() throws SQLException {
-        return connection != null && !connection.isClosed();
-    }
+    public @NotNull QueryBuilder prepare(@NotNull String statement, Object... args) throws SQLException {
+        DriverManager.registerDriver(new JDBC());
 
-    @Override
-    public boolean disconnect() throws SQLException {
-        connection.close();
-
-        return !isConnected();
-    }
-
-    @Override
-    public @Nullable Connection getConnection() {
-        return connection;
-    }
-
-    @Override
-    public @NotNull QueryBuilder prepare(@NotNull String statement, Object... args) {
-        return new QueryBuilder(connection, statement, args);
+        return new QueryBuilder(source, statement, args);
     }
 }

@@ -4,6 +4,7 @@ import de.timeout.libs.log.ColoredLogger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -25,17 +26,17 @@ class QueryBuilder {
         ColoredLogger.enableColoredLogging('&', LOGGER, "&8[&6MySQL&8]");
     }
 
-    private final Connection connection;
-
     private final String query;
+    private final DataSource source;
     private final Object[] args;
 
-    public QueryBuilder(@NotNull Connection connection, @NotNull String query, Object... args) {
-        this.connection = connection;
+    public QueryBuilder(@NotNull DataSource source, @NotNull String query, Object... args) {
         this.query = query;
         this.args = args;
+        this.source = source;
     }
-    private PreparedStatement prepareStatement(@NotNull String statement, Object... args) throws SQLException {
+
+    private PreparedStatement prepareStatement(Connection connection, @NotNull String statement, Object... args) throws SQLException {
         //Do not close this Statement here!!
         PreparedStatement ps = connection.prepareStatement(statement);
         if(args != null)
@@ -52,7 +53,8 @@ class QueryBuilder {
      */
     public void query(@NotNull ThrowableConsumer<ResultSet> result) {
         THREAD_EXECUTOR.execute(() -> {
-            try(PreparedStatement statement = prepareStatement(query, args);
+            try(Connection connection = source.getConnection();
+                PreparedStatement statement = prepareStatement(connection, query, args);
                 ResultSet set = statement.executeQuery()) {
 
                 result.accept(set);
@@ -79,7 +81,8 @@ class QueryBuilder {
      */
     public void execute(@Nullable ThrowableConsumer<Boolean> result) {
         THREAD_EXECUTOR.execute(() -> {
-            try(PreparedStatement statement = prepareStatement(query, args)) {
+            try(Connection connection = source.getConnection();
+                PreparedStatement statement = prepareStatement(connection, query, args)) {
                 boolean bool = statement.execute();
 
                 if(result != null) result.accept(bool);
@@ -106,7 +109,8 @@ class QueryBuilder {
      */
     public void update(@Nullable ThrowableConsumer<Integer> result) {
         THREAD_EXECUTOR.execute(() -> {
-            try(PreparedStatement statement = prepareStatement(query, args)) {
+            try(Connection connection = source.getConnection();
+                PreparedStatement statement = prepareStatement(connection, query, args)) {
                 int updateValue = statement.executeUpdate();
 
                 if(result != null) result.accept(updateValue);
