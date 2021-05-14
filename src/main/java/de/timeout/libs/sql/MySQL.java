@@ -4,8 +4,6 @@ import com.mysql.jdbc.jdbc2.optional.MysqlDataSource;
 
 import org.jetbrains.annotations.NotNull;
 
-import javax.sql.DataSource;
-
 /**
  * This Class is a Hook into the MySQL-Database
  * @author Timeout
@@ -33,9 +31,5 @@ public class MySQL implements SQL {
     @Override
     public @NotNull QueryBuilder prepare(@NotNull String statement, Object... args) {
         return new QueryBuilder(source, statement, args);
-    }
-
-    public MysqlDataSource getDataSource() {
-        return source;
     }
 }
