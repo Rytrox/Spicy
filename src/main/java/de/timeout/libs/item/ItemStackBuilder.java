@@ -27,7 +27,7 @@ public class ItemStackBuilder {
 
     private static final String NBT_ERROR = "Cannot write NBT-Data in ";
 
-    private ItemStack currentBuilding;
+    protected ItemStack currentBuilding;
 
     public ItemStackBuilder() {
         this.currentBuilding = new ItemStack(Material.STONE);
@@ -43,18 +43,6 @@ public class ItemStackBuilder {
         // validate
         Validate.notNull(material, "Material cannot be null");
         this.currentBuilding = new ItemStack(material);
-    }
-
-    /**
-     * This method sets the type of the Material
-     * @param material the new material of the itemstack
-     * @return the builder to contiunue
-     */
-    public ItemStackBuilder setType(Material material) {
-        this.currentBuilding.setType(material);
-
-        // return this to continue
-        return this;
     }
 
     /**

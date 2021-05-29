@@ -16,7 +16,7 @@ public class ConfigCreator {
 	private static final Logger logger = Logger.getLogger("ConfigCreator");
 
 	static {
-		ColoredLogger.enableColoredLogging('&', logger, "&8[&6Libs&8] ");
+		ColoredLogger.enableColoredLogging('&', logger, "&8[&6Libs&8]");
 	}
 
 	protected final File pluginDataFolder;

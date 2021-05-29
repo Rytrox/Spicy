@@ -1,4 +1,4 @@
-package de.timeout.libs.mineskin;
+package de.timeout.libs.skin;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;

@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.logging.ConsoleHandler;
+import java.util.logging.Handler;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -36,6 +37,12 @@ public final class ColoredLogger {
 	public static void enableColoredLogging(char colorFormatter,
 											@NotNull Logger pluginLogger,
 											@Nullable String prefix) {
+		// remove old colored logger
+		Arrays.stream(pluginLogger.getHandlers())
+				.filter(handler -> handler instanceof ColorCodeHandler)
+				.forEach(pluginLogger::removeHandler);
+
+		// Add new colored logger
 		pluginLogger.addHandler(new ColorCodeHandler(prefix, colorFormatter));
 	}
 

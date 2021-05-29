@@ -67,6 +67,33 @@ public class Reflections {
     }
 
     /**
+     * This method reads a value from a declared field in a class.
+     * If the field cannot be found it returns null.
+     *
+     * @param value The holder of the field
+     * @param name the name of the field
+     * @param type the type of the field
+     * @param <T> the type of the field
+     * @return the found field or null if the field does not exist
+     */
+    @Nullable
+    public static <T> T getSafeValueFromDeclaredField(Object value, String name, Class<T> type) {
+        Field field = getField(value.getClass(), type, name);
+
+        if(field != null) {
+            field.setAccessible(true);
+
+            try {
+                return (T) field.get(value);
+            } catch (IllegalAccessException e) {
+                Logger.getGlobal().log(Level.WARNING, e, () -> "Could not access field " + name);
+            }
+        }
+
+        return null;
+    }
+
+    /**
      * This method gets a SubClass in a class with a certain name
      * @param overclass the class which contains the class you are searching for
      * @param classname the name of the class you are searching for
