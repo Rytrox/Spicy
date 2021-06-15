@@ -51,14 +51,15 @@ public class ConfigCreator {
 		File file = createFile(toPath);
 
 		// try to get FileStream
-		try(InputStream in = this.getClass().getClassLoader().getResourceAsStream(fromPath.toString());
-			FileWriter out = new FileWriter(file)) {
-			System.out.println(in);
-			// check if file was found
-			if(in != null) {
-				IOUtils.copy(in, out, StandardCharsets.UTF_8);
-			} else
-				logger.log(Level.WARNING, "&cUnable to copy content of {0} to Plugin folder", fromPath.getFileName());
+		if(file.length() <= 2) {
+			try (InputStream in = this.getClass().getClassLoader().getResourceAsStream(fromPath.toString());
+				 FileWriter out = new FileWriter(file)) {
+				// check if file was found
+				if (in != null) {
+					IOUtils.copy(in, out, StandardCharsets.UTF_8);
+				} else
+					logger.log(Level.WARNING, "&cUnable to copy content of {0} to Plugin folder", fromPath.getFileName());
+			}
 		}
 
 		return file;
@@ -81,7 +82,7 @@ public class ConfigCreator {
 		if(!configFile.toFile().exists()) {
 			Files.createFile(configFile);
 
-			logger.log(Level.INFO, "&7Created new file {0} in datafolder", configFile.getFileName());
+			logger.log(Level.FINE, "&7Created new file {0} in datafolder", configFile.getFileName());
 		}
 		
 		return configFile.toFile();
