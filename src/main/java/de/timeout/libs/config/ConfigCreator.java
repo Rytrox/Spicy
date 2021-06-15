@@ -10,6 +10,7 @@ import java.util.logging.Logger;
 import de.timeout.libs.log.ColoredLogger;
 
 import org.bukkit.craftbukkit.libs.org.apache.commons.io.IOUtils;
+import org.bukkit.util.FileUtil;
 import org.jetbrains.annotations.NotNull;
 
 public class ConfigCreator {
@@ -47,7 +48,7 @@ public class ConfigCreator {
 	 */
 	public File copyDefaultFile(@NotNull Path fromPath, @NotNull Path toPath) throws IOException {
 		// create new file if not exists
-		File file = createFile(pluginDataFolder.toPath().resolve(toPath));
+		File file = createFile(toPath);
 
 		// try to get FileStream
 		try(InputStream in = this.getClass().getClassLoader().getResourceAsStream(fromPath.toString());
@@ -72,14 +73,17 @@ public class ConfigCreator {
 	 * @throws IllegalArgumentException if the parameter is null
 	 */
 	public File createFile(@NotNull Path filePath) throws IOException {
-		File configFile = pluginDataFolder.toPath().resolve(filePath).toFile();
+		Path configFile = pluginDataFolder.toPath().resolve(filePath);
 
 		// Create datafolder
-		Files.createDirectories(pluginDataFolder.toPath());
+		Files.createDirectories(configFile.getParent());
 
-		if(configFile.createNewFile())
-			logger.log(Level.INFO, "&7Created new file {0} in datafolder", configFile.getName());
+		if(!configFile.toFile().exists()) {
+			Files.createFile(configFile);
+
+			logger.log(Level.INFO, "&7Created new file {0} in datafolder", configFile.getFileName());
+		}
 		
-		return configFile;
+		return configFile.toFile();
 	}
 }

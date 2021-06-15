@@ -23,16 +23,18 @@ public class BukkitConfigCreatorTest {
     public void start() {
         MockBukkit.mock();
         plugin = MockBukkit.load(LibsTestPlugin.class);
-        creator = new ConfigCreator(plugin.getDataFolder(), Paths.get("/"));
+        creator = new ConfigCreator(plugin.getDataFolder(), Paths.get(""));
     }
 
     @Test
     public void loadEmptyYamlConfig() throws IOException {
         assertEquals(0, plugin.getDataFolder().list().length);
 
-        File file = creator.createFile(Paths.get("config.yml"));
+        File file = creator.createFile(Paths.get("test.yml"));
         assertTrue(file.exists());
         assertEquals(0L, file.length());
+
+//        Files.delete(file.toPath());
     }
 
     @Test(expected = IllegalArgumentException.class)
