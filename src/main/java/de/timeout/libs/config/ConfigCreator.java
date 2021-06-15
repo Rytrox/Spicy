@@ -1,14 +1,15 @@
 package de.timeout.libs.config;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import com.google.common.io.ByteStreams;
 import de.timeout.libs.log.ColoredLogger;
-import org.apache.commons.lang.Validate;
+
+import org.bukkit.craftbukkit.libs.org.apache.commons.io.IOUtils;
 import org.jetbrains.annotations.NotNull;
 
 public class ConfigCreator {
@@ -21,7 +22,14 @@ public class ConfigCreator {
 
 	protected final File pluginDataFolder;
 	protected final Path configDirectory;
-	
+
+	/**
+	 * Creates a new ConfigCreator
+	 *
+	 * @param pluginDataFolder the Plugin-Folder of your plugin
+	 * @param configDirectory the Path of your Config directory. Start like this:
+	 *                        Paths.get("subfolder1", "subfolder2");
+	 */
 	public ConfigCreator(@NotNull File pluginDataFolder, @NotNull Path configDirectory) {
 		this.configDirectory = configDirectory;
 		this.pluginDataFolder = pluginDataFolder;
@@ -38,24 +46,21 @@ public class ConfigCreator {
 	 * @throws IllegalArgumentException if any argument is null
 	 */
 	public File copyDefaultFile(@NotNull Path fromPath, @NotNull Path toPath) throws IOException {
-		// create Path
-		Path internalPath = this.configDirectory.resolve(fromPath);
-		Validate.isTrue(internalPath.toFile().exists(),
-				String.format("Unable to find file inside JAR: %s", internalPath.toString()));
+		// create new file if not exists
+		File file = createFile(pluginDataFolder.toPath().resolve(toPath));
 
-		// call loadFile()
-		File configuration = createFile(toPath);
-		// If file is empty
-		if(configuration.length() == 0L) {
-			// copy files into subfolder
-			try(InputStream in = this.getClass().getClassLoader().getResourceAsStream(internalPath.toString());
-					OutputStream out = new FileOutputStream(configuration)) {
-				if(in != null)
-					ByteStreams.copy(in, out);
-			}
+		// try to get FileStream
+		try(InputStream in = this.getClass().getClassLoader().getResourceAsStream(fromPath.toString());
+			FileWriter out = new FileWriter(file)) {
+			System.out.println(in);
+			// check if file was found
+			if(in != null) {
+				IOUtils.copy(in, out, StandardCharsets.UTF_8);
+			} else
+				logger.log(Level.WARNING, "&cUnable to copy content of {0} to Plugin folder", fromPath.getFileName());
 		}
-		logger.log(Level.INFO, "&7Loaded File {0} &asuccessfully", configuration.getName());
-		return configuration;
+
+		return file;
 	}
 
 	/**

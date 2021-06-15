@@ -8,6 +8,7 @@ import org.junit.Test;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Paths;
 
 import static org.junit.Assert.*;
@@ -38,6 +39,14 @@ public class BukkitConfigCreatorTest {
     public void throwExceptionWhenNullInput() throws IOException {
 
         creator.createFile(null);
+    }
+
+    @Test
+    public void shouldLoadYamlConfiguration() throws IOException {
+        File file = creator.copyDefaultFile(Paths.get("config.yml"), Files.createTempFile("temp", "suff").toAbsolutePath());
+
+        assertTrue(file.exists());
+        assertTrue(file.length() > 0);
     }
 
     @After
