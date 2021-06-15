@@ -15,7 +15,7 @@ import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-class QueryBuilder {
+public class QueryBuilder {
 
     private static final String EXCEPTION = "Unhandled exception while executing statement: ";
 
@@ -125,7 +125,7 @@ class QueryBuilder {
      * @param <T> the Type of the Consumer
      */
     @FunctionalInterface
-    interface ThrowableConsumer<T> extends Consumer<T> {
+    public interface ThrowableConsumer<T> extends Consumer<T> {
 
         @Override
         default void accept(T t) {
