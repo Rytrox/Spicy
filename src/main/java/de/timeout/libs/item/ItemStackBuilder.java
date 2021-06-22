@@ -33,15 +33,11 @@ public class ItemStackBuilder {
         this.currentBuilding = new ItemStack(Material.STONE);
     }
 
-    public ItemStackBuilder(ItemStack base) {
-        // validate
-        Validate.notNull(base, "ItemStack cannot be null");
+    public ItemStackBuilder(@NotNull ItemStack base) {
         this.currentBuilding = base.clone();
     }
 
-    public ItemStackBuilder(Material material) {
-        // validate
-        Validate.notNull(material, "Material cannot be null");
+    public ItemStackBuilder(@NotNull Material material) {
         this.currentBuilding = new ItemStack(material);
     }
 
@@ -245,7 +241,7 @@ public class ItemStackBuilder {
 
     protected static @NotNull ItemMeta getSafeItemMeta(ItemStack item) {
         // an itemmeta is only null when the item is air or null
-        if(item != null && item.getType() == Material.AIR && item.getItemMeta() != null) {
+        if(item != null && item.getItemMeta() != null) {
             return item.getItemMeta();
         }
 
