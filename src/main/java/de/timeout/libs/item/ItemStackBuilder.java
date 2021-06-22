@@ -71,7 +71,7 @@ public class ItemStackBuilder {
      */
     public ItemStackBuilder addEnchantment(Enchantment enchantment, int level) {
         // set enchantment
-        this.currentBuilding.addEnchantment(enchantment, level);
+        this.currentBuilding.addUnsafeEnchantment(enchantment, level);
         // return this to continue
         return this;
     }
