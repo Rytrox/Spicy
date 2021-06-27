@@ -145,7 +145,7 @@ public final class ItemStacks {
     @Nullable
     public static Object asNMSCopy(ItemStack item) {
         try {
-            return MethodUtils.invokeExactStaticMethod(craftitemstackClass, "asNMSCopy", item);
+            return MethodUtils.invokeStaticMethod(craftitemstackClass, "asNMSCopy", item);
         } catch (IllegalAccessException e) {
             Bukkit.getLogger().log(Level.SEVERE, "Unable to create NMS-Copy of an itemstack: ", e);
         } catch (IllegalArgumentException e) {
