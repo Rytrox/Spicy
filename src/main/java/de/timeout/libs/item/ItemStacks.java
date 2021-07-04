@@ -55,18 +55,14 @@ public final class ItemStacks {
      * @param item the item
      * @return the string
      */
-    @Nullable
-    public static String encodeBase64(ItemStack item) {
-        try {
-            ByteArrayOutputStream str = new ByteArrayOutputStream();
-            try(BukkitObjectOutputStream data = new BukkitObjectOutputStream(str)) {
-                data.writeObject(item);
-            }
+    @NotNull
+    public static String encodeBase64(ItemStack item) throws IOException {
+        try(ByteArrayOutputStream str = new ByteArrayOutputStream();
+            BukkitObjectOutputStream data = new BukkitObjectOutputStream(str)) {
+            data.writeObject(item);
+
             return Base64.getEncoder().encodeToString(str.toByteArray());
-        } catch (IOException e) {
-            Bukkit.getLogger().log(Level.SEVERE, "Could not create String", e);
         }
-        return null;
     }
 
     /**
@@ -75,17 +71,13 @@ public final class ItemStacks {
      * @param base64 the base 64
      * @return the item stack
      */
-    @Nullable
-    public static ItemStack decodeBase64(String base64) {
-        try {
-            ByteArrayInputStream str = new ByteArrayInputStream(Base64.getDecoder().decode(base64));
-            try(BukkitObjectInputStream data = new BukkitObjectInputStream(str)) {
-                return (ItemStack) data.readObject();
-            }
-        } catch (IOException | ClassNotFoundException e) {
-            Bukkit.getLogger().log(Level.SEVERE, "Could not create Object", e);
+    @NotNull
+    public static ItemStack decodeBase64(String base64) throws IOException, ClassNotFoundException {
+        try(ByteArrayInputStream str = new ByteArrayInputStream(Base64.getDecoder().decode(base64));
+            BukkitObjectInputStream data = new BukkitObjectInputStream(str)) {
+
+            return (ItemStack) data.readObject();
         }
-        return null;
     }
 
     /**
@@ -111,7 +103,7 @@ public final class ItemStacks {
     @NotNull
     public static String getCustomizedName(ItemStack itemStack) {
         // return displayname if item has one
-        if(itemStack.hasItemMeta() && Objects.requireNonNull(itemStack.getItemMeta()).hasDisplayName())
+        if(itemStack.getItemMeta() != null && itemStack.getItemMeta().hasDisplayName())
             return itemStack.getItemMeta().getDisplayName();
 
         // get nmsItem
