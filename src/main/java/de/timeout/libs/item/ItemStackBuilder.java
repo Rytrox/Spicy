@@ -15,6 +15,7 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class ItemStackBuilder {
 
@@ -72,7 +73,23 @@ public class ItemStackBuilder {
     public ItemStackBuilder addEnchantment(Enchantment enchantment, int level) {
         // set enchantment
         this.currentBuilding.addUnsafeEnchantment(enchantment, level);
+
         // return this to continue
+        return this;
+    }
+
+    /**
+     * This Method sets the Custom Model Data which is associated with the client model
+     *
+     * @param model the number of the model
+     * @return the builder to continue
+     */
+    public ItemStackBuilder setModelData(@Nullable Integer model) {
+        // set model data
+        ItemMeta meta = getSafeItemMeta(currentBuilding);
+        meta.setCustomModelData(model);
+        this.currentBuilding.setItemMeta(meta);
+
         return this;
     }
 
