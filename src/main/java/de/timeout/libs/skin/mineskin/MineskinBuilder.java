@@ -12,7 +12,7 @@ import java.util.concurrent.Future;
  * DONT USE THIS CLASS TOO OFTEN!! <br>
  * <br>
  * Best practise is creating one skin once and save his uuid in a file or database and grab the skin with
- * {@link MineskinHandler#}
+ * {@link MineskinBuilder#loadMineskin(UUID)}
  *
  * @author Timeout
  */
