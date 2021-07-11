@@ -7,6 +7,8 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.Serializable;
 import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Implementation of the Mineskin-API Skin-DTO
@@ -15,6 +17,7 @@ import java.util.UUID;
  */
 public class Mineskin implements Serializable {
 
+    private static final Pattern UUID_PATTERN = Pattern.compile("(.{8})(.{4})(.{4})(.{4})(.{12})");
 
     private final int id;
     private final UUID uuid;
@@ -29,7 +32,7 @@ public class Mineskin implements Serializable {
 
     public Mineskin(@NotNull JsonObject data) {
         this.id = data.get("id").getAsInt();
-        this.uuid = UUID.fromString(data.get("uuid").getAsString());
+        this.uuid = fetchTrimmedID(data.get("uuid").getAsString());
         this.name = data.get("name").getAsString();
         this.timestamp = data.get("timestamp").getAsLong();
         this.duration = data.get("duration").getAsInt();
@@ -47,6 +50,21 @@ public class Mineskin implements Serializable {
                         textures.get("value").getAsString(),
                         textures.get("signature").getAsString())
         );
+    }
+
+    private UUID fetchTrimmedID(String trimmedID) {
+
+        Matcher matcher = UUID_PATTERN.matcher(trimmedID);
+
+        // Must call matched to load REGEX in Matcher
+        if(matcher.matches()) {
+            return UUID.fromString(
+                    String.format("%s-%s-%s-%s-%s", matcher.group(1), matcher.group(2), matcher.group(3),
+                            matcher.group(4), matcher.group(5))
+            );
+        }
+
+        return null;
     }
 
     /**

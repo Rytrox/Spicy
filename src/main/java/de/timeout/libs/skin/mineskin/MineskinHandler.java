@@ -32,6 +32,7 @@ class MineskinHandler {
     public static long REQUEST_TIMEOUT = 0;
 
     private static final ScheduledExecutorService scheduler = new ScheduledThreadPoolExecutor(0);
+    private static final HttpClient client = HttpClient.newHttpClient();
 
     private static final LoadingCache<UUID, Mineskin> mineskinCache = CacheBuilder.newBuilder()
             .maximumSize(100L)
@@ -69,7 +70,7 @@ class MineskinHandler {
                     .build();
 
             return parseResponse(request);
-        }, Math.max(System.currentTimeMillis() - REQUEST_TIMEOUT, 0), TimeUnit.MILLISECONDS);
+        }, Math.max(REQUEST_TIMEOUT - System.currentTimeMillis(), 0), TimeUnit.MILLISECONDS);
     }
 
     public Future<Mineskin> generate(@NotNull GenerateOptions options, @NotNull File file) {
@@ -96,7 +97,7 @@ class MineskinHandler {
             }
 
             return null;
-        }, Math.max(System.currentTimeMillis() - REQUEST_TIMEOUT, 0), TimeUnit.MILLISECONDS);
+        }, Math.max(REQUEST_TIMEOUT - System.currentTimeMillis(), 0), TimeUnit.MILLISECONDS);
     }
 
     public Future<Mineskin> generate(@NotNull GenerateOptions options, @NotNull UUID uuid) {
@@ -111,12 +112,11 @@ class MineskinHandler {
                     .build();
 
             return parseResponse(request);
-        }, Math.max(System.currentTimeMillis() - REQUEST_TIMEOUT, 0), TimeUnit.MILLISECONDS);
+        }, Math.max(REQUEST_TIMEOUT - System.currentTimeMillis(), 0), TimeUnit.MILLISECONDS);
     }
 
     private static Mineskin parseResponse(HttpRequest request) {
         try {
-            HttpClient client = HttpClient.newHttpClient();
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
             if(response.statusCode() == 200) {
@@ -124,6 +124,8 @@ class MineskinHandler {
                 Mineskin mineskin = new Mineskin(object);
 
                 // cache
+                System.out.println(mineskin);
+                System.out.println(mineskin.getUniqueID());
                 mineskinCache.put(mineskin.getUniqueID(), mineskin);
                 // update timeout
                 REQUEST_TIMEOUT = System.currentTimeMillis() + object.get("nextRequest").getAsLong();
