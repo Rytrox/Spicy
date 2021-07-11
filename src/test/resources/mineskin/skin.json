@@ -1,0 +1,23 @@
+{
+  "id": 101,
+  "idStr": "101",
+  "uuid": "e6821dfaefb549ef824f335feb3919d5",
+  "name": "test",
+  "variant": "classic",
+  "data": {
+    "uuid": "94dd234a-2320-4f17-9f40-a1cc80afab2d",
+    "texture": {
+      "value": "ewogICJ0aW1lc3RhbXAiIDogMTYwNzcxNTY2MDI2OSwKICAicHJvZmlsZUlkIiA6ICI5NGRkMjM0YTIzMjA0ZjE3OWY0MGExY2M4MGFmYWIyZCIsCiAgInByb2ZpbGVOYW1lIiA6ICJEZXJUaW1lb3V0IiwKICAic2lnbmF0dXJlUmVxdWlyZWQiIDogdHJ1ZSwKICAidGV4dHVyZXMiIDogewogICAgIlNLSU4iIDogewogICAgICAidXJsIiA6ICJodHRwOi8vdGV4dHVyZXMubWluZWNyYWZ0Lm5ldC90ZXh0dXJlLzgxNDc4NDg2YjY4ZmQwYzkyNTViZDRhYzdmZjI4ZDFhYjhkYjZkODFlZGEwMWVlY2IzMTkwMjA5ODVmZWNhOWYiCiAgICB9CiAgfQp9",
+      "signature": "DFii9Dqfq6/QrGWJ0rOn9qrlOY00/M+bFkU/73PJxFybAlOUVzeq59PnHlKisaoCLZJ27yzwxfn7SRQ0XyFdI3SMaKS6zEL1LJSPCuYN1/Tz8tjYo3dCS+cYL3g2Z1cmKT2HxwHTtg85jRk+ShYQt6QX/lXDG9J06RrTsbQJVuvtVUXipKzIyYn0Q3NroGib2uqkONet11OtDk5RrxzehhISQedjCUhCGzkneYIM/i4wVZwDV/SCBy+98Jk1W+xj1Dv3xNBwvxmgKi597r40P6/dikCbGhe0jMbnUFc/rhUoEw8mPFgeRw61EqfdR6uzbfC03YMN6wjrUaqTneAIDlDUl4Ik2e2xXAk7kmE9nAzcPa1Z99armmUhOXpb/j+WUjd8O8LTzBub8L0E8zB8g4guL45z6VTp1QYp1Cv930xVRkLK5lu6+H155Tne3+wV7+AtyC0G3I6xJ/jzpBT26K7Lfng7JwfWgPZEJnbv7maN9DjmxA1URCjPSwz00LdNFsKXGQ6m7+Cwj/0YRP3a6y1AHp31wZzI4JAx+8cGIJBPQzEGGAgyx0uJXwA+aLOo1BoScbjzzWAgDgSALpQSx/sn2R6fv69kpLCYESgf+Jms9UYq+HOxfG6z/4xxnYoaZbcQhttwtbR7Z05bbi//SUPGLbyzMyqKz2fsWdQs16M=",
+      "url": "http://textures.minecraft.net/texture/81478486b68fd0c9255bd4ac7ff28d1ab8db6d81eda01eecb319020985feca9f"
+    }
+  },
+  "timestamp": 1625947177503,
+  "duration": 1002,
+  "accountId": 53,
+  "server": "string",
+  "private": true,
+  "views": 0,
+  "nextRequest": 1000,
+  "duplicate": true
+}

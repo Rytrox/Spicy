@@ -3,23 +3,18 @@ package de.timeout.libs.item;
 import be.seeseemelk.mockbukkit.MockBukkit;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-import net.minecraft.server.v1_16_R3.IMaterial;
-import net.minecraft.server.v1_16_R3.Items;
 import net.minecraft.server.v1_16_R3.LocaleLanguage;
 import net.minecraft.server.v1_16_R3.NBTTagCompound;
 import org.apache.commons.lang.WordUtils;
 import org.apache.commons.lang.reflect.FieldUtils;
-import org.apache.commons.lang.reflect.MethodUtils;
 import org.bukkit.Material;
 import org.bukkit.craftbukkit.v1_16_R3.inventory.CraftItemStack;
-import org.bukkit.craftbukkit.v1_16_R3.util.CraftMagicNumbers;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.powermock.api.mockito.PowerMockito;
@@ -29,7 +24,6 @@ import org.powermock.core.classloader.annotations.SuppressStaticInitializationFo
 import org.powermock.modules.junit4.PowerMockRunner;
 
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 
 import static org.junit.Assert.*;
 
