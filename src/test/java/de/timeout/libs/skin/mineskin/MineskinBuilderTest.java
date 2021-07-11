@@ -1,21 +1,13 @@
 package de.timeout.libs.skin.mineskin;
 
-import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.pgssoft.httpclient.HttpClientMock;
-import de.timeout.libs.reflect.Reflections;
-import org.apache.commons.lang.reflect.FieldUtils;
-import org.easymock.EasyMock;
-import org.easymock.EasyMockRule;
-import org.easymock.EasyMockSupport;
-import org.easymock.Mock;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.nio.file.Paths;
@@ -23,7 +15,7 @@ import java.util.concurrent.*;
 
 import static org.junit.Assert.*;
 
-public class MineskinBuilderTest extends EasyMockSupport {
+public class MineskinBuilderTest {
 
     HttpClientMock mock;
 
