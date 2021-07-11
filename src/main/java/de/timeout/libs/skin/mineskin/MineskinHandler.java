@@ -43,7 +43,7 @@ class MineskinHandler {
                     // Load from Mineskin-API:
                     HttpRequest request = HttpRequest.newBuilder()
                             .GET()
-                            .uri(URI.create("https://api.mineskin.org/get/uuid/" + id))
+                            .uri(URI.create("https://api.mineskin.org/get/uuid/" + id.toString().replace("-", "")))
                             .build();
                     // Wait until next try
                     Thread.sleep(Math.max(System.currentTimeMillis() - REQUEST_TIMEOUT, 0));
