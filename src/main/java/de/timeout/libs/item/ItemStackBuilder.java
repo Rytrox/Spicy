@@ -108,6 +108,21 @@ public class ItemStackBuilder {
     }
 
     /**
+     * This Method sets the custom model data id of the itemstack
+     *
+     * @param data the custom-model id of the data
+     * @return the builder itself to continue
+     */
+    public ItemStackBuilder setCustomModelData(int data) {
+        ItemMeta meta = getSafeItemMeta(this.currentBuilding);
+        meta.setCustomModelData(data);
+        currentBuilding.setItemMeta(meta);
+
+        // return this to continue
+        return this;
+    }
+
+    /**
      * This Method sets the Lore of the Item
      * @param lore the Lore you want to set
      * @return the builder to continue
