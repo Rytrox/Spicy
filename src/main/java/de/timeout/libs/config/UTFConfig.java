@@ -146,12 +146,11 @@ public class UTFConfig extends YamlConfiguration {
 						List<String> commentList = comments.get(key);
 						if (commentList != null && !commentList.isEmpty()) {
 							for (String commentLine : commentList) {
-								StringBuilder lineBuilder = new StringBuilder();
 
-								for (int i = 0; i < StringUtils.countMatches(key, "."); i++) lineBuilder.append("  ");
-								lineBuilder.append(commentLine);
+								String lineBuilder = "  ".repeat(Math.max(0, StringUtils.countMatches(key, "."))) +
+										commentLine;
 
-								newLines.add(lineBuilder.toString());
+								newLines.add(lineBuilder);
 							}
 						}
 					}
