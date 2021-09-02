@@ -214,7 +214,7 @@ public class UTFConfig extends YamlConfiguration {
 				});
 	}
 
-	private void updateKeyPath(LinkedList<String> pathBuilder, Matcher keyMatcher) {
+	private void updateKeyPath(@NotNull LinkedList<String> pathBuilder, @NotNull Matcher keyMatcher) {
 		// get Layer
 		int layer = keyMatcher.group(1).length() / 2;
 

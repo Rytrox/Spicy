@@ -28,7 +28,7 @@ public class MineskinBuilder {
      * @param uuid the uuid of the mineskin
      * @return a Future containing the mineskin
      */
-    public static Future<Mineskin> loadMineskin(@NotNull UUID uuid) {
+    public static @NotNull Future<Mineskin> loadMineskin(@NotNull UUID uuid) {
         return MineskinHandler.getMineskin(uuid);
     }
 

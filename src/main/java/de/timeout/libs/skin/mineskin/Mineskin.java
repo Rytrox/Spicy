@@ -4,6 +4,7 @@ import com.google.gson.JsonObject;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.Serializable;
 import java.util.UUID;
@@ -52,7 +53,7 @@ public class Mineskin implements Serializable {
         );
     }
 
-    private UUID fetchTrimmedID(String trimmedID) {
+    private @Nullable UUID fetchTrimmedID(String trimmedID) {
 
         Matcher matcher = UUID_PATTERN.matcher(trimmedID);
 

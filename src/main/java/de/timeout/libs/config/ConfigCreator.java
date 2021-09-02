@@ -10,7 +10,6 @@ import java.util.logging.Logger;
 import de.timeout.libs.log.ColoredLogger;
 
 import org.bukkit.craftbukkit.libs.org.apache.commons.io.IOUtils;
-import org.bukkit.util.FileUtil;
 import org.jetbrains.annotations.NotNull;
 
 public class ConfigCreator {

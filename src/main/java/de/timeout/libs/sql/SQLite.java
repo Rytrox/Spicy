@@ -1,15 +1,12 @@
 package de.timeout.libs.sql;
 
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.sqlite.JDBC;
 import org.sqlite.SQLiteDataSource;
 
 import java.io.File;
-import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.util.Optional;
 
 public class SQLite implements SQL {
 

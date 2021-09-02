@@ -56,7 +56,7 @@ public final class ItemStacks {
      * @return the string
      */
     @NotNull
-    public static String encodeBase64(ItemStack item) throws IOException {
+    public static String encodeBase64(@NotNull ItemStack item) throws IOException {
         try(ByteArrayOutputStream str = new ByteArrayOutputStream();
             BukkitObjectOutputStream data = new BukkitObjectOutputStream(str)) {
             data.writeObject(item);
@@ -72,7 +72,7 @@ public final class ItemStacks {
      * @return the item stack
      */
     @NotNull
-    public static ItemStack decodeBase64(String base64) throws IOException, ClassNotFoundException {
+    public static ItemStack decodeBase64(@NotNull String base64) throws IOException, ClassNotFoundException {
         try(ByteArrayInputStream str = new ByteArrayInputStream(Base64.getDecoder().decode(base64));
             BukkitObjectInputStream data = new BukkitObjectInputStream(str)) {
 
@@ -86,7 +86,7 @@ public final class ItemStacks {
      * @return the json object of the itemstack. Cannot be null
      */
     @NotNull
-    public static JsonObject encodeJson(ItemStack item) {
+    public static JsonObject encodeJson(@NotNull ItemStack item) {
         return new JsonParser().parse(GSON.toJson(item.serialize())).getAsJsonObject();
     }
 
@@ -101,7 +101,7 @@ public final class ItemStacks {
     }
 
     @NotNull
-    public static String getCustomizedName(ItemStack itemStack) {
+    public static String getCustomizedName(@NotNull ItemStack itemStack) {
         // return displayname if item has one
         if(itemStack.getItemMeta() != null && itemStack.getItemMeta().hasDisplayName())
             return itemStack.getItemMeta().getDisplayName();
@@ -263,7 +263,7 @@ public final class ItemStacks {
         return (boolean) Objects.requireNonNull(getNBTValue(item, key, "getBoolean"));
     }
 
-    protected static Object getNBTValue(ItemStack item, String key, String methodName) {
+    private static @Nullable Object getNBTValue(ItemStack item, String key, String methodName) {
         // create NMSCopy
         Object nms = asNMSCopy(item);
 

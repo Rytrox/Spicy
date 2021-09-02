@@ -75,7 +75,7 @@ public class JsonConfig extends FileConfiguration {
 		convertMapsToSections(map, this);
 	}
 
-	private void convertMapsToSections(Map<?, ?> input, ConfigurationSection section) {
+	private void convertMapsToSections(@NotNull Map<?, ?> input, ConfigurationSection section) {
 		input.forEach((key, value) -> {
 			if (value instanceof Map) {
 				convertMapsToSections((Map<?, ?>)value, section.createSection(key.toString()));
@@ -83,7 +83,7 @@ public class JsonConfig extends FileConfiguration {
 		});
 	}
 
-	private JsonObject convertSectionsToJson(ConfigurationSection currentSection) {
+	private @NotNull JsonObject convertSectionsToJson(@NotNull ConfigurationSection currentSection) {
 		JsonObject json = new JsonObject();
 
 		// convert map to json
@@ -106,7 +106,7 @@ public class JsonConfig extends FileConfiguration {
 		return json;
 	}
 
-	private JsonArray convertListToArray(List<?> currentList) {
+	private @NotNull JsonArray convertListToArray(@NotNull List<?> currentList) {
 		JsonArray array = new JsonArray();
 
 		currentList.forEach(element -> {

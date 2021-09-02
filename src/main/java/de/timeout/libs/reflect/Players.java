@@ -3,6 +3,8 @@ package de.timeout.libs.reflect;
 import com.mojang.authlib.GameProfile;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -21,7 +23,8 @@ public class Players {
      * @param player the owner of the GameProfile
      * @return the Gameprofile
      */
-    public static GameProfile getGameProfile(Player player) {
+    @Nullable
+    public static GameProfile getGameProfile(@NotNull Player player) {
         try {
             Class<?> craftplayerClass = Reflections.getCraftBukkitClass("entity.CraftPlayer");
             return craftplayerClass != null ? (GameProfile) craftplayerClass.getMethod("getProfile").invoke(player) : null;
@@ -37,7 +40,8 @@ public class Players {
      * @return the EntityPlayer as Object
      * @throws ReflectiveOperationException if there was an error
      */
-    public static Object getEntityPlayer(Player player) throws ReflectiveOperationException {
+    @NotNull
+    public static Object getEntityPlayer(@NotNull Player player) throws ReflectiveOperationException {
         Method getHandle = player.getClass().getMethod("getHandle");
         return getHandle.invoke(player);
     }
@@ -48,7 +52,8 @@ public class Players {
      * @return the PlayerConnection as Object
      * @throws ReflectiveOperationException if there was an error
      */
-    public static Object getPlayerConnection(Player player) throws ReflectiveOperationException {
+    @NotNull
+    public static Object getPlayerConnection(@NotNull Player player) throws ReflectiveOperationException {
         Object nmsp = getEntityPlayer(player);
         Field con = nmsp.getClass().getField("playerConnection");
         return con.get(nmsp);
@@ -60,7 +65,7 @@ public class Players {
      * @param packet the packet
      * @throws ReflectiveOperationException if the object is not a packet
      */
-    public static void sendPacket(Player player, Object packet) throws ReflectiveOperationException {
+    public static void sendPacket(@NotNull Player player, @NotNull Object packet) throws ReflectiveOperationException {
         Object playerConnection = getPlayerConnection(player);
         playerConnection.getClass().getMethod("sendPacket", packetClass).invoke(playerConnection, packet);
     }

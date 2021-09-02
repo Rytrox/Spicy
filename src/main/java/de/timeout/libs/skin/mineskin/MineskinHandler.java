@@ -9,6 +9,7 @@ import com.google.gson.JsonParser;
 
 import org.bukkit.craftbukkit.libs.org.apache.commons.io.FileUtils;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.io.IOException;
@@ -54,7 +55,7 @@ class MineskinHandler {
 
             });
 
-    public static Future<Mineskin> getMineskin(@NotNull UUID uuid) {
+    public static @NotNull Future<Mineskin> getMineskin(@NotNull UUID uuid) {
         return scheduler.submit(() -> mineskinCache.get(uuid));
     }
 
@@ -115,7 +116,7 @@ class MineskinHandler {
         }, Math.max(REQUEST_TIMEOUT - System.currentTimeMillis(), 0), TimeUnit.MILLISECONDS);
     }
 
-    private static Mineskin parseResponse(HttpRequest request) {
+    private static @Nullable Mineskin parseResponse(HttpRequest request) {
         try {
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
