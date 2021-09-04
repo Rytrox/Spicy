@@ -53,6 +53,11 @@ public class MatrixTest {
     }
 
     @Test
+    public void shouldMultiplyConstant() {
+        assertEquals(new Matrix(new Vector(2, 0, 0), new Vector(0, 2, 0), new Vector(0, 0, 2)), E.multiply(2));
+    }
+
+    @Test
     public void shouldInvert() {
         assertEquals(E.invert(), new Matrix());
         assertEquals(new Matrix(

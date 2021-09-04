@@ -32,7 +32,7 @@ public class Matrix {
     }
 
     /**
-     * Creates a new elementary 3x3-Matrix.
+     * Creates a new unitary 3x3-Matrix.
      */
     public Matrix() {
         A[0] = new double[] { 1D, 0D, 0D };
@@ -237,7 +237,7 @@ public class Matrix {
      * @return the inverted matrix
      */
     public Matrix invert() {
-        // tran
+        // transform when Matrix is orthogonal
         if(isOrthogonal())
             return transform();
 
