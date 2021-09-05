@@ -20,10 +20,10 @@ public class GUICloseEvent extends InventoryCloseEvent implements Cancellable {
 
     private boolean cancel;
 
-    public GUICloseEvent(@NotNull InventoryView transaction) {
+    public GUICloseEvent(@NotNull InventoryView transaction, @NotNull GUI gui) {
         super(transaction);
 
-        this.gui = GUI.getOpenedGUI(getPlayer());
+        this.gui = gui;
     }
 
     @NotNull

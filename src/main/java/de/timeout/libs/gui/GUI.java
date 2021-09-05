@@ -129,13 +129,35 @@ public class GUI {
         this.closeFunction = function;
     }
 
+    public void registerButton(int slot, ItemStack item, Consumer<ButtonClickEvent> clickFunction) {
+        this.design.setItem(slot, item);
+        this.events.put(slot, clickFunction);
+    }
+
+    /*
+     * INTERNAL METHODS!!
+     */
+
     /**
      * ATTENTION: Only internal use <br>
      * Returns the close-Function
      *
      * @return the close-function
      */
+    @Nullable
     Consumer<GUICloseEvent> getCloseFunction() {
         return closeFunction;
+    }
+
+    /**
+     * ATTENTION: Only internal use <br>
+     * Returns the click-function of a certain slot
+     *
+     * @param slot the slot you clicked
+     * @return the clickfunction or null if this function does not exists
+     */
+    @Nullable
+    Consumer<ButtonClickEvent> getClickFunction(int slot) {
+        return this.events.get(slot);
     }
 }
