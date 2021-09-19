@@ -1,28 +1,14 @@
 package de.timeout.libs.sql;
 
-import de.timeout.libs.log.ColoredLogger;
-
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import javax.sql.DataSource;
 import java.sql.*;
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
-import java.util.function.Consumer;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
+import java.util.function.Function;
 
 public class QueryBuilder {
-
-    private static final String EXCEPTION = "Unhandled exception while executing statement: ";
-
-    private static final Executor THREAD_EXECUTOR = Executors.newFixedThreadPool(3);
-    private static final Logger LOGGER = Logger.getLogger("MySQL-Connector");
-
-    static {
-        ColoredLogger.enableColoredLogging('&', LOGGER, "&8[&6MySQL&8]");
-    }
 
     private final String query;
     private final DataSource source;
@@ -62,26 +48,17 @@ public class QueryBuilder {
      *
      * @param result A function that is executed after the ResultSet is received.
      */
-    public void query(@NotNull ThrowableConsumer<ResultSet> result) {
-        THREAD_EXECUTOR.execute(() -> {
+    public <T> CompletableFuture<T> query(@NotNull Function<ResultSet, T> result) {
+        return CompletableFuture.supplyAsync(() -> {
             try(Connection connection = source.getConnection();
                 PreparedStatement statement = prepareStatement(connection, query, args);
                 ResultSet set = statement.executeQuery()) {
 
-                result.accept(set);
+                return result.apply(set);
             } catch (SQLException exception) {
-                LOGGER.log(Level.WARNING, EXCEPTION, exception);
+                throw new CompletionException(exception);
             }
         });
-    }
-
-    /**
-     * Executes any MySQL-Statement. <br>
-     * This method runs asynchronously. <br>
-     *
-     */
-    public void execute() {
-        this.execute(null);
     }
 
     /**
@@ -90,15 +67,14 @@ public class QueryBuilder {
      *
      * @param result a function that is executed after the result bool is received
      */
-    public void execute(@Nullable ThrowableConsumer<Boolean> result) {
-        THREAD_EXECUTOR.execute(() -> {
+    public CompletableFuture<Boolean> execute() {
+        return CompletableFuture.supplyAsync(() -> {
             try(Connection connection = source.getConnection();
                 PreparedStatement statement = prepareStatement(connection, query, args)) {
-                boolean bool = statement.execute();
 
-                if(result != null) result.accept(bool);
+                return statement.execute();
             } catch (SQLException exception) {
-                LOGGER.log(Level.WARNING, EXCEPTION, exception);
+                throw new CompletionException(exception);
             }
         });
     }
@@ -107,39 +83,18 @@ public class QueryBuilder {
      * Executes a default INSERT-Statement. <br>
      * This method runs asynchronously.
      */
-    public void insert() {
-        insert(null);
-    }
-
-    /**
-     * Executes a default INSERT-Statement. <br>
-     * This method runs asynchronously.
-     *
-     * @param result a function that is executed after the result state is received
-     */
-    public void insert(@Nullable ThrowableConsumer<Integer> result) {
-        THREAD_EXECUTOR.execute(() -> {
+    public CompletableFuture<Integer> insert() {
+        return CompletableFuture.supplyAsync(() -> {
             try(Connection connection = source.getConnection();
                 PreparedStatement statement = prepareStatement(connection, query, args, Statement.RETURN_GENERATED_KEYS)) {
                 statement.executeUpdate();
 
                 ResultSet resultSet = statement.getGeneratedKeys();
-                if(result != null && resultSet.next()) {
-                    result.accept(resultSet.getInt(1));
-                }
+                return resultSet.getInt(1);
             } catch (SQLException exception) {
-                LOGGER.log(Level.WARNING, EXCEPTION, exception);
+                throw new CompletionException(exception);
             }
         });
-    }
-
-    /**
-     * Executes a MySQL-Statement like UPDATE, DELETE etc.<br>
-     * This method runs asynchronously.
-     *
-     */
-    public void update() {
-        this.update(null);
     }
 
     /**
@@ -148,35 +103,15 @@ public class QueryBuilder {
      *
      * @param result A function that is executed after the integer result is received.
      */
-    public void update(@Nullable ThrowableConsumer<Integer> result) {
-        THREAD_EXECUTOR.execute(() -> {
+    public CompletableFuture<Integer> update() {
+        return CompletableFuture.supplyAsync(() -> {
             try(Connection connection = source.getConnection();
                 PreparedStatement statement = prepareStatement(connection, query, args)) {
-                int updateValue = statement.executeUpdate();
 
-                if(result != null) result.accept(updateValue);
+                return statement.executeUpdate();
             } catch (SQLException exception) {
-                LOGGER.log(Level.WARNING, EXCEPTION, exception);
+                throw new CompletionException(exception);
             }
         });
-    }
-
-    /**
-     * Interface which allows Exception-Throwing while consuming
-     * @param <T> the Type of the Consumer
-     */
-    @FunctionalInterface
-    public interface ThrowableConsumer<T> extends Consumer<T> {
-
-        @Override
-        default void accept(T t) {
-            try {
-                this.acceptWithThrows(t);
-            } catch (Exception e) {
-                LOGGER.log(Level.WARNING, "Unhandled exception while accepting consumer", e);
-            }
-        }
-
-        void acceptWithThrows(T t) throws Exception;
     }
 }
