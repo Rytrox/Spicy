@@ -70,14 +70,17 @@ public class ItemStacksTest {
     @Test
     public void shouldDecodeJSONToItemStack() throws IllegalAccessException {
         // Tear up mock-methods (MockBukkit doesn't support ItemStack.deserialize yet...)
-        Mockito.when(ItemStack.deserialize(Mockito.any()))
-                .thenAnswer((inheritance) -> new ItemStack(itemStack));
-        FieldUtils.writeDeclaredStaticField(ItemStacks.class, "GSON", new Gson(), true);
+        try(MockedStatic<ItemStack> mockedStatic = Mockito.mockStatic(ItemStack.class, Mockito.CALLS_REAL_METHODS)) {
+            mockedStatic.when(() -> ItemStack.deserialize(Mockito.any()))
+                    .thenAnswer((invocation) -> new ItemStack(itemStack));
 
-        JsonObject element = ItemStacks.encodeJson(itemStack);
-        ItemStack copy = ItemStacks.decodeJson(element);
+            FieldUtils.writeDeclaredStaticField(ItemStacks.class, "GSON", new Gson(), true);
 
-        assertEquals(this.itemStack, copy);
+            JsonObject element = ItemStacks.encodeJson(itemStack);
+            ItemStack copy = ItemStacks.decodeJson(element);
+
+            assertEquals(this.itemStack, copy);
+        }
     }
 
     @Test
@@ -121,7 +124,7 @@ public class ItemStacksTest {
             String name = ItemStacks.getCustomizedName(itemStack);
             assertEquals("Test", name);
 
-            mockedStatic.verify(Mockito.times(1), () -> WordUtils.capitalize(Mockito.anyString()));
+            mockedStatic.verify(() -> WordUtils.capitalize(Mockito.anyString()), Mockito.times(1));
         }
     }
 }

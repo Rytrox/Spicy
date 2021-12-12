@@ -6,3 +6,5 @@ target/
 Libs.iml
 
 LibsRebuild.iml
+
+src/test/resources/mysql.yml
