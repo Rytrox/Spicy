@@ -7,3 +7,5 @@ Libs.iml
 
 LibsRebuild.iml
 /logs
+
+src/test/resources/mysql.yml

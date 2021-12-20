@@ -10,6 +10,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.SQLException;
 
+import static org.junit.Assert.*;
+
 public class SQLiteTest {
 
     private SQLite sql;
@@ -25,30 +27,29 @@ public class SQLiteTest {
 
     @Test
     public void shouldGetCorrectValues() throws SQLException {
-        sql.prepare("SELECT * FROM Test1 WHERE 1")
-                .query(Assert::assertNotNull);
+        sql.prepare("SELECT * FROM Test2 WHERE 1")
+                .query(Test1.class)
+                .subscribe(Assert::assertNotNull);
     }
 
     @Test
     public void shouldInsertValues() throws SQLException {
-        sql.prepare("INSERT INTO Test1(id, name) VALUES (?, ?)", 408, "Timeout")
+        sql.prepare("INSERT INTO Test2(id, name) VALUES (?, ?)", 408, "Timeout")
                 .update();
-        sql.prepare("INSERT INTO Test1(id, name) VALUES (?, ?)", 701, "Sether")
+        sql.prepare("INSERT INTO Test2(id, name) VALUES (?, ?)", 701, "Sether")
                 .update();
 
         sql.prepare("SELECT * FROM Test1 WHERE 1")
-                .query(resultSet -> {
-                    while(resultSet.next()) {
-                        System.out.println("ID: " + resultSet.getInt("id"));
-                        System.out.println("Name: " + resultSet.getString("name"));
-                    }
-//                    resultSet.next();
-//                    assertEquals(408, resultSet.getInt("id"));
-//                    assertEquals("Timeout", resultSet.getString("name"));
-//
-//                    resultSet.next();
-//                    assertEquals(701, resultSet.getInt("id"));
-//                    assertEquals("Sether", resultSet.getString("name"));
+                .query(Test1.class)
+                .subscribe((elements) -> {
+                    Test1 timeout = elements.get(0);
+                    Test1 sether = elements.get(1);
+
+                    assertEquals(408, timeout.getId());
+                    assertEquals("Timeout", timeout.getName());
+
+                    assertEquals(701, sether.getId());
+                    assertEquals("Sether", sether.getName());
                 });
     }
 
