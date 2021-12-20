@@ -7,7 +7,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
-import org.bukkit.craftbukkit.libs.org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FileUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -22,6 +22,7 @@ import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.*;
 import java.util.logging.Level;
@@ -40,7 +41,7 @@ class MineskinHandler {
             .build(new CacheLoader<>() {
 
                 @Override
-                public Mineskin load(@NotNull UUID id) throws Exception {
+                public @NotNull Mineskin load(@NotNull UUID id) throws Exception {
                     // Load from Mineskin-API:
                     HttpRequest request = HttpRequest.newBuilder()
                             .GET()
@@ -50,7 +51,7 @@ class MineskinHandler {
                     Thread.sleep(Math.max(System.currentTimeMillis() - REQUEST_TIMEOUT, 0));
 
                     // send Request
-                    return parseResponse(request);
+                    return Objects.requireNonNull(parseResponse(request));
                 }
 
             });
@@ -121,7 +122,7 @@ class MineskinHandler {
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
             if(response.statusCode() == 200) {
-                JsonObject object = new JsonParser().parse(response.body()).getAsJsonObject();
+                JsonObject object = JsonParser.parseString(response.body()).getAsJsonObject();
                 Mineskin mineskin = new Mineskin(object);
 
                 // cache

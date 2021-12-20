@@ -1,8 +1,8 @@
 package de.timeout.libs.math;
 
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.bukkit.Location;
-import org.bukkit.craftbukkit.libs.org.apache.commons.lang3.builder.EqualsBuilder;
-import org.bukkit.craftbukkit.libs.org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 

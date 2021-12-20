@@ -3,12 +3,12 @@ package de.timeout.libs.item;
 import be.seeseemelk.mockbukkit.MockBukkit;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-import net.minecraft.server.v1_16_R3.LocaleLanguage;
-import net.minecraft.server.v1_16_R3.NBTTagCompound;
+import net.minecraft.locale.LocaleLanguage;
+import net.minecraft.nbt.NBTTagCompound;
 import org.apache.commons.lang.WordUtils;
 import org.apache.commons.lang.reflect.FieldUtils;
 import org.bukkit.Material;
-import org.bukkit.craftbukkit.v1_16_R3.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.v1_18_R1.inventory.CraftItemStack;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.junit.After;
@@ -35,7 +35,7 @@ public class ItemStacksTest {
 
     private final ItemStack itemStack = new ItemStack(Material.STONE);
 
-    private final Class<?> itemstackClass = net.minecraft.server.v1_16_R3.ItemStack.class;
+    private final Class<?> itemstackClass = net.minecraft.world.item.ItemStack.class;
     private final Class<?> craftItemStackClass = CraftItemStack.class;
     private final Class<?> nbttagcompoundClass = NBTTagCompound.class;
     private final Class<?> localelanguageClass = LocaleLanguage.class;
@@ -121,7 +121,7 @@ public class ItemStacksTest {
             String name = ItemStacks.getCustomizedName(itemStack);
             assertEquals("Test", name);
 
-            mockedStatic.verify(Mockito.times(1), () -> WordUtils.capitalize(Mockito.anyString()));
+            mockedStatic.verify(() -> WordUtils.capitalize(Mockito.anyString()), Mockito.times(1));
         }
     }
 }
