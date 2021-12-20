@@ -1,13 +1,11 @@
 package de.timeout.libs.item;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.logging.Level;
 
-import de.timeout.libs.reflect.Reflections;
+import net.minecraft.nbt.*;
 import org.apache.commons.lang.Validate;
+import org.apache.commons.lang3.reflect.FieldUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
@@ -18,13 +16,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class ItemStackBuilder {
-
-    private static final Class<?> itemstackClass = Reflections.getNMSClass("ItemStack");
-    private static final Class<?> nbttagcompoundClass = Reflections.getNMSClass("NBTTagCompound");
-
-    private static final String HAS_TAG = "hasTag";
-    private static final String GET_TAG = "getTag";
-    private static final String SET_TAG = "setTag";
 
     private static final String NBT_ERROR = "Cannot write NBT-Data in ";
 
@@ -194,81 +185,47 @@ public class ItemStackBuilder {
      * @param value the value you want to write in this key
      * @return the builder to continue
      */
-    public ItemStackBuilder writeNBTInt(String key, int value) {
+    public <T> ItemStackBuilder writeNBTData(String key, T value) {
         try {
-            writeNBT(key, value, "setInt", int.class);
-        } catch (ReflectiveOperationException e) {
+            net.minecraft.world.item.ItemStack handle = (net.minecraft.world.item.ItemStack)
+                    FieldUtils.readField(this.currentBuilding, "handle", true);
+
+            NBTTagCompound compound = Optional.ofNullable(handle.s())
+                    .orElse(new NBTTagCompound());
+
+            NBTBase base = convertToNBTBase(value);
+            if(base != null) {
+                // Add key to compound
+                compound.a(key, base);
+
+                // Set Compound in itemStack
+                handle.c(compound);
+            } else throw new IllegalArgumentException("Cannot convert " + value.getClass().getSimpleName() + " to NBT-Data");
+        } catch (IllegalAccessException e) {
             Bukkit.getLogger().log(Level.SEVERE, e, () -> NBT_ERROR + key);
         }
+
+
         // return this to continue
         return this;
     }
 
-    /**
-     * This Method writes the NBT-Tag with an Boolean as value in a certain key
-     * @param key the key of the tag
-     * @param value the value you want to write in this key
-     * @return the builder to continue
-     */
-    public ItemStackBuilder writeNBTBoolean(@NotNull String key, boolean value) {
-        // Validate
-
-        try {
-            writeNBT(key, value, "setBoolean", boolean.class);
-        } catch (ReflectiveOperationException e) {
-            Bukkit.getLogger().log(Level.SEVERE, e, () -> NBT_ERROR + key);
-        }
-        // return this to continue
-        return this;
-    }
-
-    /**
-     * This Method writes the NBT-Tag with an String as value in a certain key
-     * @param key the key of the tag
-     * @param value the value you want to write in this key
-     * @return the builder to continue
-     */
-    public ItemStackBuilder writeNBTString(@NotNull String key, String value) {
-        // Validate
-        Validate.isTrue(!key.isEmpty(), "Unable to write NBT without a key");
-
-        try {
-            writeNBT(key, value, "setString", String.class);
-        } catch (ReflectiveOperationException e) {
-            Bukkit.getLogger().log(Level.SEVERE, e, () -> NBT_ERROR + key);
-        }
-        // return this to continue
-        return this;
-    }
-
-    /**
-     * Internal method for accessing and modifying NBT-TagCompound.
-     *
-     * @param <T> the datatype which will be accessed
-     * @param key the name of the key where this data will be stored
-     * @param value the data itself
-     * @param methodName the name of the internal NMS-Method to insert the data with the right type at the right place
-     * @param clazz the class instance of the type T
-     * @throws ReflectiveOperationException if working with reflections failed
-     */
-    protected <T> void writeNBT(String key, T value, String methodName, Class<T> clazz) throws ReflectiveOperationException {
-        // create nms-copy
-        Object nms = ItemStacks.asNMSCopy(currentBuilding);
-        if(nms != null) {
-            // get tagcompound
-            Object compound = (boolean) itemstackClass.getMethod(HAS_TAG).invoke(nms) ?
-                    itemstackClass.getMethod(GET_TAG).invoke(nms) : nbttagcompoundClass.getConstructor().newInstance();
-
-            if(compound != null) {
-                // write data in compound
-                nbttagcompoundClass.getMethod(methodName, String.class, clazz).invoke(compound, key, value);
-                // set tagcompound in item
-                itemstackClass.getMethod(SET_TAG, nbttagcompoundClass).invoke(nms, compound);
-
-                // save new itemstack
-                currentBuilding = ItemStacks.asBukkitCopy(nms);
-            }
-        }
+    private <T> NBTBase convertToNBTBase(@NotNull T value) {
+        return switch (value) {
+            case Boolean b -> NBTTagByte.a(b);
+            case Byte b -> NBTTagByte.a(b);
+            case Short s -> NBTTagShort.a(s);
+            case Integer i -> NBTTagInt.a(i);
+            case Long l -> NBTTagLong.a(l);
+            case Float f -> NBTTagFloat.a(f);
+            case Double d -> NBTTagDouble.a(d);
+            case String s -> NBTTagString.a(s);
+            case UUID uuid -> GameProfileSerializer.a(uuid);
+            case byte[] b -> new NBTTagByteArray(b);
+            case int[] i -> new NBTTagIntArray(i);
+            case long[] l -> new NBTTagLongArray(l);
+            default -> null;
+        };
     }
 
     protected static @NotNull ItemMeta getSafeItemMeta(ItemStack item) {

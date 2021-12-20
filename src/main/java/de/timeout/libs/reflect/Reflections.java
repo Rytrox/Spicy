@@ -25,7 +25,7 @@ public class Reflections {
      * @return the searched field or null if the field cannot be found.
      */
     @Nullable
-    public static Field getField(Class<?> clazz, String... names) {
+    public static Field getField(@NotNull Class<?> clazz, @NotNull String... names) {
         Validate.notEmpty(names, "Names cannot be empty");
 
         return Arrays.stream(names)
@@ -43,7 +43,7 @@ public class Reflections {
      * @return the field or null if the field could not be found
      */
     @Nullable
-    public static Field getField(Class<?> clazz, Class<?> type, String... names) {
+    public static Field getField(@NotNull Class<?> clazz, @NotNull Class<?> type, @NotNull String... names) {
         // Validate
         Validate.notEmpty(names, "Names cannot be empty");
 
@@ -62,7 +62,8 @@ public class Reflections {
      * @param obj the object you want to read
      * @return the value, which you are looking for. null if there were an error
      */
-    public static @NotNull Object getValue(Field field, Object obj) throws IllegalAccessException {
+    @NotNull
+    public static Object getValue(@NotNull Field field, @NotNull Object obj) throws IllegalAccessException {
         return FieldUtils.readField(field, obj, true);
     }
 
@@ -77,7 +78,7 @@ public class Reflections {
      * @return the found field or null if the field does not exist
      */
     @Nullable
-    public static <T> T getSafeValueFromDeclaredField(Object value, String name, Class<T> type) {
+    public static <T> T getSafeValueFromDeclaredField(@NotNull Object value, @NotNull String name, @NotNull Class<T> type) {
         Field field = getField(value.getClass(), type, name);
 
         if(field != null) {
@@ -191,7 +192,7 @@ public class Reflections {
         return loadClass("[Lorg.bukkit.craftbukkit.%s.%s;", clazz);
     }
 
-    private static Class<?> loadClass(String subpackage, String clazz) {
+    private static @Nullable Class<?> loadClass(String subpackage, String clazz) {
         String version = Bukkit.getServer().getClass().getPackage().getName().split("\\.")[3];
 
         String name = String.format(subpackage, version, clazz);

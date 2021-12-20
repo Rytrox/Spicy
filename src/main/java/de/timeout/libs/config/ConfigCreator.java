@@ -9,26 +9,23 @@ import java.util.logging.Logger;
 
 import de.timeout.libs.log.ColoredLogger;
 
-import org.bukkit.craftbukkit.libs.org.apache.commons.io.IOUtils;
+import org.apache.commons.io.IOUtils;
 import org.jetbrains.annotations.NotNull;
 
-public class ConfigCreator {
-	
+public record ConfigCreator(File pluginDataFolder, Path configDirectory) {
+
 	private static final Logger logger = Logger.getLogger("ConfigCreator");
 
 	static {
 		ColoredLogger.enableColoredLogging('&', logger, "&8[&6Libs&8]");
 	}
 
-	protected final File pluginDataFolder;
-	protected final Path configDirectory;
-
 	/**
 	 * Creates a new ConfigCreator
 	 *
 	 * @param pluginDataFolder the Plugin-Folder of your plugin
-	 * @param configDirectory the Path of your Config directory. Start like this:
-	 *                        Paths.get("subfolder1", "subfolder2");
+	 * @param configDirectory  the Path of your Config directory. Start like this:
+	 *                         Paths.get("subfolder1", "subfolder2");
 	 */
 	public ConfigCreator(@NotNull File pluginDataFolder, @NotNull Path configDirectory) {
 		this.configDirectory = configDirectory;
@@ -40,17 +37,18 @@ public class ConfigCreator {
 	 * If the specified file cannot be found, a FileNotFoundException is thrown.
 	 *
 	 * @param fromPath the subpath of the config you want to load from
-	 * @param toPath the subpath where the file should be copied
+	 * @param toPath   the subpath where the file should be copied
 	 * @return the file with the content inside the datafolder
-	 * @throws IOException if your disk is unwritable or any path could not be found
+	 * @throws IOException              if your disk is unwritable or any path could not be found
 	 * @throws IllegalArgumentException if any argument is null
 	 */
+	@NotNull
 	public File copyDefaultFile(@NotNull Path fromPath, @NotNull Path toPath) throws IOException {
 		// create new file if not exists
 		File file = createFile(toPath);
 
 		// try to get FileStream
-		if(file.length() <= 2) {
+		if (file.length() <= 2) {
 			try (InputStream in = this.getClass().getClassLoader().getResourceAsStream(fromPath.toString());
 				 FileWriter out = new FileWriter(file)) {
 				// check if file was found
@@ -69,21 +67,22 @@ public class ConfigCreator {
 	 *
 	 * @param filePath the subpath of the new file. Starting from the plugin's datafolder. Cannot be null
 	 * @return the created file
-	 * @throws IOException if the disk is not writable
+	 * @throws IOException              if the disk is not writable
 	 * @throws IllegalArgumentException if the parameter is null
 	 */
+	@NotNull
 	public File createFile(@NotNull Path filePath) throws IOException {
 		Path configFile = pluginDataFolder.toPath().resolve(filePath);
 
 		// Create datafolder
 		Files.createDirectories(configFile.getParent());
 
-		if(!configFile.toFile().exists()) {
+		if (!configFile.toFile().exists()) {
 			Files.createFile(configFile);
 
 			logger.log(Level.FINE, "&7Created new file {0} in datafolder", configFile.getFileName());
 		}
-		
+
 		return configFile.toFile();
 	}
 }

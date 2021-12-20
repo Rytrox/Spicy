@@ -6,15 +6,15 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Base64;
 import java.util.Map;
-import java.util.Objects;
+import java.util.Optional;
 import java.util.logging.Level;
 
 import de.timeout.libs.reflect.Reflections;
 
+import net.minecraft.nbt.NBTTagCompound;
 import org.apache.commons.lang.reflect.MethodUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.apache.commons.lang.Validate;
 import org.apache.commons.lang.WordUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.inventory.ItemStack;
@@ -34,14 +34,6 @@ import com.google.gson.internal.bind.JsonTreeReader;
  *
  */
 public final class ItemStacks {
-
-    private static final Class<?> itemstackClass = Reflections.getNMSClass("ItemStack");
-    private static final Class<?> craftitemstackClass = Reflections.getCraftBukkitClass("inventory.CraftItemStack");
-    private static final Class<?> nbttagcompoundClass = Reflections.getNMSClass("NBTTagCompound");
-    private static final Class<?> localelanguageClass = Reflections.getNMSClass("LocaleLanguage");
-
-    private static final String ERROR_NO_NBT_TAG = "ItemStack has no NBT-Tag";
-    private static final String ERROR_FAILED_GET_NBT_TAG = "Cannot get NMS-Copy of item ";
 
     private static final Gson GSON = new Gson();
 
@@ -87,7 +79,7 @@ public final class ItemStacks {
      */
     @NotNull
     public static JsonObject encodeJson(@NotNull ItemStack item) {
-        return new JsonParser().parse(GSON.toJson(item.serialize())).getAsJsonObject();
+        return JsonParser.parseString(GSON.toJson(item.serialize())).getAsJsonObject();
     }
 
     /**
@@ -106,27 +98,11 @@ public final class ItemStacks {
         if(itemStack.getItemMeta() != null && itemStack.getItemMeta().hasDisplayName())
             return itemStack.getItemMeta().getDisplayName();
 
-        // get nmsItem
-        Object nmsItem = getNMSItem(itemStack);
-
         // only continue if the item could be found
-        if(nmsItem != null) {
-            try {
-                String name = (String) MethodUtils.invokeExactMethod(nmsItem, "getName", null);
-
-                if(name != null) {
-                    Object localLanguage =
-                            Reflections.getValue(Reflections.getField(localelanguageClass, "d"), localelanguageClass);
-
-                    return (String) MethodUtils.invokeExactMethod(localLanguage, "a", name);
-                }
-            } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
-                Bukkit.getLogger().log(Level.WARNING, "Unable to get name of itemstack. Continue with normal name");
-            }
-        }
-
-        // return ItemStack name if no name could be found
-        return WordUtils.capitalize(itemStack.getType().toString());
+        // otherwise return ItemStack type name
+        return Optional.ofNullable(asNMSCopy(itemStack))
+                .map((item) -> item.v().a())
+                .orElse(WordUtils.capitalize(itemStack.getType().toString()));
     }
 
     /**
@@ -135,9 +111,10 @@ public final class ItemStacks {
      * @return the nms itemstack as object type
      */
     @Nullable
-    public static Object asNMSCopy(ItemStack item) {
+    public static net.minecraft.world.item.ItemStack asNMSCopy(ItemStack item) {
         try {
-            return MethodUtils.invokeStaticMethod(craftitemstackClass, "asNMSCopy", item);
+            return (net.minecraft.world.item.ItemStack) MethodUtils.invokeStaticMethod(
+                    Reflections.getCraftBukkitClass("inventory.CraftItemStack"), "asNMSCopy", item);
         } catch (IllegalAccessException e) {
             Bukkit.getLogger().log(Level.SEVERE, "Unable to create NMS-Copy of an itemstack: ", e);
         } catch (IllegalArgumentException e) {
@@ -154,29 +131,13 @@ public final class ItemStacks {
     }
 
     @Nullable
-    public static Object getNMSItem(ItemStack item) {
-        // get nms item
+    public static ItemStack asBukkitCopy(@NotNull net.minecraft.world.item.ItemStack nmsItem) {
         try {
-            Object nms = asNMSCopy(item);
+            Class<?> craftitemstackClass = Reflections.getCraftBukkitClass("inventory.CraftItemStack");
 
-            if(nms != null) {
-                return MethodUtils.invokeExactMethod(nms, "getItem", null);
-            }
-        } catch (IllegalAccessException e) {
-            Bukkit.getLogger().log(Level.WARNING, "Unable to access ItemStack#getItem in NMS ItemStack", e);
-        } catch (InvocationTargetException e) {
-            Bukkit.getLogger().log(Level.WARNING, "Unable to access ItemStack#getItem. No such target", e);
-        } catch (NoSuchMethodException e) {
-            Bukkit.getLogger().log(Level.WARNING, "Unable to find Method ");
-        }
-
-        return null;
-    }
-
-    @Nullable
-    public static ItemStack asBukkitCopy(Object nmsItem) {
-        try {
-            return (ItemStack) craftitemstackClass.getMethod("asBukkitCopy", itemstackClass).invoke(craftitemstackClass, nmsItem);
+            return (ItemStack) craftitemstackClass
+                    .getMethod("asBukkitCopy", net.minecraft.world.item.ItemStack.class)
+                    .invoke(craftitemstackClass, nmsItem);
         } catch (IllegalAccessException e) {
             Bukkit.getLogger().log(Level.SEVERE, "Unable to create Bukkit-Copy of an itemstack: ", e);
         } catch (IllegalArgumentException e) {
@@ -193,95 +154,311 @@ public final class ItemStacks {
     }
 
     @Nullable
-    public static Object getNBTTagCompound(ItemStack item) {
-        // create NMS itemstack
-        Object nms = asNMSCopy(item);
-
-        // return null if itemstack is null
-        if(nms != null) {
-            try {
-                if((boolean) MethodUtils.invokeExactMethod(nms, "hasTag", null)) {
-                    return MethodUtils.invokeExactMethod(nms, "getTag", null);
-                }
-            } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
-                Bukkit.getLogger().log(Level.WARNING, "Unable to check up NBT-TagCompound", e);
-            }
-        }
-
-        return null;
-    }
-
-    public static boolean hasNBTValue(ItemStack item, String key) {
-        // get Compound
-        Object compound = getNBTTagCompound(item);
-
-        // only search if compound exists!
-        if(compound != null) {
-            try {
-                // return if key exist
-                return (boolean) MethodUtils.invokeExactMethod(compound, "hasKey", key);
-            } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
-                Bukkit.getLogger().log(Level.SEVERE, e, () -> ERROR_FAILED_GET_NBT_TAG + key);
-            }
-        }
-
-        return false;
+    public static NBTTagCompound getNBTTagCompound(@NotNull ItemStack item) {
+        // return null if itemstack is null otherwise return nbt-tag compound
+        return Optional.ofNullable(asNMSCopy(item))
+                .map(net.minecraft.world.item.ItemStack::s)
+                .orElse(null);
     }
 
     /**
-     * Returns the value of an integer stored in that key.
-     * If the value could not be found it will throw a NullPointerException
-     * @param item the item which stores the data
-     * @param key the key where the data is stored
-     * @return the integer value
-     * @throws NullPointerException if the value could not be found
-     */
-    public static int getNBTIntValue(ItemStack item, String key) {
-        return (int) Objects.requireNonNull(getNBTValue(item, key, "getInt"));
-    }
-
-    /**
-     * Returns the string value which is stored inside of the NBT-Key
+     * Returns a boolean value that is stored inside the NBT-Data under a certain key
+     *
      * @param item the item where the value is stored
      * @param key the NBT-Key where the data is stored
-     * @return the String-Data itself. Cannot be null
-     * @throws NullPointerException if the value could not be found or is null
+     *
+     * @return the stored boolean or false if the item does not have tags or the key does not exist
      */
-    @NotNull
-    public static String getNBTStringValue(ItemStack item, String key) {
-        return (String) Objects.requireNonNull(getNBTValue(item, key, "getString"));
+    public static boolean getNBTBoolean(ItemStack item, String key) {
+        return Optional.ofNullable(getNBTTagCompound(item))
+                .map((compound) -> compound.q(key))
+                .orElse(false);
     }
 
     /**
-     * Returns the boolean value which is stored inside of the NBT-Key
+     * Returns a boolean value that is stored inside the NBT-Data under a certain key
+     *
      * @param item the item where the value is stored
      * @param key the NBT-Key where the data is stored
-     * @return the boolean itself.
-     * @throws NullPointerException if the value could not be found
+     * @param def the default value that will be returned when no such key exists
+     *
+     * @return the stored value or the def
      */
-    public static boolean getNBTBooleanValue(ItemStack item, String key) {
-        return (boolean) Objects.requireNonNull(getNBTValue(item, key, "getBoolean"));
+    public static boolean getNBTBoolean(ItemStack item, String key, boolean def) {
+        return Optional.ofNullable(getNBTTagCompound(item))
+                .filter((compound) -> compound.e(key))
+                .map((compound) -> compound.q(key))
+                .orElse(def);
     }
 
-    private static @Nullable Object getNBTValue(ItemStack item, String key, String methodName) {
-        // create NMSCopy
-        Object nms = asNMSCopy(item);
+    /**
+     * Returns a byte value that is stored inside the NBT-Data under a certain key
+     *
+     * @param item the item where the value is stored
+     * @param key the key destination of the value
+     *
+     * @return the stored value or the byte 0 if no such key exists
+     */
+    public static byte getNBTByte(ItemStack item, String key) {
+        return Optional.ofNullable(getNBTTagCompound(item))
+                .map((compound) -> compound.f(key))
+                .orElse((byte) 0);
+    }
 
-        if(nms != null) {
-            try {
-                // validate
-                Validate.isTrue((boolean)
-                        MethodUtils.invokeExactMethod(nms, "hasTag", null), ERROR_NO_NBT_TAG);
-                // get compound
-                Object compound = MethodUtils.invokeExactMethod(nms, "getTag", null);
+    /**
+     * Returns a byte value that is stored inside the NBT-Date under a certain key
+     *
+     * @param item the item where the value is stored
+     * @param key the key destination of the value
+     * @param def the default value that will be returned if no such key exists
+     *
+     * @return the stored value or def
+     */
+    public static byte getNBTByte(ItemStack item, String key, byte def) {
+        return Optional.ofNullable(getNBTTagCompound(item))
+                .filter((compound) -> compound.e(key))
+                .map((compound) -> compound.f(key))
+                .orElse(def);
+    }
 
-                // return value
-                return nbttagcompoundClass.getMethod(methodName, String.class).invoke(compound, key);
-            } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException | SecurityException e) {
-                Bukkit.getLogger().log(Level.SEVERE, () -> ERROR_FAILED_GET_NBT_TAG + key);
-            }
-        }
+    /**
+     * Returns a short value that is stored inside the NBT-Data under a certain key
+     *
+     * @param item the item where the value is stored
+     * @param key the key destination of the value
+     *
+     * @return the stored value or the byte 0 if no such key exists
+     */
+    public static short getNBTShort(ItemStack item, String key) {
+        return Optional.ofNullable(getNBTTagCompound(item))
+                .map((compound) -> compound.g(key))
+                .orElse((short) 0);
+    }
 
-        return null;
+    /**
+     * Returns a short value that is stored inside the NBT-Data under a certain key
+     *
+     * @param item the item where the value is stored
+     * @param key the key destination of the value
+     * @param def the default value that will be returned if no such key exists
+     *
+     * @return the stored value or def
+     */
+    public static short getNBTShort(ItemStack item, String key, short def) {
+        return Optional.ofNullable(getNBTTagCompound(item))
+                .filter((compound) -> compound.e(key))
+                .map((compound) -> compound.g(key))
+                .orElse(def);
+    }
+
+    /**
+     * Returns an integer value that is stored inside the NBT-Data under a certain key
+     *
+     * @param item the item where the value is stored
+     * @param key the key destination of the value
+     *
+     * @return the stored value or value 0 if no such key exists
+     */
+    public static int getNBTInt(ItemStack item, String key) {
+        return Optional.ofNullable(getNBTTagCompound(item))
+                .map((compound) -> compound.h(key))
+                .orElse(0);
+    }
+
+    /**
+     * Returns an integer value that is stored inside the NBT-Data under a certain key
+     *
+     * @param item the item where the value is stored
+     * @param key the key destination of the value
+     * @param def the default value that will be returned if no such key exists
+     *
+     * @return the stored value or def
+     */
+    public static int getNBTInt(ItemStack item, String key, int def) {
+        return Optional.ofNullable(getNBTTagCompound(item))
+                .filter((compound) -> compound.e(key))
+                .map((compound) -> compound.h(key))
+                .orElse(def);
+    }
+
+    /**
+     * Returns a float value that is stored inside the NBT-Data under a certain key
+     *
+     * @param item the item where the value is stored
+     * @param key the key destination of the value
+     *
+     * @return the stored value or value 0 if no such key exists
+     */
+    public static float getNBTFloat(ItemStack item, String key) {
+        return Optional.ofNullable(getNBTTagCompound(item))
+                .map((compound) -> compound.j(key))
+                .orElse(0F);
+    }
+
+    /**
+     * Returns a float value that is stored inside the NBT-Data under a certain key
+     *
+     * @param item the item where the value is stored
+     * @param key the key destination of the value
+     * @param def the default value that will be returned if no such key exists
+     *
+     * @return the stored value or def
+     */
+    public static float getNBTFloat(ItemStack item, String key, float def) {
+        return Optional.ofNullable(getNBTTagCompound(item))
+                .filter((compound) -> compound.e(key))
+                .map((compound) -> compound.j(key))
+                .orElse(def);
+    }
+
+    /**
+     * Returns a double value that is stored inside the NBT-Data under a certain key
+     *
+     * @param item the item where the value is stored
+     * @param key the key destination of the value
+     *
+     * @return the stored value or value 0 if no such key exists
+     */
+    public static double getNBTDouble(ItemStack item, String key) {
+        return Optional.ofNullable(getNBTTagCompound(item))
+                .map((compound) -> compound.k(key))
+                .orElse(0D);
+    }
+
+    /**
+     * Returns a double value that is stored inside the NBT-Data under a certain key
+     *
+     * @param item the item where the value is stored
+     * @param key the key destination of the value
+     * @param def the default value that will be returned if no such key exists
+     *
+     * @return the stored value or def
+     */
+    public static double getNBTDouble(ItemStack item, String key, double def) {
+        return Optional.ofNullable(getNBTTagCompound(item))
+                .filter((compound) -> compound.e(key))
+                .map((compound) -> compound.k(key))
+                .orElse(def);
+    }
+
+    /**
+     * Returns a String value that is stored inside the NBT-Data under a certain key
+     *
+     * @param item the item where the value is stored
+     * @param key the key destination of the value
+     *
+     * @return the stored value or an empty string if no such key exists
+     */
+    public static String getNBTString(ItemStack item, String key) {
+        return Optional.ofNullable(getNBTTagCompound(item))
+                .map((compound) -> compound.l(key))
+                .orElse("");
+    }
+
+    /**
+     * Returns a double value that is stored inside the NBT-Data under a certain key
+     *
+     * @param item the item where the value is stored
+     * @param key the key destination of the value
+     * @param def the default value that will be returned if no such key exists
+     *
+     * @return the stored value or def
+     */
+    public static String getNBTDouble(ItemStack item, String key, String def) {
+        return Optional.ofNullable(getNBTTagCompound(item))
+                .filter((compound) -> compound.e(key))
+                .map((compound) -> compound.l(key))
+                .orElse(def);
+    }
+
+    /**
+     * Returns a byte array that is stored inside the NBT-Data under a certain key
+     *
+     * @param item the item where the array is stored
+     * @param key the key destination of the array
+     *
+     * @return the stored array or an empty byte array with length 0 if no such key exists
+     */
+    public static byte[] getNBTByteArray(ItemStack item, String key) {
+        return Optional.ofNullable(getNBTTagCompound(item))
+                .map((compound) -> compound.m(key))
+                .orElse(new byte[0]);
+    }
+
+    /**
+     * Returns a byte array that is stored inside the NBT-Data under a certain key
+     *
+     * @param item the item where the array is stored
+     * @param key the key destination of the array
+     * @param def the default array that will be returned if no such key exists
+     *
+     * @return the stored array or def
+     */
+    public static byte[] getNBTByteArray(ItemStack item, String key, byte[] def) {
+        return Optional.ofNullable(getNBTTagCompound(item))
+                .filter((compound) -> compound.e(key))
+                .map((compound) -> compound.m(key))
+                .orElse(def);
+    }
+
+
+    /**
+     * Returns an integer array that is stored inside the NBT-Data under a certain key
+     *
+     * @param item the item where the array is stored
+     * @param key the key destination of the array
+     *
+     * @return the stored array or an empty integer array with length 0 if no such key exists
+     */
+    public static int[] getNBTIntArray(ItemStack item, String key) {
+        return Optional.ofNullable(getNBTTagCompound(item))
+                .map((compound) -> compound.n(key))
+                .orElse(new int[0]);
+    }
+
+    /**
+     * Returns an integer array that is stored inside the NBT-Data under a certain key
+     *
+     * @param item the item where the array is stored
+     * @param key the key destination of the array
+     * @param def the default array that will be returned if no such key exists
+     *
+     * @return the stored array or def
+     */
+    public static int[] getNBTIntArray(ItemStack item, String key, int[] def) {
+        return Optional.ofNullable(getNBTTagCompound(item))
+                .filter((compound) -> compound.e(key))
+                .map((compound) -> compound.n(key))
+                .orElse(def);
+    }
+
+    /**
+     * Returns a long array that is stored inside the NBT-Data under a certain key
+     *
+     * @param item the item where the array is stored
+     * @param key the key destination of the array
+     *
+     * @return the stored array or an empty integer array with length 0 if no such key exists
+     */
+    public static long[] getNBTLongArray(ItemStack item, String key) {
+        return Optional.ofNullable(getNBTTagCompound(item))
+                .map((compound) -> compound.o(key))
+                .orElse(new long[0]);
+    }
+
+    /**
+     * Returns a long array that is stored inside the NBT-Data under a certain key
+     *
+     * @param item the item where the array is stored
+     * @param key the key destination of the array
+     * @param def the default array that will be returned if no such key exists
+     *
+     * @return the stored array or def
+     */
+    public static long[] getNBTLongArray(ItemStack item, String key, long[] def) {
+        return Optional.ofNullable(getNBTTagCompound(item))
+                .filter((compound) -> compound.e(key))
+                .map((compound) -> compound.o(key))
+                .orElse(def);
     }
 }

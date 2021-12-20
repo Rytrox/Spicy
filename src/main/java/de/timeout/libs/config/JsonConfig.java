@@ -9,13 +9,13 @@ import java.util.logging.Level;
 
 import com.google.gson.*;
 
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
 
-import org.bukkit.craftbukkit.libs.org.apache.commons.io.FileUtils;
-import org.bukkit.craftbukkit.libs.org.apache.commons.io.IOUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

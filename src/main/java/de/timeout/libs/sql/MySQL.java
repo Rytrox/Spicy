@@ -1,7 +1,6 @@
 package de.timeout.libs.sql;
 
-import com.mysql.jdbc.jdbc2.optional.MysqlDataSource;
-
+import com.mysql.cj.jdbc.MysqlDataSource;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -16,10 +15,6 @@ public class MySQL implements SQL {
     public MySQL(String host, int port, String database, String username, String password) {
         MysqlDataSource properties = new MysqlDataSource();
 
-        properties.setUseUnicode(true);
-        properties.setUseJDBCCompliantTimezoneShift(true);
-        properties.setUseLegacyDatetimeCode(false);
-        properties.setServerTimezone("UTC");
         properties.setUrl(String.format("jdbc:mysql://%s:%d/", host, port));
         properties.setDatabaseName(database);
         properties.setUser(username);
