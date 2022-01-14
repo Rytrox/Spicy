@@ -21,6 +21,7 @@ import org.apache.logging.log4j.core.util.IOUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
@@ -275,5 +276,10 @@ public class UTFConfig extends YamlConfiguration {
 	public List<String> getComments(@NotNull String path) {
 		return new ArrayList<>(Optional.ofNullable(comments.get(path))
 					.orElse(new ArrayList<>()));
+	}
+
+	@ApiStatus.Internal
+	Map<String, Object> getMap() {
+		return new HashMap<>(map);
 	}
 }
