@@ -13,6 +13,14 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
           cache: maven
+      - name: Setup Spigot
+        uses: SpraxDev/Action-Spigot@v3
+        with:
+          versions: latest
+          generateSrc: false
+          generateDoc: false
+          disableJavaCheck: false
+          buildToolProvider: SpigotMC
       - name: Build
         run: mvn clean package
       - name: Test
