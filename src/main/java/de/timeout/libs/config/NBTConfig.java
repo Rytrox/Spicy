@@ -23,37 +23,10 @@ public class NBTConfig extends MemoryConfiguration {
     public NBTConfig(@NotNull NBTTagCompound compound) {
         Map<String, Object> readData = readTagCompound(compound);
 
-        this.map.clear();
-        this.map.putAll(readData);
-
         this.convertMapsToSections(readData, Objects.requireNonNull(this.getRoot()));
     }
 
     public NBTConfig() {
-    }
-
-    @NotNull
-    public static NBTConfig fromJSONFile(@NotNull File file) {
-        JsonConfig json = new JsonConfig(file);
-        NBTConfig config = new NBTConfig();
-
-        config.map.clear();
-        config.map.putAll(json.getMap());
-        config.convertMapsToSections(json.getMap(), Objects.requireNonNull(config.getRoot()));
-
-        return config;
-    }
-
-    @NotNull
-    public static NBTConfig fromYAMLFile(@NotNull File file) {
-        UTFConfig yaml = new UTFConfig(file);
-        NBTConfig config = new NBTConfig();
-
-        config.map.clear();
-        config.map.putAll(yaml.getMap());
-        config.convertMapsToSections(yaml.getMap(), Objects.requireNonNull(config.getRoot()));
-
-        return config;
     }
 
     @NotNull
@@ -155,14 +128,12 @@ public class NBTConfig extends MemoryConfiguration {
         return nbtList;
     }
 
-    private void convertMapsToSections(@NotNull Map<?, ?> input, @NotNull ConfigurationSection section) {
+    private void convertMapsToSections(@NotNull Map<String, Object> input, @NotNull ConfigurationSection section) {
         input.forEach((key, value) -> {
-            if(key instanceof String) {
-                if (value instanceof Map<?, ?> map) {
-                    this.convertMapsToSections(map, section.createSection((String) key));
-                } else {
-                    section.set((String) key, value);
-                }
+            if (value instanceof Map map) {
+                this.convertMapsToSections(map, section.createSection(key));
+            } else {
+                section.set(key, value);
             }
         });
     }
@@ -174,7 +145,11 @@ public class NBTConfig extends MemoryConfiguration {
      */
     @NotNull
     public NBTTagCompound save() {
-        return convertMapToCompound(this.map);
+        Map<String, Object> map = Optional.ofNullable(this.getRoot())
+                .map((root) -> root.getValues(true))
+                .orElse(new HashMap<>());
+
+        return convertMapToCompound(map);
     }
 
     /**
@@ -184,6 +159,6 @@ public class NBTConfig extends MemoryConfiguration {
      * @throws IOException if the file cannot be written
      */
     public void save(@NotNull File file) throws IOException {
-        NBTCompressedStreamTools.b(convertMapToCompound(this.map), file);
+        NBTCompressedStreamTools.b(save(), file);
     }
 }

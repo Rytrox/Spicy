@@ -132,14 +132,4 @@ public class JsonConfig extends FileConfiguration {
 		return GSON.toJson(convertSectionsToJson(this));
 	}
 
-
-	/**
-	 * Just Internal for conversion between configs
-	 *
-	 * @return a map containing all valid keys
-	 */
-	@ApiStatus.Internal
-	Map<String, Object> getMap() {
-		return new HashMap<>(this.map);
-	}
 }
