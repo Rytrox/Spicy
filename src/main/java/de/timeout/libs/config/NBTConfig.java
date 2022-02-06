@@ -5,6 +5,7 @@ import com.google.common.primitives.Bytes;
 import net.minecraft.nbt.*;
 
 import org.bukkit.Bukkit;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.MemoryConfiguration;
 import org.jetbrains.annotations.NotNull;
 
@@ -14,11 +15,21 @@ import java.util.*;
 import java.util.logging.Level;
 
 public class NBTConfig extends MemoryConfiguration {
+    
+    public NBTConfig(@NotNull File file) throws IOException {
+        this(Objects.requireNonNull(NBTCompressedStreamTools.b(file)));
+    }
 
-    public static NBTConfig fromNBTFile(@NotNull File file) throws IOException {
-        return Optional.ofNullable(NBTCompressedStreamTools.b(file))
-                .map(NBTConfig::fromTagCompound)
-                .orElse(new NBTConfig());
+    public NBTConfig(@NotNull NBTTagCompound compound) {
+        Map<String, Object> readData = readTagCompound(compound);
+
+        this.map.clear();
+        this.map.putAll(readData);
+
+        this.convertMapsToSections(readData, Objects.requireNonNull(this.getRoot()));
+    }
+
+    public NBTConfig() {
     }
 
     @NotNull
@@ -28,6 +39,7 @@ public class NBTConfig extends MemoryConfiguration {
 
         config.map.clear();
         config.map.putAll(json.getMap());
+        config.convertMapsToSections(json.getMap(), Objects.requireNonNull(config.getRoot()));
 
         return config;
     }
@@ -39,16 +51,7 @@ public class NBTConfig extends MemoryConfiguration {
 
         config.map.clear();
         config.map.putAll(yaml.getMap());
-
-        return config;
-    }
-
-    @NotNull
-    public static NBTConfig fromTagCompound(@NotNull NBTTagCompound compound) {
-        NBTConfig config = new NBTConfig();
-
-        config.map.clear();
-        config.map.putAll(readTagCompound(compound));
+        config.convertMapsToSections(yaml.getMap(), Objects.requireNonNull(config.getRoot()));
 
         return config;
     }
@@ -152,7 +155,35 @@ public class NBTConfig extends MemoryConfiguration {
         return nbtList;
     }
 
+    private void convertMapsToSections(@NotNull Map<?, ?> input, @NotNull ConfigurationSection section) {
+        input.forEach((key, value) -> {
+            if(key instanceof String) {
+                if (value instanceof Map<?, ?> map) {
+                    this.convertMapsToSections(map, section.createSection((String) key));
+                } else {
+                    section.set((String) key, value);
+                }
+            }
+        });
+    }
+
+    /**
+     * Saves this config to an NBTTabCompound
+     *
+     * @return the NBTTagCompounds of this config
+     */
+    @NotNull
     public NBTTagCompound save() {
         return convertMapToCompound(this.map);
+    }
+
+    /**
+     * Saves the config into a file
+     *
+     * @param file the file you want to save the nbt-data
+     * @throws IOException if the file cannot be written
+     */
+    public void save(@NotNull File file) throws IOException {
+        NBTCompressedStreamTools.b(convertMapToCompound(this.map), file);
     }
 }

@@ -10,6 +10,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Objects;
 
 import static org.junit.Assert.*;
 
@@ -28,7 +29,7 @@ public class BukkitConfigCreatorTest {
 
     @Test
     public void loadEmptyYamlConfig() throws IOException {
-        assertEquals(0, plugin.getDataFolder().list().length);
+        assertEquals(0, Objects.requireNonNull(plugin.getDataFolder().list()).length);
 
         File file = creator.createFile(Paths.get("test.yml"));
         assertTrue(file.exists());
