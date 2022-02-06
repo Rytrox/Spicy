@@ -16,7 +16,7 @@ jobs:
       - name: Setup Spigot
         uses: SpraxDev/Action-SpigotMC@v3
         with:
-          versions: latest
+          versions: 1.18.1
           generateSrc: false
           generateDoc: false
           disableJavaCheck: false
