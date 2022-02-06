@@ -16,6 +16,7 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
 
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -88,18 +89,16 @@ public class JsonConfig extends FileConfiguration {
 
 		// convert map to json
 		currentSection.getValues(false).forEach((key, value) -> {
-			if(value instanceof ConfigurationSection) {
-				json.add(key, convertSectionsToJson((ConfigurationSection) value));
-			} else if(value instanceof List) {
-				json.add(key, convertListToArray((List<?>) value));
-			} else {
-				if(value instanceof Boolean) {
-					json.addProperty(key, (Boolean) value);
-				} else if(value instanceof Number) {
-					json.addProperty(key, (Number) value);
-				} else if(value instanceof Character) {
-					json.addProperty(key, (Character) value);
-				} else json.addProperty(key, value.toString());
+			switch (value) {
+				case ConfigurationSection section -> json.add(key, convertSectionsToJson(section));
+				case List<?> list -> json.add(key, convertListToArray(list));
+				case Boolean aBoolean -> json.addProperty(key, aBoolean);
+				case Number number -> json.addProperty(key, number);
+				case Character character -> json.addProperty(key, character);
+				case null, default -> {
+					assert value != null;
+					json.addProperty(key, value.toString());
+				}
 			}
 		});
 
@@ -110,18 +109,13 @@ public class JsonConfig extends FileConfiguration {
 		JsonArray array = new JsonArray();
 
 		currentList.forEach(element -> {
-			if(element instanceof List) {
-				array.add(convertListToArray((List<?>) element));
-			} else if(element instanceof ConfigurationSection) {
-				array.add(convertSectionsToJson((ConfigurationSection) element));
-			} else {
-				if(element instanceof Boolean) {
-					array.add((Boolean) element);
-				} else if(element instanceof Number) {
-					array.add((Number) element);
-				} else if(element instanceof Character) {
-					array.add((Character) element);
-				} else array.add(element.toString());
+			switch (element) {
+				case List<?> list -> array.add(convertListToArray(list));
+				case ConfigurationSection section -> array.add(convertSectionsToJson(section));
+				case Boolean b -> array.add(b);
+				case Number n -> array.add(n);
+				case Character c -> array.add(c);
+				default -> array.add(element.toString());
 			}
 		});
 
@@ -137,4 +131,5 @@ public class JsonConfig extends FileConfiguration {
 	public @NotNull String saveToString() {
 		return GSON.toJson(convertSectionsToJson(this));
 	}
+
 }

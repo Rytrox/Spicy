@@ -67,7 +67,6 @@ public class UTFConfigTest {
         File file = new File(plugin.getDataFolder(), "config.yml");
         config.save(file);
 
-        System.out.println(file.getAbsolutePath());
         FileReader reader = new FileReader(file);
         BufferedReader lineReader = new BufferedReader(reader);
 

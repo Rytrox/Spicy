@@ -11,7 +11,8 @@
 # 1. MySQL-Daten eingeben. Gib die korrekten Verbindungsinformationen ein.
 # 2. Die korrekte Welt setzen. Trage bitte in den Reiter workdsettings.world den richtigen Weltnamen ein. Achte auf Groß- und Kleinschreibung
 # 3. Den Spawnpoint setzen. Alternativ kannst du auch den Befehl /spawn set im Spiel eingeben
-# 4. Fightzone setzen. Alternatiuv kannst du auch den Befehl /fightzone set im Spiel eingeben
+# 4. Fightzone setzen. Alternativ kannst du auch den Befehl /fightzone set im Spiel eingeben
+# Hier ist der Test mit Ä, Ö, Ü, ä, ü, ö
 
 # Language of the Plugin
 language: de_DE
