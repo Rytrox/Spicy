@@ -1,5 +1,7 @@
 package de.timeout.libs.log;
 
+import org.jetbrains.annotations.NotNull;
+
 /**
  * Represents a set of Minecraft-ColorCodes and their ANSI-Codes
  * @author Timeout
@@ -44,7 +46,7 @@ enum ConsoleColor {
      * @param code the Minecraft-ColorCode without Formatter-Char
      * @return the Color enum or null if no enum can be found
      */
-    public static ConsoleColor getColorByCode(char code) {
+    public static @NotNull ConsoleColor getColorByCode(char code) {
         // run trough colors
         for(ConsoleColor color: values()) {
             // check code

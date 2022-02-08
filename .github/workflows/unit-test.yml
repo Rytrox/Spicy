@@ -24,4 +24,8 @@ jobs:
       - name: Build
         run: mvn clean package
       - name: Test
-        run: mvn test
+        run: mvn test jacoco:report
+      - name: jacoco-badge-generator
+        uses: cicirello/jacoco-badge-generator@v2.5.0
+        with:
+          generate-branches-badge: true

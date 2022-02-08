@@ -3,6 +3,7 @@ package de.timeout.libs.config;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.logging.Level;
@@ -10,13 +11,11 @@ import java.util.logging.Level;
 import com.google.gson.*;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
 
-import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -61,11 +60,9 @@ public class JsonConfig extends FileConfiguration {
 	
 	public JsonConfig(@NotNull InputStream json) {
 		try {
-			loadFromString(Optional.ofNullable(IOUtils.toString(json)).orElse("{}"));
+			loadFromString(Optional.ofNullable(JsonParser.parseReader(new InputStreamReader(json)).toString()).orElse("{}"));
 		} catch (JsonParseException | InvalidConfigurationException e) {
 			Bukkit.getLogger().log(Level.SEVERE, "Cannot load Configuration from InputStream", e);			
-		} catch (IOException e) {
-			Bukkit.getLogger().log(Level.SEVERE, "Cannot load Json from InputStream. IO-Exception: ", e);
 		}
 	}
 
@@ -120,11 +117,6 @@ public class JsonConfig extends FileConfiguration {
 		});
 
 		return array;
-	}
-
-	@Override
-	protected @NotNull String buildHeader() {
-		return "";
 	}
 
 	@Override
