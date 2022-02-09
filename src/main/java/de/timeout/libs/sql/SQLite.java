@@ -1,5 +1,6 @@
 package de.timeout.libs.sql;
 
+import org.intellij.lang.annotations.Language;
 import org.jetbrains.annotations.NotNull;
 import org.sqlite.JDBC;
 import org.sqlite.SQLiteDataSource;
@@ -16,7 +17,7 @@ public final class SQLite implements SQL {
         try {
             DriverManager.registerDriver(new JDBC());
         } catch (SQLException e) {
-            throw new IllegalArgumentException("Unable to register JDBC-SQLite Driver");
+            throw new IllegalStateException("Unable to register JDBC-SQLite Driver");
         }
 
         SQLiteDataSource properties = new SQLiteDataSource();
@@ -26,7 +27,7 @@ public final class SQLite implements SQL {
     }
 
     @Override
-    public @NotNull QueryBuilder prepare(@NotNull String statement, Object... args) {
+    public @NotNull QueryBuilder prepare(@NotNull @Language("SQLite") String statement, Object... args) {
         return new QueryBuilder(source, statement, args);
     }
 }

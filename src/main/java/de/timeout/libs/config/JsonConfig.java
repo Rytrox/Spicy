@@ -16,6 +16,7 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
 
+import org.intellij.lang.annotations.Language;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -34,7 +35,7 @@ public class JsonConfig extends FileConfiguration {
 	 * 
 	 * @param json the Json-String. Cannot be null
 	 */
-	public JsonConfig(@Nullable String json) {
+	public JsonConfig(@Nullable @Language("JSON") String json) {
 		try {
 			loadFromString(Optional.ofNullable(json).orElse("{}"));
 		} catch (JsonParseException | InvalidConfigurationException e) {

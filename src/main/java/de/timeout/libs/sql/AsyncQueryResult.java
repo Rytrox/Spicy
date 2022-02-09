@@ -16,8 +16,9 @@ record AsyncQueryResult<T>(CompletableFuture<List<T>> task) implements QueryResu
 
     @Override
     public @NotNull <R> QueryResult<R> map(@NotNull Function<T, R> mappingFunction) {
-        CompletableFuture<List<R>> future = this.task.thenApply((list) ->
-                list.stream()
+        CompletableFuture<List<R>> future = this.task
+                .thenApply((list) ->
+                    list.stream()
                         .map(mappingFunction)
                         .collect(Collectors.toList())
         );

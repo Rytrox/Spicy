@@ -1,6 +1,7 @@
 package de.timeout.libs.sql;
 
 import com.mysql.cj.jdbc.MysqlDataSource;
+import org.intellij.lang.annotations.Language;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -24,7 +25,7 @@ public final class MySQL implements SQL {
     }
 
     @Override
-    public @NotNull QueryBuilder prepare(@NotNull String statement, Object... args) {
+    public @NotNull QueryBuilder prepare(@NotNull @Language("MySQL") String statement, Object... args) {
         return new QueryBuilder(source, statement, args);
     }
 }

@@ -1,60 +1,38 @@
 package de.timeout.libs.sql;
 
-import be.seeseemelk.mockbukkit.MockBukkit;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
-import java.nio.file.Path;
+import org.mockito.MockedStatic;
+import org.mockito.junit.MockitoJUnitRunner;
+
 import java.nio.file.Paths;
+import java.sql.Driver;
+import java.sql.DriverManager;
 import java.sql.SQLException;
 
 import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
 
+@RunWith(MockitoJUnitRunner.class)
 public class SQLiteTest {
 
-    private SQLite sql;
-
-    @Before
-    public void mock() {
-        MockBukkit.mock();
-
-        Path path = Paths.get("src", "test", "resources", "database.db");
-
-        sql = new SQLite(path.toFile());
-    }
-
     @Test
-    public void shouldGetCorrectValues() throws SQLException {
-        sql.prepare("SELECT * FROM Test2 WHERE 1")
-                .queryAsync(Test1.class)
-                .subscribe(Assert::assertNotNull);
+    public void shouldPrepareStatement() {
+        SQLite sql = new SQLite(Paths.get("test.db").toFile());
+
+        QueryBuilder builder = sql.prepare("SELECT * FROM Test WHERE 1");
+
+        assertNotNull(builder);
     }
 
-    @Test
-    public void shouldInsertValues() throws SQLException {
-        sql.prepare("INSERT INTO Test2(id, name) VALUES (?, ?)", 408, "Timeout")
-                .updateAsync();
-        sql.prepare("INSERT INTO Test2(id, name) VALUES (?, ?)", 701, "Sether")
-                .updateAsync();
+    @Test(expected = IllegalStateException.class)
+    public void shouldThrowExceptionWhenDriverCouldNotBeRegistered() {
+        try(MockedStatic<DriverManager> manager = mockStatic(DriverManager.class)) {
+            manager.when(() -> DriverManager.registerDriver(any(Driver.class)))
+                    .thenThrow(SQLException.class);
 
-        sql.prepare("SELECT * FROM Test1 WHERE 1")
-                .queryAsync(Test1.class)
-                .subscribe((elements) -> {
-                    Test1 timeout = elements.get(0);
-                    Test1 sether = elements.get(1);
-
-                    assertEquals(408, timeout.getId());
-                    assertEquals("Timeout", timeout.getName());
-
-                    assertEquals(701, sether.getId());
-                    assertEquals("Sether", sether.getName());
-                });
-    }
-
-    @After
-    public void tearDown() {
-        MockBukkit.unmock();
+            new SQLite(Paths.get("test.db").toFile());
+        }
     }
 }

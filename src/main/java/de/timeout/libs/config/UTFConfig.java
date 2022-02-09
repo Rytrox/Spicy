@@ -13,6 +13,7 @@ import org.apache.logging.log4j.core.util.IOUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.intellij.lang.annotations.Language;
 import org.jetbrains.annotations.NotNull;
 import org.yaml.snakeyaml.DumperOptions;
 
@@ -52,7 +53,7 @@ public class UTFConfig extends YamlConfiguration {
 		this(IOUtils.toString(new InputStreamReader(stream)));
 	}
 	
-	public UTFConfig(String source) {
+	public UTFConfig(@Language("YAML") String source) {
 		try {
 			loadFromString(source);
 		} catch (InvalidConfigurationException e) {

@@ -1,5 +1,6 @@
 package de.timeout.libs.sql;
 
+import org.intellij.lang.annotations.Language;
 import org.jetbrains.annotations.NotNull;
 
 import java.sql.SQLException;
@@ -34,5 +35,5 @@ public interface SQL {
      * @return a builder which will be used for connections later
      */
     @NotNull
-    QueryBuilder prepare(@NotNull String statement, @NotNull Object... args);
+    QueryBuilder prepare(@NotNull @Language("SQL") String statement, @NotNull Object... args);
 }
