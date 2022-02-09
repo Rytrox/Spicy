@@ -28,19 +28,19 @@ public class SQLiteTest {
     @Test
     public void shouldGetCorrectValues() throws SQLException {
         sql.prepare("SELECT * FROM Test2 WHERE 1")
-                .query(Test1.class)
+                .queryAsync(Test1.class)
                 .subscribe(Assert::assertNotNull);
     }
 
     @Test
     public void shouldInsertValues() throws SQLException {
         sql.prepare("INSERT INTO Test2(id, name) VALUES (?, ?)", 408, "Timeout")
-                .update();
+                .updateAsync();
         sql.prepare("INSERT INTO Test2(id, name) VALUES (?, ?)", 701, "Sether")
-                .update();
+                .updateAsync();
 
         sql.prepare("SELECT * FROM Test1 WHERE 1")
-                .query(Test1.class)
+                .queryAsync(Test1.class)
                 .subscribe((elements) -> {
                     Test1 timeout = elements.get(0);
                     Test1 sether = elements.get(1);

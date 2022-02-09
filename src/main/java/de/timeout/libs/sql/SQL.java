@@ -34,5 +34,5 @@ public interface SQL {
      * @return a builder which will be used for connections later
      */
     @NotNull
-    QueryBuilder prepare(@NotNull String statement, @NotNull Object... args) throws SQLException;
+    QueryBuilder prepare(@NotNull String statement, @NotNull Object... args);
 }

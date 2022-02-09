@@ -8,7 +8,7 @@ import org.jetbrains.annotations.NotNull;
  * @author Timeout
  *
  */
-public class MySQL implements SQL {
+public final class MySQL implements SQL {
 
     private final MysqlDataSource source;
 
