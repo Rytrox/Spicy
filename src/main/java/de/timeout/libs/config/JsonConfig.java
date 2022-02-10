@@ -67,6 +67,10 @@ public class JsonConfig extends FileConfiguration {
 		}
 	}
 
+	public JsonConfig() {
+		super();
+	}
+
 	@Override
 	public void loadFromString(@NotNull String arg0) throws InvalidConfigurationException {
 		Map<?, ?> map = GSON.fromJson(arg0, Map.class);
@@ -125,4 +129,24 @@ public class JsonConfig extends FileConfiguration {
 		return GSON.toJson(convertSectionsToJson(this));
 	}
 
+
+	@Override
+	public @NotNull List<String> getComments(@NotNull String path) {
+		throw new UnsupportedOperationException("JSON does not support comments");
+	}
+
+	@Override
+	public @NotNull List<String> getInlineComments(@NotNull String path) {
+		throw new UnsupportedOperationException("JSON does not support comments");
+	}
+
+	@Override
+	public void setComments(@NotNull String path, @Nullable List<String> comments) {
+		throw new UnsupportedOperationException("JSON does not support comments");
+	}
+
+	@Override
+	public void setInlineComments(@NotNull String path, @Nullable List<String> comments) {
+		throw new UnsupportedOperationException("JSON does not support comments");
+	}
 }

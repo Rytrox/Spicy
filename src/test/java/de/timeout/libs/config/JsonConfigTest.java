@@ -28,21 +28,22 @@ public class JsonConfigTest {
 
     @Test
     public void loadJsonFromString() {
-        JsonConfig config = new JsonConfig("{\n" +
-                "    \"firstName\": \"Rack\",\n" +
-                "    \"lastName\": \"Jackon\",\n" +
-                "    \"gender\": \"man\",\n" +
-                "    \"age\": 24,\n" +
-                "    \"address\": {\n" +
-                "        \"streetAddress\": \"126\",\n" +
-                "        \"city\": \"San Jone\",\n" +
-                "        \"state\": \"CA\",\n" +
-                "        \"postalCode\": \"394221\"\n" +
-                "    },\n" +
-                "    \"phoneNumbers\": [\n" +
-                "        { \"type\": \"home\", \"number\": \"7383627627\" }\n" +
-                "    ]\n" +
-                "}");
+        JsonConfig config = new JsonConfig("""
+                {
+                    "firstName": "Rack",
+                    "lastName": "Jackon",
+                    "gender": "man",
+                    "age": 24,
+                    "address": {
+                        "streetAddress": "126",
+                        "city": "San Jone",
+                        "state": "CA",
+                        "postalCode": "394221"
+                    },
+                    "phoneNumbers": [
+                        { "type": "home", "number": "7383627627" }
+                    ]
+                }""");
 
         assertNotNull(config);
         assertFalse(config.getKeys(false).isEmpty());
@@ -54,7 +55,7 @@ public class JsonConfigTest {
     }
 
     @Test
-    public void loadJsonFromFile() throws IOException {
+    public void loadJsonFromFile() {
         File file = Paths.get("src","test", "resources", "config.json").toFile();
         JsonConfig config = new JsonConfig(file);
 

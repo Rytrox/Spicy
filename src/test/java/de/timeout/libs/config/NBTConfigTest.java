@@ -1,17 +1,21 @@
 package de.timeout.libs.config;
 
+import be.seeseemelk.mockbukkit.MockBukkit;
 import net.minecraft.nbt.*;
 
+import org.bukkit.Bukkit;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Objects;
-import java.util.stream.IntStream;
+import java.util.UUID;
 
 import static org.junit.Assert.*;
 
@@ -20,71 +24,150 @@ public class NBTConfigTest {
     @Rule
     public final TemporaryFolder temporaryFolder = new TemporaryFolder();
 
-    @Test
-    public void shouldReadSimpleTagCompound() {
-        NBTTagCompound compound = new NBTTagCompound();
+    private NBTTagCompound testCompound;
 
-        compound.a("string", "Testwert1");
-        compound.a("int", 124);
-        compound.a("byte", (byte) 4);
-        compound.a("short", (short) 16);
+    @Before
+    public void prepareConfig() {
+        MockBukkit.mock();
 
-        NBTConfig config = new NBTConfig(compound);
-        assertEquals("Testwert1", config.getString("string"));
-        assertEquals(124, config.getInt("int"));
-        assertEquals((byte) 4, config.getInt("byte"));
-        assertEquals((short) 16, config.getInt("short"));
-    }
+        testCompound = new NBTTagCompound();
 
-    @Test
-    public void shouldReadNestedTagCompounds() {
-        NBTTagCompound root = new NBTTagCompound();
-        NBTTagCompound child = new NBTTagCompound();
-        NBTTagCompound grandchild = new NBTTagCompound();
+        // Map all primitives
+        testCompound.a("boolean", true);
+        testCompound.a("byte", (byte) 5);
+        testCompound.a("short", (short) 2463);
+        testCompound.a("integer", 343575324);
+        testCompound.a("long", Long.MAX_VALUE);
+        testCompound.a("char", 'r');
+        testCompound.a("float", 4.0F);
+        testCompound.a("double", 2356.232535D);
 
-        root.a("child", child);
-        child.a("child", grandchild);
-        grandchild.a("value", "Gefunden");
+        // Supported full classes
+        testCompound.a("string", "Hello World");
+        testCompound.a("uuid", UUID.randomUUID());
+        testCompound.a("offlineplayer", UUID.fromString("94dd234a-2320-4f17-9f40-a1cc80afab2d"));
 
-        NBTConfig config = new NBTConfig(root);
+        // Support array classes
+        testCompound.a("intArray", new int[] { 1, 2, 3, 4, 5}); // size 4 is a UUID!
+        testCompound.a("longArray", new long[] { 6L, 7L, 8L, 9L});
+        testCompound.a("byteArray", new byte[] { 10, 23, 0 });
 
-        assertEquals("Gefunden", config.getString("child.child.value"));
-    }
-
-    @Test
-    public void shouldReadSimpleArrayCompounds() {
-        NBTTagCompound compound = new NBTTagCompound();
-
-        compound.a("intArray", new int[] { 8, 2, 65, 3, 6, -23, 46 });
-        compound.a("byteArray", new byte[] { 45, 35, 2, 4, -56 });
-        compound.a("longArray", new long[] { 36, 3, 78, 4, 45687, 5673, 324, 325, 34 });
-
+        // Support List classes
         NBTTagList list = new NBTTagList();
-        List<String> strings = IntStream.range(0, 12)
-                .mapToObj((_v) -> String.valueOf(Math.random()))
-                .toList();
+        list.add(NBTTagString.a("Hello"));
+        list.add(NBTTagString.a("World"));
+        list.add(NBTTagString.a("Test"));
+        testCompound.a("stringList", list);
 
-        strings.forEach(element -> list.add(NBTTagString.a(element)));
-        compound.a("stringArray", list);
+        NBTTagList intList = new NBTTagList();
+        intList.add(NBTTagLong.a(12));
+        intList.add(NBTTagLong.a(1));
+        intList.add(NBTTagLong.a(12467));
+        intList.add(NBTTagLong.a(76433));
+        testCompound.a("longList", intList);
 
-        NBTConfig config = new NBTConfig(compound);
+        NBTTagList developerList = new NBTTagList();
+        NBTTagCompound timeout = new NBTTagCompound();
+        timeout.a("name", "Timeout");
+        timeout.a("id", 408);
+        timeout.a("player", UUID.fromString("94dd234a-2320-4f17-9f40-a1cc80afab2d"));
 
-        assertEquals(Arrays.asList(8, 2, 65, 3, 6, -23, 46), config.getIntegerList("intArray"));
-        assertEquals(Arrays.asList((byte) 45, (byte) 35, (byte) 2, (byte) 4, (byte) -56), config.getByteList("byteArray"));
-        assertEquals(Arrays.asList(36L, 3L, 78L, 4L, 45687L, 5673L, 324L, 325L, 34L), config.getLongList("longArray"));
-        assertEquals(strings, config.getStringList("stringArray"));
+        NBTTagCompound sether = new NBTTagCompound();
+        sether.a("name", "Sether");
+        sether.a("id", 701);
+        sether.a("player", UUID.fromString("58a6382a-3b85-4d7f-8a6a-0b920ecb88bd"));
+
+        developerList.add(timeout);
+        developerList.add(sether);
+        testCompound.a("developerList", developerList);
+    }
+
+    @Test
+    public void shouldCreateConfig() {
+        // Should create an empty config
+        NBTConfig empty = new NBTConfig();
+
+        assertTrue(empty.getKeys(true).isEmpty());
+
+        NBTConfig filled = new NBTConfig(testCompound);
+        assertFalse(filled.getKeys(false).isEmpty());
+    }
+
+    @Test
+    public void shouldReadConfigFromCompound() {
+        NBTConfig config = new NBTConfig(testCompound);
+
+        assertTrue(config.getBoolean("boolean"));
+        assertEquals(5, config.getInt("byte"));
+        assertEquals(2463, config.getInt("short"));
+        assertEquals(343575324, config.getInt("integer"));
+        assertEquals(Long.MAX_VALUE, config.getLong("long"));
+        assertEquals('r', config.getCharacter("char"));
+        assertEquals(4F, config.getDouble("float"), 0);
+        assertEquals(2356.232535D, config.getDouble("double"), 0);
+
+        assertEquals("Hello World", config.getString("string"));
+        assertEquals(Bukkit.getOfflinePlayer(testCompound.a("uuid")).getUniqueId(),
+                Objects.requireNonNull(config.getOfflinePlayer("uuid")).getUniqueId());
+        assertEquals(UUID.fromString("94dd234a-2320-4f17-9f40-a1cc80afab2d"),
+                Objects.requireNonNull(config.getOfflinePlayer("offlineplayer")).getUniqueId());
+
+        assertEquals(Arrays.asList(1, 2, 3, 4, 5), config.getIntegerList("intArray"));
+        assertEquals(Arrays.asList(6L, 7L, 8L, 9L), config.getLongList("longArray"));
+        assertEquals(Arrays.asList((byte) 10, (byte) 23, (byte) 0), config.getByteList("byteArray"));
+    }
+
+    @Test
+    public void shouldReadConfigFromUncompressedFile() throws IOException {
+        NBTConfig config = NBTConfig.fromUncompressedFile(Paths.get("src", "test", "resources", "config.dat").toFile());
+
+        assertTrue(config.getBoolean("boolean"));
+        assertEquals(5, config.getInt("byte"));
+        assertEquals(2463, config.getInt("short"));
+        assertEquals(343575324, config.getInt("integer"));
+        assertEquals(Long.MAX_VALUE, config.getLong("long"));
+        assertEquals('r', config.getCharacter("char"));
+        assertEquals(4F, config.getDouble("float"), 0);
+        assertEquals(2356.232535D, config.getDouble("double"), 0);
+
+        assertEquals("Hello World", config.getString("string"));
+        assertEquals(UUID.fromString("4da098bc-9573-4524-855b-5cb418899f37"),
+                Objects.requireNonNull(config.getOfflinePlayer("uuid")).getUniqueId());
+        assertEquals(UUID.fromString("94dd234a-2320-4f17-9f40-a1cc80afab2d"),
+                Objects.requireNonNull(config.getOfflinePlayer("offlineplayer")).getUniqueId());
+
+        assertEquals(Arrays.asList(1, 2, 3, 4, 5), config.getIntegerList("intArray"));
+        assertEquals(Arrays.asList(6L, 7L, 8L, 9L), config.getLongList("longArray"));
+        assertEquals(Arrays.asList((byte) 10, (byte) 23, (byte) 0), config.getByteList("byteArray"));
+    }
+
+    @Test
+    public void shouldReadConfigFromCompressedFile() throws IOException {
+        NBTConfig config = NBTConfig.fromCompressedFile(Paths.get("src", "test", "resources", "config-compressed.dat").toFile());
+
+        assertTrue(config.getBoolean("boolean"));
+        assertEquals(5, config.getInt("byte"));
+        assertEquals(2463, config.getInt("short"));
+        assertEquals(343575324, config.getInt("integer"));
+        assertEquals(Long.MAX_VALUE, config.getLong("long"));
+        assertEquals('r', config.getCharacter("char"));
+        assertEquals(4F, config.getDouble("float"), 0);
+        assertEquals(2356.232535D, config.getDouble("double"), 0);
+
+        assertEquals("Hello World", config.getString("string"));
+        assertEquals(UUID.fromString("4da098bc-9573-4524-855b-5cb418899f37"),
+                Objects.requireNonNull(config.getOfflinePlayer("uuid")).getUniqueId());
+        assertEquals(UUID.fromString("94dd234a-2320-4f17-9f40-a1cc80afab2d"),
+                Objects.requireNonNull(config.getOfflinePlayer("offlineplayer")).getUniqueId());
+
+        assertEquals(Arrays.asList(1, 2, 3, 4, 5), config.getIntegerList("intArray"));
+        assertEquals(Arrays.asList(6L, 7L, 8L, 9L), config.getLongList("longArray"));
+        assertEquals(Arrays.asList((byte) 10, (byte) 23, (byte) 0), config.getByteList("byteArray"));
     }
 
     @Test
     public void shouldSaveConfigInFile() throws IOException {
-        NBTTagCompound compound = new NBTTagCompound();
-
-        compound.a("string", "Testwert1");
-        compound.a("int", 124);
-        compound.a("byte", (byte) 4);
-        compound.a("short", (short) 16);
-
-        NBTConfig config = new NBTConfig(compound);
+        NBTConfig config = new NBTConfig(testCompound);
 
         File file = temporaryFolder.newFile();
 
@@ -110,5 +193,10 @@ public class NBTConfigTest {
         assertEquals(124, ((NBTTagInt) Objects.requireNonNull(saved.c("int"))).k());
         assertEquals((byte) 4, ((NBTTagByte) Objects.requireNonNull(saved.c("byte"))).k());
         assertEquals((short) 16, ((NBTTagShort) Objects.requireNonNull(saved.c("short"))).k());
+    }
+
+    @After
+    public void tearDown() {
+        MockBukkit.unmock();
     }
 }

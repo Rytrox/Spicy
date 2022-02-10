@@ -5,9 +5,13 @@ import com.google.common.primitives.Bytes;
 import net.minecraft.nbt.*;
 
 import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.MemoryConfiguration;
+import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.io.IOException;
@@ -15,10 +19,6 @@ import java.util.*;
 import java.util.logging.Level;
 
 public class NBTConfig extends MemoryConfiguration {
-    
-    public NBTConfig(@NotNull File file) throws IOException {
-        this(Objects.requireNonNull(NBTCompressedStreamTools.b(file)));
-    }
 
     public NBTConfig(@NotNull NBTTagCompound compound) {
         Map<String, Object> readData = readTagCompound(compound);
@@ -29,6 +29,16 @@ public class NBTConfig extends MemoryConfiguration {
     public NBTConfig() {
     }
 
+    @Contract("_ -> new")
+    public static @NotNull NBTConfig fromCompressedFile(@NotNull File compressedFile) throws IOException {
+        return new NBTConfig(Objects.requireNonNull(NBTCompressedStreamTools.a(compressedFile)));
+    }
+
+    @Contract("_ -> new")
+    public static @NotNull NBTConfig fromUncompressedFile(@NotNull File uncompressedFile) throws IOException {
+        return new NBTConfig(Objects.requireNonNull(NBTCompressedStreamTools.b(uncompressedFile)));
+    }
+
     @NotNull
     private static Map<String, Object> readTagCompound(@NotNull NBTTagCompound section) {
         Map<String, Object> map = new HashMap<>();
@@ -36,6 +46,11 @@ public class NBTConfig extends MemoryConfiguration {
         for (String key : section.d()) {
             switch(Objects.requireNonNull(section.c(key))) {
                 case NBTTagCompound s -> map.put(key, readTagCompound(s));
+                case NBTTagIntArray i -> {
+                    if(i.size() == 4) {
+                        map.put(key, Bukkit.getOfflinePlayer(GameProfileSerializer.a(i)));
+                    } else map.put(key, readList(i));
+                }
                 case NBTList<? extends NBTBase> l -> map.put(key, readList(l));
                 case NBTNumber number -> map.put(key, number.k());
                 case NBTTagString string -> map.put(key, string.e_());
@@ -53,7 +68,12 @@ public class NBTConfig extends MemoryConfiguration {
 
         switch (list) {
             case NBTTagByteArray byteArray -> elements.addAll(Bytes.asList(byteArray.d()));
-            case NBTTagIntArray intArray -> elements.addAll(Arrays.stream(intArray.f()).boxed().toList());
+            case NBTTagIntArray i -> {
+                if(i.size() == 4) {
+                    // Try convert to OfflinePlayer here!
+                    elements.add(Bukkit.getOfflinePlayer(GameProfileSerializer.a(i)));
+                } else elements.addAll(Arrays.stream(i.f()).boxed().toList());
+            }
             case NBTTagLongArray longArray -> elements.addAll(Arrays.stream(longArray.f()).boxed().toList());
             default ->
                 list.forEach(element -> {
@@ -87,10 +107,8 @@ public class NBTConfig extends MemoryConfiguration {
                     case Character c -> compound.a(key, c);
                     case String s -> compound.a(key, s);
                     case UUID uuid -> compound.a(key, uuid);
+                    case OfflinePlayer p -> compound.a(key, p.getUniqueId());
                     case Map m -> compound.a(key, convertMapToCompound(m));
-                    case int[] ints -> compound.a(key, ints);
-                    case long[] longs -> compound.a(key, longs);
-                    case byte[] bytes -> compound.a(key, bytes);
                     case List l -> compound.a(key, convertListToNBTList(l));
                     default -> Bukkit.getLogger().log(Level.WARNING, "Unable to convert type " + value.getClass());
                 }
@@ -115,11 +133,9 @@ public class NBTConfig extends MemoryConfiguration {
                 case Boolean b -> nbtList.add(NBTTagByte.a(b));
                 case Character c -> nbtList.add(NBTTagString.a(String.valueOf(c)));
                 case String s -> nbtList.add(NBTTagString.a(s));
+                case OfflinePlayer p -> nbtList.add(GameProfileSerializer.a(p.getUniqueId()));
                 case UUID uuid -> nbtList.add(GameProfileSerializer.a(uuid));
                 case Map m -> nbtList.add(convertMapToCompound(m));
-                case int[] ints -> nbtList.add(new NBTTagIntArray(ints));
-                case long[] longs -> nbtList.add(new NBTTagLongArray(longs));
-                case byte[] bytes -> nbtList.add(new NBTTagByteArray(bytes));
                 case List l -> nbtList.add(convertListToNBTList(l));
                 default -> Bukkit.getLogger().log(Level.WARNING, "Unable to convert type " + element.getClass());
             }
@@ -160,5 +176,83 @@ public class NBTConfig extends MemoryConfiguration {
      */
     public void save(@NotNull File file) throws IOException {
         NBTCompressedStreamTools.b(save(), file);
+    }
+
+    /*
+     * Adjustments for supported types
+     */
+
+    @Override
+    public boolean getBoolean(@NotNull String path) {
+        return getInt(path, 0) == 1;
+    }
+
+    @Override
+    public boolean getBoolean(@NotNull String path, boolean def) {
+        return getInt(path, 0) == 1 || def;
+    }
+
+    @Override
+    public boolean isBoolean(@NotNull String path) {
+        Object val = get(path);
+
+        return val instanceof Number n && (n.byteValue() == 1 || n.byteValue() == 0);
+    }
+
+    public char getCharacter(@NotNull String path) {
+        return (char) getInt(path);
+    }
+
+    public char getCharacter(@NotNull String path, char def) {
+        return isCharacter(path) ? getCharacter(path) : def;
+    }
+
+    public boolean isCharacter(@NotNull String path) {
+        if(isInt(path)) {
+            int val = getInt(path);
+
+            return val >= 0x000000 && val < 0x10FFFF;
+        }
+
+        return false;
+    }
+
+    @Override
+    public @NotNull List<Boolean> getBooleanList(@NotNull String path) {
+        return getList(path, new ArrayList<>()).stream()
+                .filter((element) -> element instanceof Number)
+                .map((element) -> ((Number) element).byteValue())
+                .filter((element) -> element == 0 || element == 1)
+                .map((element) -> element == 1).toList();
+    }
+
+    @Override
+    public ItemStack getItemStack(@NotNull String path) {
+        throw new UnsupportedOperationException("NBTTagCompounds can't hold ItemStacks");
+    }
+
+    @Override
+    public ItemStack getItemStack(@NotNull String path, @Nullable ItemStack def) {
+        throw new UnsupportedOperationException("NBTTagCompounds can't hold ItemStacks");
+    }
+
+    @Override
+    public boolean isItemStack(@NotNull String path) {
+        throw new UnsupportedOperationException("NBTTagCompounds can't hold ItemStacks");
+    }
+
+    @Override
+    public @NotNull List<String> getInlineComments(@NotNull String path) {
+        throw new UnsupportedOperationException("NBTTagCompounds does not support comments");
+    }
+
+    @Override
+    public void setComments(@NotNull String path, @Nullable List<String> comments) {
+        throw new UnsupportedOperationException("NBTTagCompounds does not support comments");
+    }
+
+    @Override
+    public void setInlineComments(@NotNull String path, @Nullable List<String> comments) {
+        throw new UnsupportedOperationException("NBTTagCompounds does not support comments");
     }
 }
