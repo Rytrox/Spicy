@@ -179,6 +179,22 @@ public class JsonConfigTest {
         options.header("");
     }
 
+    @Test(expected = UnsupportedOperationException.class)
+    public void shouldNotAllowParseComments() {
+        JsonConfig config = new JsonConfig();
+        FileConfigurationOptions options = config.options();
+
+        options.parseComments(true);
+    }
+
+    @Test(expected = UnsupportedOperationException.class)
+    public void shouldNotAllowCopyHeader() {
+        JsonConfig config = new JsonConfig();
+        FileConfigurationOptions options = config.options();
+
+        options.copyHeader(true);
+    }
+
     @After
     public void tearDown() {
         MockBukkit.unmock();
