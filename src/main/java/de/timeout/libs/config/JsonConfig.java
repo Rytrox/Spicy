@@ -14,8 +14,11 @@ import org.apache.commons.io.FileUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.InvalidConfigurationException;
+import org.bukkit.configuration.MemoryConfiguration;
+import org.bukkit.configuration.MemoryConfigurationOptions;
 import org.bukkit.configuration.file.FileConfiguration;
 
+import org.bukkit.configuration.file.FileConfigurationOptions;
 import org.intellij.lang.annotations.Language;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -94,12 +97,8 @@ public class JsonConfig extends FileConfiguration {
 			switch (value) {
 				case ConfigurationSection section -> json.add(key, convertSectionsToJson(section));
 				case List<?> list -> json.add(key, convertListToArray(list));
-				case Boolean aBoolean -> json.addProperty(key, aBoolean);
-				case Number number -> json.addProperty(key, number);
-				case Character character -> json.addProperty(key, character);
 				case null, default -> {
-					assert value != null;
-					json.addProperty(key, value.toString());
+					json.add(key, GSON.toJsonTree(value));
 				}
 			}
 		});
@@ -108,20 +107,17 @@ public class JsonConfig extends FileConfiguration {
 	}
 
 	private @NotNull JsonArray convertListToArray(@NotNull List<?> currentList) {
-		JsonArray array = new JsonArray();
+		return GSON.toJsonTree(currentList).getAsJsonArray();
+	}
 
-		currentList.forEach(element -> {
-			switch (element) {
-				case List<?> list -> array.add(convertListToArray(list));
-				case ConfigurationSection section -> array.add(convertSectionsToJson(section));
-				case Boolean b -> array.add(b);
-				case Number n -> array.add(n);
-				case Character c -> array.add(c);
-				default -> array.add(element.toString());
-			}
-		});
+	@NotNull
+	@Override
+	public FileConfigurationOptions options() {
+		if(this.options == null) {
+			this.options = new JsonFileConfigurationOptions(this);
+		}
 
-		return array;
+		return super.options();
 	}
 
 	@Override
@@ -129,24 +125,60 @@ public class JsonConfig extends FileConfiguration {
 		return GSON.toJson(convertSectionsToJson(this));
 	}
 
+	private static final class JsonFileConfigurationOptions extends FileConfigurationOptions {
 
-	@Override
-	public @NotNull List<String> getComments(@NotNull String path) {
-		throw new UnsupportedOperationException("JSON does not support comments");
-	}
+		private JsonFileConfigurationOptions(@NotNull MemoryConfiguration configuration) {
+			super(configuration);
+		}
 
-	@Override
-	public @NotNull List<String> getInlineComments(@NotNull String path) {
-		throw new UnsupportedOperationException("JSON does not support comments");
-	}
+		@Override
+		public @NotNull List<String> getHeader() {
+			return new ArrayList<>();
+		}
 
-	@Override
-	public void setComments(@NotNull String path, @Nullable List<String> comments) {
-		throw new UnsupportedOperationException("JSON does not support comments");
-	}
+		@Override
+		public @NotNull String header() {
+			return "";
+		}
 
-	@Override
-	public void setInlineComments(@NotNull String path, @Nullable List<String> comments) {
-		throw new UnsupportedOperationException("JSON does not support comments");
+		@Override
+		public @NotNull FileConfigurationOptions setHeader(@Nullable List<String> value) {
+			throw new UnsupportedOperationException("JSON does not support Comments");
+		}
+
+		@Override
+		public @NotNull FileConfigurationOptions header(@Nullable String value) {
+			throw new UnsupportedOperationException("JSON does not support Comments");
+		}
+
+		@Override
+		public @NotNull List<String> getFooter() {
+			return new ArrayList<>();
+		}
+
+		@Override
+		public @NotNull FileConfigurationOptions setFooter(@Nullable List<String> value) {
+			throw new UnsupportedOperationException("JSON does not support Comments");
+		}
+
+		@Override
+		public boolean parseComments() {
+			return false;
+		}
+
+		@Override
+		public @NotNull MemoryConfigurationOptions parseComments(boolean value) {
+			throw new UnsupportedOperationException("JSON does not support Comments");
+		}
+
+		@Override
+		public boolean copyHeader() {
+			return false;
+		}
+
+		@Override
+		public @NotNull FileConfigurationOptions copyHeader(boolean value) {
+			throw new UnsupportedOperationException("JSON does not support Comments");
+		}
 	}
 }

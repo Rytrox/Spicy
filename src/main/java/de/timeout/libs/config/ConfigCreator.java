@@ -4,6 +4,7 @@ import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -17,7 +18,7 @@ public record ConfigCreator(File pluginDataFolder, Path configDirectory) {
 	private static final Logger logger = Logger.getLogger("ConfigCreator");
 
 	static {
-		ColoredLogger.enableColoredLogging('&', logger, "&8[&6Libs&8]");
+		ColoredLogger.enableColoredLogging('&', logger, "&8[&6Spicy&8]");
 	}
 
 	/**
@@ -30,6 +31,15 @@ public record ConfigCreator(File pluginDataFolder, Path configDirectory) {
 	public ConfigCreator(@NotNull File pluginDataFolder, @NotNull Path configDirectory) {
 		this.configDirectory = configDirectory;
 		this.pluginDataFolder = pluginDataFolder;
+	}
+
+	/**
+	 * Creates a new ConfigCreator with internat config directory on archive's root
+	 *
+	 * @param pluginDataFolder the Plugin-Folder of your plugin
+	 */
+	public ConfigCreator(@NotNull File pluginDataFolder) {
+		this(pluginDataFolder, Paths.get(""));
 	}
 
 	/**

@@ -4,7 +4,9 @@ import be.seeseemelk.mockbukkit.MockBukkit;
 import de.timeout.libs.LibsTestPlugin;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 
 import java.io.File;
 import java.io.IOException;
@@ -14,34 +16,24 @@ import java.util.Objects;
 
 import static org.junit.Assert.*;
 
-public class BukkitConfigCreatorTest {
+public class ConfigCreatorTest {
 
     private ConfigCreator creator;
 
-    private LibsTestPlugin plugin;
+    @Rule
+    public TemporaryFolder temporaryFolder = new TemporaryFolder();
 
     @Before
-    public void start() {
+    public void start() throws IOException {
         MockBukkit.mock();
-        plugin = MockBukkit.load(LibsTestPlugin.class);
-        creator = new ConfigCreator(plugin.getDataFolder(), Paths.get(""));
+        creator = new ConfigCreator(temporaryFolder.newFolder(), Paths.get(""));
     }
 
     @Test
     public void loadEmptyYamlConfig() throws IOException {
-        assertEquals(0, Objects.requireNonNull(plugin.getDataFolder().list()).length);
-
         File file = creator.createFile(Paths.get("test.yml"));
         assertTrue(file.exists());
         assertEquals(0L, file.length());
-
-//        Files.delete(file.toPath());
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void throwExceptionWhenNullInput() throws IOException {
-
-        creator.createFile(null);
     }
 
     @Test

@@ -1,15 +1,10 @@
 package de.timeout.libs.config;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.lang.reflect.Field;
 import java.nio.charset.StandardCharsets;
 import java.util.logging.Level;
 
-import org.apache.logging.log4j.core.util.IOUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -33,9 +28,12 @@ public class UTFConfig extends YamlConfiguration {
 
 	/**
 	 * Create a UTF-Config of a File
+	 *
 	 * @param file the required file
 	 */
-	public UTFConfig(File file) {	
+	public UTFConfig(File file) {
+		this.options().parseComments(true);
+
 		try {
 			// load Config from file content
 			load(file);
@@ -46,14 +44,22 @@ public class UTFConfig extends YamlConfiguration {
 	
 	/**
 	 * Create a UTF-Config of an InputStream
+	 *
 	 * @param stream the used inputsteam
-	 * @throws IOException If the stream cannot be read
 	 */
-	public UTFConfig(InputStream stream) throws IOException {
-		this(IOUtils.toString(new InputStreamReader(stream)));
+	public UTFConfig(@NotNull InputStream stream) {
+		this.options().parseComments(true);
+
+		try {
+			this.load(stream);
+		} catch (IOException | InvalidConfigurationException e) {
+			Bukkit.getLogger().log(Level.WARNING, e, () -> "Could not load Configuration from String");
+		}
 	}
 	
 	public UTFConfig(@Language("YAML") String source) {
+		this.options().parseComments(true);
+
 		try {
 			loadFromString(source);
 		} catch (InvalidConfigurationException e) {
