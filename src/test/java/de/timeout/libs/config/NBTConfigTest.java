@@ -1,9 +1,11 @@
 package de.timeout.libs.config;
 
 import be.seeseemelk.mockbukkit.MockBukkit;
+import net.minecraft.core.MinecraftSerializableUUID;
 import net.minecraft.nbt.*;
 
 import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -13,9 +15,7 @@ import org.junit.rules.TemporaryFolder;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
-import java.util.Arrays;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 
 import static org.junit.Assert.*;
 
@@ -71,15 +71,32 @@ public class NBTConfigTest {
         timeout.a("name", "Timeout");
         timeout.a("id", 408);
         timeout.a("player", UUID.fromString("94dd234a-2320-4f17-9f40-a1cc80afab2d"));
+        NBTTagCompound asedem = new NBTTagCompound();
+        asedem.a("name", "Asedem");
+        asedem.a("id", 409);
+        asedem.a("player", UUID.fromString("121a9207-cd9a-4717-ba06-bb96667492f1"));
+        timeout.a("assistant", asedem);
 
         NBTTagCompound sether = new NBTTagCompound();
         sether.a("name", "Sether");
         sether.a("id", 701);
         sether.a("player", UUID.fromString("58a6382a-3b85-4d7f-8a6a-0b920ecb88bd"));
+        NBTTagCompound kaigoe = new NBTTagCompound();
+        kaigoe.a("name", "kaigoe");
+        kaigoe.a("id", 702);
+        kaigoe.a("player", UUID.fromString("b24b275f-23ee-4c3f-ba98-6bce8442bd8a"));
+        sether.a("assistant", kaigoe);
 
         developerList.add(timeout);
         developerList.add(sether);
         testCompound.a("developerList", developerList);
+
+        NBTTagList team = new NBTTagList();
+        team.add(new NBTTagIntArray(MinecraftSerializableUUID.a(UUID.fromString("94dd234a-2320-4f17-9f40-a1cc80afab2d"))));
+        team.add(new NBTTagIntArray(MinecraftSerializableUUID.a(UUID.fromString("121a9207-cd9a-4717-ba06-bb96667492f1"))));
+        team.add(new NBTTagIntArray(MinecraftSerializableUUID.a(UUID.fromString("58a6382a-3b85-4d7f-8a6a-0b920ecb88bd"))));
+        team.add(new NBTTagIntArray(MinecraftSerializableUUID.a(UUID.fromString("b24b275f-23ee-4c3f-ba98-6bce8442bd8a"))));
+        testCompound.a("teamList", team);
     }
 
     @Test
@@ -115,6 +132,41 @@ public class NBTConfigTest {
         assertEquals(Arrays.asList(1, 2, 3, 4, 5), config.getIntegerList("intArray"));
         assertEquals(Arrays.asList(6L, 7L, 8L, 9L), config.getLongList("longArray"));
         assertEquals(Arrays.asList((byte) 10, (byte) 23, (byte) 0), config.getByteList("byteArray"));
+
+        HashMap<String, Object> timeout = (HashMap<String, Object>) config.getList("developerList").get(0);
+        assertTrue(timeout instanceof Map<?,?>);
+        assertEquals(408, timeout.get("id"));
+        assertEquals("Timeout", timeout.get("name"));
+        assertEquals(UUID.fromString("94dd234a-2320-4f17-9f40-a1cc80afab2d"),
+                ((OfflinePlayer) timeout.get("player")).getUniqueId());
+        HashMap<String, Object> sether = (HashMap<String, Object>) config.getList("developerList").get(1);
+        assertTrue(sether instanceof Map<?,?>);
+        assertEquals(701, sether.get("id"));
+        assertEquals("Sether", sether.get("name"));
+        assertEquals(UUID.fromString("58a6382a-3b85-4d7f-8a6a-0b920ecb88bd"),
+                ((OfflinePlayer) sether.get("player")).getUniqueId());
+
+        HashMap<String, Object> asedem = (HashMap<String, Object>) timeout.get("assistant");
+        assertTrue(asedem instanceof Map<?,?>);
+        assertEquals(409, asedem.get("id"));
+        assertEquals("Asedem", asedem.get("name"));
+        assertEquals(UUID.fromString("121a9207-cd9a-4717-ba06-bb96667492f1"),
+                ((OfflinePlayer) asedem.get("player")).getUniqueId());
+
+        HashMap<String, Object> kaigoe = (HashMap<String, Object>) sether.get("assistant");
+        assertTrue(kaigoe instanceof Map<?,?>);
+        assertEquals(702, kaigoe.get("id"));
+        assertEquals("kaigoe", kaigoe.get("name"));
+        assertEquals(UUID.fromString("b24b275f-23ee-4c3f-ba98-6bce8442bd8a"),
+                ((OfflinePlayer) kaigoe.get("player")).getUniqueId());
+
+        List<OfflinePlayer> team = (List<OfflinePlayer>) config.getList("teamList");
+        assertNotNull(team);
+        System.out.println(team.get(0));
+        assertEquals(UUID.fromString("94dd234a-2320-4f17-9f40-a1cc80afab2d"), team.get(0).getUniqueId());
+        assertEquals(UUID.fromString("121a9207-cd9a-4717-ba06-bb96667492f1"), team.get(1).getUniqueId());
+        assertEquals(UUID.fromString("58a6382a-3b85-4d7f-8a6a-0b920ecb88bd"), team.get(2).getUniqueId());
+        assertEquals(UUID.fromString("b24b275f-23ee-4c3f-ba98-6bce8442bd8a"), team.get(3).getUniqueId());
     }
 
     @Test
@@ -139,6 +191,17 @@ public class NBTConfigTest {
         assertEquals(Arrays.asList(1, 2, 3, 4, 5), config.getIntegerList("intArray"));
         assertEquals(Arrays.asList(6L, 7L, 8L, 9L), config.getLongList("longArray"));
         assertEquals(Arrays.asList((byte) 10, (byte) 23, (byte) 0), config.getByteList("byteArray"));
+
+        HashMap<String, Object> timeout = (HashMap<String, Object>) config.getList("developerList").get(0);
+        assertEquals(408, timeout.get("id"));
+        assertEquals("Timeout", timeout.get("name"));
+        assertEquals(UUID.fromString("94dd234a-2320-4f17-9f40-a1cc80afab2d"),
+                ((OfflinePlayer) timeout.get("player")).getUniqueId());
+        HashMap<String, Object> sether = (HashMap<String, Object>) config.getList("developerList").get(1);
+        assertEquals(701, sether.get("id"));
+        assertEquals("Sether", sether.get("name"));
+        assertEquals(UUID.fromString("58a6382a-3b85-4d7f-8a6a-0b920ecb88bd"),
+                ((OfflinePlayer) sether.get("player")).getUniqueId());
     }
 
     @Test
@@ -163,6 +226,17 @@ public class NBTConfigTest {
         assertEquals(Arrays.asList(1, 2, 3, 4, 5), config.getIntegerList("intArray"));
         assertEquals(Arrays.asList(6L, 7L, 8L, 9L), config.getLongList("longArray"));
         assertEquals(Arrays.asList((byte) 10, (byte) 23, (byte) 0), config.getByteList("byteArray"));
+
+        HashMap<String, Object> timeout = (HashMap<String, Object>) config.getList("developerList").get(0);
+        assertEquals(408, timeout.get("id"));
+        assertEquals("Timeout", timeout.get("name"));
+        assertEquals(UUID.fromString("94dd234a-2320-4f17-9f40-a1cc80afab2d"),
+                ((OfflinePlayer) timeout.get("player")).getUniqueId());
+        HashMap<String, Object> sether = (HashMap<String, Object>) config.getList("developerList").get(1);
+        assertEquals(701, sether.get("id"));
+        assertEquals("Sether", sether.get("name"));
+        assertEquals(UUID.fromString("58a6382a-3b85-4d7f-8a6a-0b920ecb88bd"),
+                ((OfflinePlayer) sether.get("player")).getUniqueId());
     }
 
     @Test

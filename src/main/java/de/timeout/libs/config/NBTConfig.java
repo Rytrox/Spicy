@@ -62,7 +62,7 @@ public class NBTConfig extends MemoryConfiguration {
     }
 
     @NotNull
-    private static List<?> readList(@NotNull NBTList<? extends NBTBase> list) {
+    private static Object readList(@NotNull NBTList<? extends NBTBase> list) {
         // Convert TagList to List with elements
         List<Object> elements = new LinkedList<>();
 
@@ -70,8 +70,8 @@ public class NBTConfig extends MemoryConfiguration {
             case NBTTagByteArray byteArray -> elements.addAll(Bytes.asList(byteArray.d()));
             case NBTTagIntArray i -> {
                 if(i.size() == 4) {
-                    // Try convert to OfflinePlayer here!
-                    elements.add(Bukkit.getOfflinePlayer(GameProfileSerializer.a(i)));
+                    // Try convert to OfflinePlayer here! That's why this method returns Object
+                    return Bukkit.getOfflinePlayer(GameProfileSerializer.a(i));
                 } else elements.addAll(Arrays.stream(i.f()).boxed().toList());
             }
             case NBTTagLongArray longArray -> elements.addAll(Arrays.stream(longArray.f()).boxed().toList());
