@@ -105,7 +105,7 @@ class MineskinHandler {
             try(CloseableHttpClient client = HttpClients.createDefault()) {
                 HttpEntity entity = MultipartEntityBuilder.create()
                         .addTextBody("variant", options.getVariant())
-                        .addTextBody("name", Optional.ofNullable(options.getName()).orElse(""))
+                        .addTextBody("name", options.getName())
                         .addTextBody("visibility", String.valueOf(options.getVisibility()))
                         .addBinaryBody("file", file)
                         .build();

@@ -19,8 +19,6 @@ import static org.mockserver.model.HttpRequest.*;
 import static org.mockserver.model.HttpResponse.*;
 import static org.junit.Assert.*;
 import static org.mockserver.integration.ClientAndServer.startClientAndServer;
-import static org.mockserver.model.Parameter.param;
-import static org.mockserver.model.ParameterBody.params;
 
 public class MineskinHandlerTest {
 
@@ -87,7 +85,7 @@ public class MineskinHandlerTest {
     }
 
     @Test
-    public void shouldLoadFromCacheOnce() throws ExecutionException, InterruptedException, TimeoutException {
+    public void shouldCacheValue() throws ExecutionException, InterruptedException, TimeoutException {
         Mineskin skin = MineskinHandler.getMineskin(UUID.fromString("f0765f67-ef4a-4a34-a3a1-a048e8ecd822"))
                 .get(5, TimeUnit.SECONDS);
 

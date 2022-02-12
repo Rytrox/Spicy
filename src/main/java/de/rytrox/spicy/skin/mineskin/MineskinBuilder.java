@@ -39,8 +39,8 @@ public class MineskinBuilder {
      * @param variant the variant you want to have. Standard value: Steve
      * @return the builder to continue
      */
-    public MineskinBuilder variant(@NotNull Mineskin.Variant variant) {
-        this.options.setVariant(variant.getType());
+    public MineskinBuilder variant(@NotNull GenerateOptions.Variant variant) {
+        this.options.setVariant(variant);
 
         return this;
     }
@@ -56,8 +56,8 @@ public class MineskinBuilder {
      * @param visibility the visibility you want to use. Standard value: private
      * @return the builder to continue
      */
-    public MineskinBuilder visibility(@NotNull Mineskin.Visibility visibility) {
-        this.options.setVisibility(visibility.getType());
+    public MineskinBuilder visibility(@NotNull GenerateOptions.Visibility visibility) {
+        this.options.setVisibility(visibility);
 
         return this;
     }

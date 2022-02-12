@@ -27,9 +27,9 @@ public class Mineskin implements Serializable {
     private final int accountId;
     private final int views;
 
-    private String name;
-    private GameProfile data;
-    private boolean privateSkin;
+    private final String name;
+    private final GameProfile data;
+    private final boolean privateSkin;
 
     public Mineskin(@NotNull JsonObject data) {
         this.id = data.get("id").getAsInt();
@@ -43,17 +43,18 @@ public class Mineskin implements Serializable {
 
         // fetch GameProfile
         JsonObject profileData = data.get("data").getAsJsonObject();
-        GameProfile profile = new GameProfile(UUID.fromString(profileData.get("uuid").getAsString()), name);
+        this.data = new GameProfile(UUID.fromString(profileData.get("uuid").getAsString()), name);
         // fetch TextureData
         JsonObject textures = profileData.get("texture").getAsJsonObject();
-        profile.getProperties().clear();
-        profile.getProperties().put("textures", new Property("textures",
+        this.data.getProperties().clear();
+        this.data.getProperties().put("textures", new Property("textures",
                         textures.get("value").getAsString(),
                         textures.get("signature").getAsString())
         );
     }
 
-    private @Nullable UUID fetchTrimmedID(String trimmedID) {
+    @NotNull
+    private UUID fetchTrimmedID(String trimmedID) {
 
         Matcher matcher = UUID_PATTERN.matcher(trimmedID);
 
@@ -63,9 +64,7 @@ public class Mineskin implements Serializable {
                     String.format("%s-%s-%s-%s-%s", matcher.group(1), matcher.group(2), matcher.group(3),
                             matcher.group(4), matcher.group(5))
             );
-        }
-
-        return null;
+        } else throw new IllegalArgumentException("JSON uuid field is not a trimmed uuid");
     }
 
     /**
@@ -96,30 +95,12 @@ public class Mineskin implements Serializable {
     }
 
     /**
-     * Sets the name of the skin
-     *
-     * @param name the name of the skin
-     */
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    /**
      * Returns the GameProfile of the Skin
      *
      * @return the GameProfile of the skin
      */
     public GameProfile getData() {
         return data;
-    }
-
-    /**
-     * Sets the Gameprofile of the Skin
-     *
-     * @param data the GameProfile of the Skin
-     */
-    public void setData(GameProfile data) {
-        this.data = data;
     }
 
     /**
@@ -159,64 +140,11 @@ public class Mineskin implements Serializable {
     }
 
     /**
-     * Sets if the skin should be private
-     * @param privateSkin true if the Skin should be private, false otherwise
-     */
-    public void setPrivateSkin(boolean privateSkin) {
-        this.privateSkin = privateSkin;
-    }
-
-    /**
      * Returns the amount of views this skin gets
      *
      * @return the amount of views of this skin
      */
     public int getViews() {
         return views;
-    }
-
-    /**
-     * Enum for Skin-Variant
-     */
-    public enum Variant {
-
-        CLASSIC("classic"),
-        SLIM("slim");
-
-        private final String type;
-
-        Variant(@NotNull String type) {
-            this.type = type;
-        }
-
-        /**
-         * Returns the name of the Variant
-         *
-         * @return the name of the Variant
-         */
-        public String getType() {
-            return type;
-        }
-    }
-
-    public enum Visibility {
-
-        PUBLIC(0),
-        PRIVATE(1);
-
-        private final int type;
-
-        Visibility(int type) {
-            this.type = type;
-        }
-
-        /**
-         * Returns the id of the Visibility
-         *
-         * @return the ID of the Visibility
-         */
-        public int getType() {
-            return type;
-        }
     }
 }
