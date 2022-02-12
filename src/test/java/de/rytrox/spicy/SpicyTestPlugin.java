@@ -1,4 +1,4 @@
-package de.timeout.libs;
+package de.rytrox.spicy;
 
 import de.rytrox.spicy.config.JsonConfig;
 import de.rytrox.spicy.config.UTFConfig;
@@ -11,16 +11,16 @@ import java.io.File;
 import java.io.IOException;
 import java.util.logging.Level;
 
-public class LibsTestPlugin extends JavaPlugin {
+public class SpicyTestPlugin extends JavaPlugin {
 
     private UTFConfig utfConfig;
     private JsonConfig jsonConfig;
 
-    public LibsTestPlugin() {
+    public SpicyTestPlugin() {
         super();
     }
 
-    protected LibsTestPlugin(JavaPluginLoader loader, PluginDescriptionFile description, File dataFolder, File file) {
+    protected SpicyTestPlugin(JavaPluginLoader loader, PluginDescriptionFile description, File dataFolder, File file) {
         super(loader, description, dataFolder, file);
     }
 

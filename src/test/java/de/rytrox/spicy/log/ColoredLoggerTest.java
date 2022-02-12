@@ -1,7 +1,9 @@
 package de.rytrox.spicy.log;
 
 import be.seeseemelk.mockbukkit.MockBukkit;
-import de.timeout.libs.LibsTestPlugin;
+
+import de.rytrox.spicy.SpicyTestPlugin;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -16,7 +18,7 @@ import static org.junit.Assert.*;
 
 public class ColoredLoggerTest {
 
-    private LibsTestPlugin plugin;
+    private SpicyTestPlugin plugin;
     private LogLogger logLogger;
 
     @Before
@@ -24,7 +26,7 @@ public class ColoredLoggerTest {
         MockBukkit.mock();
 
         logLogger = new LogLogger();
-        plugin = MockBukkit.load(LibsTestPlugin.class);
+        plugin = MockBukkit.load(SpicyTestPlugin.class);
         plugin.getLogger().addHandler(logLogger);
     }
 
@@ -32,17 +34,17 @@ public class ColoredLoggerTest {
     public void printWithoutColorCode() {
         plugin.getLogger().log(Level.INFO, "&1Das &2ist &3ein &4kleiner &5Test");
 
-        assertEquals("[Libs] &1Das &2ist &3ein &4kleiner &5Test", logLogger.messages.remove(0));
+        assertEquals("[Spicy] &1Das &2ist &3ein &4kleiner &5Test", logLogger.messages.remove(0));
     }
 
     @Test
     public void enableColorCodeHandler() {
         plugin.getLogger().log(Level.INFO, "&1Das &2ist &3ein &4kleiner &5Test");
 
-        ColoredLogger.enableColoredLogging('&', plugin.getLogger(), "&8[&6Libs&8]");
+        ColoredLogger.enableColoredLogging('&', plugin.getLogger(), "&8[&6Spicy&8]");
         plugin.getLogger().log(Level.INFO, "&1Das &2ist &3ein &4kleiner &5Test");
 
-        assertEquals("[Libs] &1Das &2ist &3ein &4kleiner &5Test", logLogger.messages.remove(0));
+        assertEquals("[Spicy] &1Das &2ist &3ein &4kleiner &5Test", logLogger.messages.remove(0));
         assertNotEquals("&1Das &2ist &3ein &4kleiner &5Test", logLogger.messages.remove(0));
     }
 

@@ -1,6 +1,6 @@
-name: Libs
+name: Spicy
 version: 1.0
 author: Timeout
-description: 'Ein Test-Plugin für die Libs'
+description: 'Ein Test-Plugin für Spicy'
 
-main: de.timeout.libs.LibsTestPlugin
+main: de.rytrox.spicy.SpicyTestPlugin
