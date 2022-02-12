@@ -57,17 +57,6 @@ public class Reflections {
     }
 
     /**
-     * This method returns the value of the Field in your obj
-     * @param field the field which you want to read
-     * @param obj the object you want to read
-     * @return the value, which you are looking for. null if there were an error
-     */
-    @NotNull
-    public static Object getValue(@NotNull Field field, @NotNull Object obj) throws IllegalAccessException {
-        return FieldUtils.readField(field, obj, true);
-    }
-
-    /**
      * This method reads a value from a declared field in a class.
      * If the field cannot be found it returns null.
      *
@@ -106,68 +95,6 @@ public class Reflections {
                 .filter(underclass -> underclass.getName().equalsIgnoreCase(overclass.getName() + "$" + classname))
                 .findAny()
                 .orElse(null);
-    }
-
-    /**
-     * This method returns a class-object from its name
-     * @param classpath the name of the class
-     * @return the class itself
-     */
-    public static @NotNull Class<?> getClass(String classpath) throws ClassNotFoundException {
-        return ClassUtils.getClass(classpath);
-    }
-
-    /**
-     * This Method set a value into a Field in an Object
-     * @param field the Field
-     * @param obj the Object you want to modify
-     * @param value the new value of the field
-     */
-    public static void setValue(@NotNull Field field, @NotNull Object obj, @Nullable Object value) throws IllegalAccessException {
-        FieldUtils.writeField(field, obj, value, true);
-    }
-
-    /**
-     * Returns the method of a certain object due reflections
-     * @param clazz the class which has the method. Cannot be null
-     * @param name the name of the method. Can neither be null nor empty
-     * @param params the parameters of the method
-     * @return the method or null if the method could not be found
-     */
-    public static @NotNull Method getMethod(@NotNull Class<?> clazz, @NotNull String name, Class<?>... params) throws NoSuchMethodException {
-        Method method;
-
-        try {
-            method = clazz.getMethod(name, params);
-        } catch(NoSuchMethodException e) {
-            method = clazz.getDeclaredMethod(name, params);
-        }
-
-        method.setAccessible(true);
-        return method;
-    }
-
-
-    /**
-     * This method return an NMS-Class, which has a certain name
-     * @param nmsClass the name of the NMS-Class
-     * @return the CLass itself. Null if the class cannot be found.
-     */
-    public static Class<?> getNMSClass(String nmsClass) {
-        return loadClass("net.minecraft.server.%s.%s", nmsClass);
-    }
-
-    /**
-     * This method returns the Array type of an NMS-Class.
-     * For example it will return PacketPlayOutNamedEntitySpawn[].class instead of PacketPlayOutNamedEntitySpawn.class
-     *
-     * For single types, please use {@link Reflections#getNMSClass(String)}
-     *
-     * @param nmsClass the name of the NMS-Class
-     * @return the Array Type of the NMS-Class. Null if the class cannot be found
-     */
-    public static Class<?> getNMSArrayTypeClass(String nmsClass) {
-        return loadClass("[Lnet.minecraft.server.%s.%s;", nmsClass);
     }
 
     /**

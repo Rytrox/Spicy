@@ -62,24 +62,20 @@ public class ItemStacksTest {
     @Test
     public void shouldEncodeItemStackToBase64() throws IOException {
         // Unable to mock this test...
-//        String base = ItemStacks.encodeBase64(itemStack);
-//
-//        assertNotNull(base);
-//        assertTrue(base.matches("^([A-Za-z0-9+/]{4})*([A-Za-z0-9+/]{3}=|[A-Za-z0-9+/]{2}==)?$"));
+        String base = ItemStacks.encodeBase64(itemStack);
+
+        assertNotNull(base);
+        assertTrue(base.matches("^([A-Za-z0-9+/]{4})*([A-Za-z0-9+/]{3}=|[A-Za-z0-9+/]{2}==)?$"));
     }
 
-    @Test
-    public void shouldDecodeBase64ToItemStack() throws IOException, ClassNotFoundException {
-        // Unable to mock this test...
+//    @Test
+//    public void shouldDecodeBase64ToItemStack() throws IOException, ClassNotFoundException {
+//        // Unable to mock this test...
 //        String base = ItemStacks.encodeBase64(itemStack);
 //        ItemStack copy = ItemStacks.decodeBase64(base);
 //
 //        assertEquals(itemStack, copy);
-    }
-
-    /**
-     * ItemStacks#getCustomName TESTS
-     */
+//    }
 
     @Test
     public void shouldGetCustomNameAsDisplayName() {

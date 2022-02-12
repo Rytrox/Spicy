@@ -1,37 +1,30 @@
 package de.rytrox.spicy.reflect;
 
 import com.mojang.authlib.GameProfile;
-import org.bukkit.Bukkit;
+
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.server.level.EntityPlayer;
+import net.minecraft.server.network.PlayerConnection;
+
+import org.apache.commons.lang3.reflect.MethodUtils;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.logging.Level;
-
 public class Players {
-
-    private static final Class<?> packetClass = Reflections.getNMSClass("Packet");
 
     private Players() {
         /* UTIL-CLASSES DON'T NEED A CONSTRUCTOR */
     }
+
     /**
      * This Method returns the player's GameProfile
      * @param player the owner of the GameProfile
      * @return the Gameprofile
      */
     @Nullable
-    public static GameProfile getGameProfile(@NotNull Player player) {
-        try {
-            Class<?> craftplayerClass = Reflections.getCraftBukkitClass("entity.CraftPlayer");
-            return craftplayerClass != null ? (GameProfile) craftplayerClass.getMethod("getProfile").invoke(player) : null;
-        } catch (IllegalAccessException | IllegalArgumentException | NoSuchMethodException | SecurityException | InvocationTargetException e) {
-            Bukkit.getLogger().log(Level.INFO, "Could not get GameProfile from Player " + player.getName(), e);
-        }
-        return new GameProfile(player.getUniqueId(), player.getName());
+    public static GameProfile getGameProfile(@NotNull Player player) throws ReflectiveOperationException {
+        return (GameProfile) MethodUtils.invokeMethod(player, "getProfile", true);
     }
 
     /**
@@ -41,9 +34,8 @@ public class Players {
      * @throws ReflectiveOperationException if there was an error
      */
     @NotNull
-    public static Object getEntityPlayer(@NotNull Player player) throws ReflectiveOperationException {
-        Method getHandle = player.getClass().getMethod("getHandle");
-        return getHandle.invoke(player);
+    public static EntityPlayer getEntityPlayer(@NotNull Player player) throws ReflectiveOperationException {
+        return (EntityPlayer) MethodUtils.invokeMethod(player, "getHandle", true);
     }
 
     /**
@@ -53,10 +45,8 @@ public class Players {
      * @throws ReflectiveOperationException if there was an error
      */
     @NotNull
-    public static Object getPlayerConnection(@NotNull Player player) throws ReflectiveOperationException {
-        Object nmsp = getEntityPlayer(player);
-        Field con = nmsp.getClass().getField("playerConnection");
-        return con.get(nmsp);
+    public static PlayerConnection getPlayerConnection(@NotNull Player player) throws ReflectiveOperationException {
+        return getEntityPlayer(player).b;
     }
 
     /**
@@ -65,8 +55,7 @@ public class Players {
      * @param packet the packet
      * @throws ReflectiveOperationException if the object is not a packet
      */
-    public static void sendPacket(@NotNull Player player, @NotNull Object packet) throws ReflectiveOperationException {
-        Object playerConnection = getPlayerConnection(player);
-        playerConnection.getClass().getMethod("sendPacket", packetClass).invoke(playerConnection, packet);
+    public static void sendPacket(@NotNull Player player, @NotNull Packet<?> packet) throws ReflectiveOperationException {
+        getPlayerConnection(player).a(packet);
     }
 }

@@ -5,6 +5,7 @@ import java.lang.reflect.Field;
 import java.nio.charset.StandardCharsets;
 import java.util.logging.Level;
 
+import org.apache.commons.lang3.reflect.FieldUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -80,7 +81,7 @@ public class UTFConfig extends YamlConfiguration {
 		try {
 			assert optionField != null;
 
-			yamlOptions = (DumperOptions) Reflections.getValue(optionField, this);
+			yamlOptions = (DumperOptions) FieldUtils.readField(optionField, this);
 		} catch (IllegalAccessException e) {
 			Bukkit.getLogger().log(Level.SEVERE, "Unable to save Yaml-File", e);
 		}
