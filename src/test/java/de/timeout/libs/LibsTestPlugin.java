@@ -1,7 +1,7 @@
 package de.timeout.libs;
 
-import de.timeout.libs.config.JsonConfig;
-import de.timeout.libs.config.UTFConfig;
+import de.rytrox.spicy.config.JsonConfig;
+import de.rytrox.spicy.config.UTFConfig;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.plugin.java.JavaPluginLoader;
