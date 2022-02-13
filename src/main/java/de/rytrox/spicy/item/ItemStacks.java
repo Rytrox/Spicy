@@ -100,7 +100,7 @@ public final class ItemStacks {
         if(itemStack.getItemMeta() != null) {
             if(itemStack.getItemMeta().hasDisplayName()) {
                 return itemStack.getItemMeta().getDisplayName();
-            } else {
+            } else if(itemStack.getItemMeta().hasLocalizedName()) {
                 return itemStack.getItemMeta().getLocalizedName();
             }
         }
