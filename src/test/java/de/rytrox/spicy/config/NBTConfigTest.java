@@ -244,9 +244,19 @@ public class NBTConfigTest {
         NBTConfig config = new NBTConfig(testCompound);
 
         File file = temporaryFolder.newFile();
+        File compressed = temporaryFolder.newFile();
 
-        config.save(file);
+        config.saveUncompressed(file);
         assertTrue(file.length() > 0L);
+
+        config.saveCompressed(compressed);
+        assertTrue(compressed.length() > 0);
+
+        NBTConfig readCompressed = NBTConfig.fromCompressedFile(compressed);
+        NBTConfig readUncompressed = NBTConfig.fromUncompressedFile(file);
+
+        assertFalse(readCompressed.getKeys(false).isEmpty());
+        assertFalse(readUncompressed.getKeys(false).isEmpty());
     }
 
     @Test

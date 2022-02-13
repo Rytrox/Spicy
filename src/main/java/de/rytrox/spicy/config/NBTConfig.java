@@ -169,12 +169,22 @@ public class NBTConfig extends MemoryConfiguration {
     }
 
     /**
-     * Saves the config into a file
+     * Compress the TagCompound and save into a file
      *
      * @param file the file you want to save the nbt-data
      * @throws IOException if the file cannot be written
      */
-    public void save(@NotNull File file) throws IOException {
+    public void saveCompressed(@NotNull File file) throws IOException {
+        NBTCompressedStreamTools.a(save(), file);
+    }
+
+    /**
+     * Save the TagCompound uncompressed in a file
+     *
+     * @param file the file you want to save the nbt-data
+     * @throws IOException if the file cannot be written
+     */
+    public void saveUncompressed(@NotNull File file) throws IOException {
         NBTCompressedStreamTools.b(save(), file);
     }
 

@@ -3,11 +3,14 @@ package de.rytrox.spicy.item;
 import java.util.*;
 import java.util.logging.Level;
 
+import de.rytrox.spicy.config.NBTConfig;
 import net.minecraft.nbt.*;
+import net.minecraft.network.chat.IChatBaseComponent;
 import org.apache.commons.lang.Validate;
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.craftbukkit.v1_18_R1.util.CraftChatMessage;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
@@ -48,7 +51,7 @@ public class ItemStackBuilder {
      */
     public ItemStackBuilder setDisplayName(String displayName) {
         // set DisplayName
-        ItemMeta meta = getSafeItemMeta(currentBuilding);
+        ItemMeta meta = ItemStacks.getSafeItemMeta(currentBuilding);
         meta.setDisplayName(displayName);
         currentBuilding.setItemMeta(meta);
         // return this to continue
@@ -77,7 +80,7 @@ public class ItemStackBuilder {
      */
     public ItemStackBuilder setModelData(@Nullable Integer model) {
         // set model data
-        ItemMeta meta = getSafeItemMeta(currentBuilding);
+        ItemMeta meta = ItemStacks.getSafeItemMeta(currentBuilding);
         meta.setCustomModelData(model);
         this.currentBuilding.setItemMeta(meta);
 
@@ -91,7 +94,7 @@ public class ItemStackBuilder {
      */
     public ItemStackBuilder removeEnchantment(Enchantment enchantment) {
         // remove enchantment
-        ItemMeta meta = getSafeItemMeta(currentBuilding);
+        ItemMeta meta = ItemStacks.getSafeItemMeta(currentBuilding);
         meta.removeEnchant(enchantment);
         currentBuilding.setItemMeta(meta);
         // return this to continue
@@ -105,7 +108,7 @@ public class ItemStackBuilder {
      * @return the builder itself to continue
      */
     public ItemStackBuilder setCustomModelData(int data) {
-        ItemMeta meta = getSafeItemMeta(this.currentBuilding);
+        ItemMeta meta = ItemStacks.getSafeItemMeta(this.currentBuilding);
         meta.setCustomModelData(data);
         currentBuilding.setItemMeta(meta);
 
@@ -120,7 +123,7 @@ public class ItemStackBuilder {
      */
     public ItemStackBuilder setLore(List<String> lore) {
         // Set Lore for currentBuilding
-        ItemMeta meta = getSafeItemMeta(currentBuilding);
+        ItemMeta meta = ItemStacks.getSafeItemMeta(currentBuilding);
         meta.setLore(lore);
         currentBuilding.setItemMeta(meta);
         // return this to continue
@@ -134,7 +137,7 @@ public class ItemStackBuilder {
      */
     public ItemStackBuilder hideEnchantments(boolean result) {
         // get Meta
-        ItemMeta meta = getSafeItemMeta(currentBuilding);
+        ItemMeta meta = ItemStacks.getSafeItemMeta(currentBuilding);
         // show or hide enchantments
         if(result) meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
         else meta.removeItemFlags(ItemFlag.HIDE_ENCHANTS);
@@ -170,7 +173,7 @@ public class ItemStackBuilder {
         Validate.notEmpty(lines, "new Lines cannot be empty or null");
         // create new lore
         List<String> newLore = new ArrayList<>(
-                Optional.ofNullable(getSafeItemMeta(currentBuilding).getLore())
+                Optional.ofNullable(ItemStacks.getSafeItemMeta(currentBuilding).getLore())
                         .orElse(new ArrayList<>())
         );
         // add elements to lore
@@ -179,62 +182,41 @@ public class ItemStackBuilder {
         return setLore(newLore);
     }
 
+    @NotNull
+    public ItemStackBuilder withNBTData(@NotNull NBTTagCompound compound) {
+        try {
+            net.minecraft.world.item.ItemStack handle = (net.minecraft.world.item.ItemStack)
+                    FieldUtils.readField(this.currentBuilding, "handle", true);
+
+            NBTTagCompound merged = Optional.ofNullable(handle.s())
+                    .orElse(new NBTTagCompound()).a(compound);
+
+            handle.c(merged);
+
+            return this;
+        } catch (IllegalAccessException e) {
+            throw new IllegalStateException("Unable to deep access ItemStack in Builder");
+        }
+    }
+
+    @NotNull
+    public ItemStackBuilder withNBTData(@NotNull NBTConfig config) {
+        return this.withNBTData(config.save());
+    }
+
     /**
      * This Method writes the NBT-Tag with an Int as value in a certain key
      * @param key the key of the tag
      * @param value the value you want to write in this key
      * @return the builder to continue
      */
-    public <T> ItemStackBuilder writeNBTData(String key, T value) {
-        try {
-            net.minecraft.world.item.ItemStack handle = (net.minecraft.world.item.ItemStack)
-                    FieldUtils.readField(this.currentBuilding, "handle", true);
+    public <T> ItemStackBuilder withNBTData(@NotNull String key, @NotNull T value) {
+        NBTConfig config = new NBTConfig(Optional.ofNullable(ItemStacks.getNBTTagCompound(this.currentBuilding))
+                .orElse(new NBTTagCompound()));
 
-            NBTTagCompound compound = Optional.ofNullable(handle.s())
-                    .orElse(new NBTTagCompound());
+        config.set(key, value);
 
-            NBTBase base = convertToNBTBase(value);
-            if(base != null) {
-                // Add key to compound
-                compound.a(key, base);
-
-                // Set Compound in itemStack
-                handle.c(compound);
-            } else throw new IllegalArgumentException("Cannot convert " + value.getClass().getSimpleName() + " to NBT-Data");
-        } catch (IllegalAccessException e) {
-            Bukkit.getLogger().log(Level.SEVERE, e, () -> NBT_ERROR + key);
-        }
-
-
-        // return this to continue
-        return this;
-    }
-
-    private <T> NBTBase convertToNBTBase(@NotNull T value) {
-        return switch (value) {
-            case Boolean b -> NBTTagByte.a(b);
-            case Byte b -> NBTTagByte.a(b);
-            case Short s -> NBTTagShort.a(s);
-            case Integer i -> NBTTagInt.a(i);
-            case Long l -> NBTTagLong.a(l);
-            case Float f -> NBTTagFloat.a(f);
-            case Double d -> NBTTagDouble.a(d);
-            case String s -> NBTTagString.a(s);
-            case UUID uuid -> GameProfileSerializer.a(uuid);
-            case byte[] b -> new NBTTagByteArray(b);
-            case int[] i -> new NBTTagIntArray(i);
-            case long[] l -> new NBTTagLongArray(l);
-            default -> null;
-        };
-    }
-
-    protected static @NotNull ItemMeta getSafeItemMeta(ItemStack item) {
-        // an itemmeta is only null when the item is air or null
-        if(item != null && item.getItemMeta() != null) {
-            return item.getItemMeta();
-        }
-
-        // Throws a new IllegalArgumentException if the ItemMeta is null
-        throw new IllegalStateException();
+        // Set Compound in itemStack
+        return this.withNBTData(config);
     }
 }

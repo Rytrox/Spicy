@@ -23,6 +23,16 @@ public record SyncQueryResult<T>(List<T> entities) implements QueryResult<T> {
         );
     }
 
+    /**
+     * Returns the Entities as a list
+     *
+     * @return the Entities as a list
+     */
+    @NotNull
+    public List<T> get() {
+        return entities;
+    }
+
     @Override
     public void subscribe(@NotNull Consumer<List<T>> result) {
         result.accept(entities);

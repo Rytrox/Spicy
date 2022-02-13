@@ -12,14 +12,16 @@ import java.util.logging.Level;
 import de.rytrox.spicy.reflect.Reflections;
 
 import net.minecraft.nbt.NBTTagCompound;
-import org.apache.commons.lang.reflect.MethodUtils;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+
+import org.apache.commons.lang3.reflect.MethodUtils;
 import org.apache.commons.lang.WordUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.util.io.BukkitObjectInputStream;
 import org.bukkit.util.io.BukkitObjectOutputStream;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
@@ -95,8 +97,13 @@ public final class ItemStacks {
     @NotNull
     public static String getCustomizedName(@NotNull ItemStack itemStack) {
         // return displayname if item has one
-        if(itemStack.getItemMeta() != null && itemStack.getItemMeta().hasDisplayName())
-            return itemStack.getItemMeta().getDisplayName();
+        if(itemStack.getItemMeta() != null) {
+            if(itemStack.getItemMeta().hasDisplayName()) {
+                return itemStack.getItemMeta().getDisplayName();
+            } else {
+                return itemStack.getItemMeta().getLocalizedName();
+            }
+        }
 
         // only continue if the item could be found
         // otherwise return ItemStack type name
@@ -153,6 +160,16 @@ public final class ItemStacks {
         return null;
     }
 
+    public static @NotNull ItemMeta getSafeItemMeta(@NotNull ItemStack item) {
+        // an itemmeta is only null when the item is air or null
+        if(item.getItemMeta() != null) {
+            return item.getItemMeta();
+        }
+
+        // Throws a new IllegalArgumentException if the ItemMeta is null
+        throw new IllegalStateException();
+    }
+
     @Nullable
     public static NBTTagCompound getNBTTagCompound(@NotNull ItemStack item) {
         // return null if itemstack is null otherwise return nbt-tag compound
@@ -166,9 +183,11 @@ public final class ItemStacks {
      *
      * @param item the item where the value is stored
      * @param key the NBT-Key where the data is stored
+     * @deprecated Use {@link de.rytrox.spicy.config.NBTConfig} instead for more functionality
      *
      * @return the stored boolean or false if the item does not have tags or the key does not exist
      */
+    @Deprecated
     public static boolean getNBTBoolean(ItemStack item, String key) {
         return Optional.ofNullable(getNBTTagCompound(item))
                 .map((compound) -> compound.q(key))
@@ -181,9 +200,11 @@ public final class ItemStacks {
      * @param item the item where the value is stored
      * @param key the NBT-Key where the data is stored
      * @param def the default value that will be returned when no such key exists
+     * @deprecated Use {@link de.rytrox.spicy.config.NBTConfig} instead for more functionality
      *
      * @return the stored value or the def
      */
+    @Deprecated
     public static boolean getNBTBoolean(ItemStack item, String key, boolean def) {
         return Optional.ofNullable(getNBTTagCompound(item))
                 .filter((compound) -> compound.e(key))
@@ -196,9 +217,11 @@ public final class ItemStacks {
      *
      * @param item the item where the value is stored
      * @param key the key destination of the value
+     * @deprecated Use {@link de.rytrox.spicy.config.NBTConfig} instead for more functionality
      *
      * @return the stored value or the byte 0 if no such key exists
      */
+    @Deprecated
     public static byte getNBTByte(ItemStack item, String key) {
         return Optional.ofNullable(getNBTTagCompound(item))
                 .map((compound) -> compound.f(key))
@@ -211,9 +234,11 @@ public final class ItemStacks {
      * @param item the item where the value is stored
      * @param key the key destination of the value
      * @param def the default value that will be returned if no such key exists
+     * @deprecated Use {@link de.rytrox.spicy.config.NBTConfig} instead for more functionality
      *
      * @return the stored value or def
      */
+    @Deprecated
     public static byte getNBTByte(ItemStack item, String key, byte def) {
         return Optional.ofNullable(getNBTTagCompound(item))
                 .filter((compound) -> compound.e(key))
@@ -226,9 +251,11 @@ public final class ItemStacks {
      *
      * @param item the item where the value is stored
      * @param key the key destination of the value
+     * @deprecated Use {@link de.rytrox.spicy.config.NBTConfig} instead for more functionality
      *
      * @return the stored value or the byte 0 if no such key exists
      */
+    @Deprecated
     public static short getNBTShort(ItemStack item, String key) {
         return Optional.ofNullable(getNBTTagCompound(item))
                 .map((compound) -> compound.g(key))
@@ -241,9 +268,11 @@ public final class ItemStacks {
      * @param item the item where the value is stored
      * @param key the key destination of the value
      * @param def the default value that will be returned if no such key exists
+     * @deprecated Use {@link de.rytrox.spicy.config.NBTConfig} instead for more functionality
      *
      * @return the stored value or def
      */
+    @Deprecated
     public static short getNBTShort(ItemStack item, String key, short def) {
         return Optional.ofNullable(getNBTTagCompound(item))
                 .filter((compound) -> compound.e(key))
@@ -256,9 +285,11 @@ public final class ItemStacks {
      *
      * @param item the item where the value is stored
      * @param key the key destination of the value
+     * @deprecated Use {@link de.rytrox.spicy.config.NBTConfig} instead for more functionality
      *
      * @return the stored value or value 0 if no such key exists
      */
+    @Deprecated
     public static int getNBTInt(ItemStack item, String key) {
         return Optional.ofNullable(getNBTTagCompound(item))
                 .map((compound) -> compound.h(key))
@@ -271,9 +302,11 @@ public final class ItemStacks {
      * @param item the item where the value is stored
      * @param key the key destination of the value
      * @param def the default value that will be returned if no such key exists
+     * @deprecated Use {@link de.rytrox.spicy.config.NBTConfig} instead for more functionality
      *
      * @return the stored value or def
      */
+    @Deprecated
     public static int getNBTInt(ItemStack item, String key, int def) {
         return Optional.ofNullable(getNBTTagCompound(item))
                 .filter((compound) -> compound.e(key))
@@ -286,9 +319,11 @@ public final class ItemStacks {
      *
      * @param item the item where the value is stored
      * @param key the key destination of the value
+     * @deprecated Use {@link de.rytrox.spicy.config.NBTConfig} instead for more functionality
      *
      * @return the stored value or value 0 if no such key exists
      */
+    @Deprecated
     public static float getNBTFloat(ItemStack item, String key) {
         return Optional.ofNullable(getNBTTagCompound(item))
                 .map((compound) -> compound.j(key))
@@ -301,9 +336,11 @@ public final class ItemStacks {
      * @param item the item where the value is stored
      * @param key the key destination of the value
      * @param def the default value that will be returned if no such key exists
+     * @deprecated Use {@link de.rytrox.spicy.config.NBTConfig} instead for more functionality
      *
      * @return the stored value or def
      */
+    @Deprecated
     public static float getNBTFloat(ItemStack item, String key, float def) {
         return Optional.ofNullable(getNBTTagCompound(item))
                 .filter((compound) -> compound.e(key))
@@ -316,9 +353,11 @@ public final class ItemStacks {
      *
      * @param item the item where the value is stored
      * @param key the key destination of the value
+     * @deprecated Use {@link de.rytrox.spicy.config.NBTConfig} instead for more functionality
      *
      * @return the stored value or value 0 if no such key exists
      */
+    @Deprecated
     public static double getNBTDouble(ItemStack item, String key) {
         return Optional.ofNullable(getNBTTagCompound(item))
                 .map((compound) -> compound.k(key))
@@ -331,9 +370,11 @@ public final class ItemStacks {
      * @param item the item where the value is stored
      * @param key the key destination of the value
      * @param def the default value that will be returned if no such key exists
+     * @deprecated Use {@link de.rytrox.spicy.config.NBTConfig} instead for more functionality
      *
      * @return the stored value or def
      */
+    @Deprecated
     public static double getNBTDouble(ItemStack item, String key, double def) {
         return Optional.ofNullable(getNBTTagCompound(item))
                 .filter((compound) -> compound.e(key))
@@ -346,9 +387,11 @@ public final class ItemStacks {
      *
      * @param item the item where the value is stored
      * @param key the key destination of the value
+     * @deprecated Use {@link de.rytrox.spicy.config.NBTConfig} instead for more functionality
      *
      * @return the stored value or an empty string if no such key exists
      */
+    @Deprecated
     public static String getNBTString(ItemStack item, String key) {
         return Optional.ofNullable(getNBTTagCompound(item))
                 .map((compound) -> compound.l(key))
@@ -361,9 +404,11 @@ public final class ItemStacks {
      * @param item the item where the value is stored
      * @param key the key destination of the value
      * @param def the default value that will be returned if no such key exists
+     * @deprecated Use {@link de.rytrox.spicy.config.NBTConfig} instead for more functionality
      *
      * @return the stored value or def
      */
+    @Deprecated
     public static String getNBTDouble(ItemStack item, String key, String def) {
         return Optional.ofNullable(getNBTTagCompound(item))
                 .filter((compound) -> compound.e(key))
@@ -376,9 +421,11 @@ public final class ItemStacks {
      *
      * @param item the item where the array is stored
      * @param key the key destination of the array
+     * @deprecated Use {@link de.rytrox.spicy.config.NBTConfig} instead for more functionality
      *
      * @return the stored array or an empty byte array with length 0 if no such key exists
      */
+    @Deprecated
     public static byte[] getNBTByteArray(ItemStack item, String key) {
         return Optional.ofNullable(getNBTTagCompound(item))
                 .map((compound) -> compound.m(key))
@@ -391,9 +438,11 @@ public final class ItemStacks {
      * @param item the item where the array is stored
      * @param key the key destination of the array
      * @param def the default array that will be returned if no such key exists
+     * @deprecated Use {@link de.rytrox.spicy.config.NBTConfig} instead for more functionality
      *
      * @return the stored array or def
      */
+    @Deprecated
     public static byte[] getNBTByteArray(ItemStack item, String key, byte[] def) {
         return Optional.ofNullable(getNBTTagCompound(item))
                 .filter((compound) -> compound.e(key))
@@ -407,9 +456,11 @@ public final class ItemStacks {
      *
      * @param item the item where the array is stored
      * @param key the key destination of the array
+     * @deprecated Use {@link de.rytrox.spicy.config.NBTConfig} instead for more functionality
      *
      * @return the stored array or an empty integer array with length 0 if no such key exists
      */
+    @Deprecated
     public static int[] getNBTIntArray(ItemStack item, String key) {
         return Optional.ofNullable(getNBTTagCompound(item))
                 .map((compound) -> compound.n(key))
@@ -422,9 +473,11 @@ public final class ItemStacks {
      * @param item the item where the array is stored
      * @param key the key destination of the array
      * @param def the default array that will be returned if no such key exists
+     * @deprecated Use {@link de.rytrox.spicy.config.NBTConfig} instead for more functionality
      *
      * @return the stored array or def
      */
+    @Deprecated
     public static int[] getNBTIntArray(ItemStack item, String key, int[] def) {
         return Optional.ofNullable(getNBTTagCompound(item))
                 .filter((compound) -> compound.e(key))
@@ -437,9 +490,11 @@ public final class ItemStacks {
      *
      * @param item the item where the array is stored
      * @param key the key destination of the array
+     * @deprecated Use {@link de.rytrox.spicy.config.NBTConfig} instead for more functionality
      *
      * @return the stored array or an empty integer array with length 0 if no such key exists
      */
+    @Deprecated
     public static long[] getNBTLongArray(ItemStack item, String key) {
         return Optional.ofNullable(getNBTTagCompound(item))
                 .map((compound) -> compound.o(key))
@@ -452,9 +507,11 @@ public final class ItemStacks {
      * @param item the item where the array is stored
      * @param key the key destination of the array
      * @param def the default array that will be returned if no such key exists
+     * @deprecated Use {@link de.rytrox.spicy.config.NBTConfig} instead for more functionality
      *
      * @return the stored array or def
      */
+    @Deprecated
     public static long[] getNBTLongArray(ItemStack item, String key, long[] def) {
         return Optional.ofNullable(getNBTTagCompound(item))
                 .filter((compound) -> compound.e(key))
