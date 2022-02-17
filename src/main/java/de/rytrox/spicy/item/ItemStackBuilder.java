@@ -20,8 +20,6 @@ import org.jetbrains.annotations.Nullable;
 
 public class ItemStackBuilder {
 
-    private static final String NBT_ERROR = "Cannot write NBT-Data in ";
-
     protected ItemStack currentBuilding;
 
     public ItemStackBuilder() {
@@ -49,7 +47,8 @@ public class ItemStackBuilder {
      * @param displayName the display name
      * @return the builder to continue
      */
-    public ItemStackBuilder setDisplayName(String displayName) {
+    @NotNull
+    public ItemStackBuilder displayName(String displayName) {
         // set DisplayName
         ItemMeta meta = ItemStacks.getSafeItemMeta(currentBuilding);
         meta.setDisplayName(displayName);
@@ -64,7 +63,8 @@ public class ItemStackBuilder {
      * @param level the level
      * @return the builder to continue
      */
-    public ItemStackBuilder addEnchantment(Enchantment enchantment, int level) {
+    @NotNull
+    public ItemStackBuilder enchantment(Enchantment enchantment, int level) {
         // set enchantment
         this.currentBuilding.addUnsafeEnchantment(enchantment, level);
 
@@ -78,7 +78,8 @@ public class ItemStackBuilder {
      * @param model the number of the model
      * @return the builder to continue
      */
-    public ItemStackBuilder setModelData(@Nullable Integer model) {
+    @NotNull
+    public ItemStackBuilder modelData(@Nullable Integer model) {
         // set model data
         ItemMeta meta = ItemStacks.getSafeItemMeta(currentBuilding);
         meta.setCustomModelData(model);
@@ -92,6 +93,7 @@ public class ItemStackBuilder {
      * @param enchantment the Enchant you want to remove
      * @return the builder to continue
      */
+    @NotNull
     public ItemStackBuilder removeEnchantment(Enchantment enchantment) {
         // remove enchantment
         ItemMeta meta = ItemStacks.getSafeItemMeta(currentBuilding);
@@ -102,26 +104,12 @@ public class ItemStackBuilder {
     }
 
     /**
-     * This Method sets the custom model data id of the itemstack
-     *
-     * @param data the custom-model id of the data
-     * @return the builder itself to continue
-     */
-    public ItemStackBuilder setCustomModelData(int data) {
-        ItemMeta meta = ItemStacks.getSafeItemMeta(this.currentBuilding);
-        meta.setCustomModelData(data);
-        currentBuilding.setItemMeta(meta);
-
-        // return this to continue
-        return this;
-    }
-
-    /**
      * This Method sets the Lore of the Item
      * @param lore the Lore you want to set
      * @return the builder to continue
      */
-    public ItemStackBuilder setLore(List<String> lore) {
+    @NotNull
+    public ItemStackBuilder lore(List<String> lore) {
         // Set Lore for currentBuilding
         ItemMeta meta = ItemStacks.getSafeItemMeta(currentBuilding);
         meta.setLore(lore);
@@ -135,6 +123,7 @@ public class ItemStackBuilder {
      * @param result a bool which answers if you want to hide the enchantments. true means the enchantments will be hidden, false otherwise
      * @return the builder to continue
      */
+    @NotNull
     public ItemStackBuilder hideEnchantments(boolean result) {
         // get Meta
         ItemMeta meta = ItemStacks.getSafeItemMeta(currentBuilding);
@@ -148,12 +137,35 @@ public class ItemStackBuilder {
     }
 
     /**
+     * This Method sets the flags of the ItemStack. <br>
+     * It will remove all other flags before
+     *
+     * @param flags the flags of the ItemStack
+     * @return the builder to continue
+     */
+    @NotNull
+    public ItemStackBuilder flags(ItemFlag... flags) {
+        ItemMeta meta = ItemStacks.getSafeItemMeta(currentBuilding);
+
+        // Remove all old flags
+        for(ItemFlag flag : meta.getItemFlags()) {
+            meta.removeItemFlags(flag);
+        }
+
+        meta.addItemFlags(flags);
+        currentBuilding.setItemMeta(meta);
+
+        return this;
+    }
+
+    /**
      * This Method set the amount of the Item. The amount must be positive.
      * @param amount the amount
      * @return the builder to continue
      * @throws IllegalArgumentException if the amount is negative
      */
-    public ItemStackBuilder setAmount(int amount) {
+    @NotNull
+    public ItemStackBuilder amount(int amount) {
         Validate.isTrue(amount >= 0, "Amount must be positive");
 
         // set Amount
@@ -163,23 +175,17 @@ public class ItemStackBuilder {
     }
 
     /**
-     * This method adds new lines to your lore
+     * This method sets the lore
      * @param lines the lines you want to add
      * @return the builder to continue
      * @throws IllegalArgumentException if the lines are empty or null
      */
-    public ItemStackBuilder addLore(String... lines) {
+    @NotNull
+    public ItemStackBuilder lore(String... lines) {
         // Validate
         Validate.notEmpty(lines, "new Lines cannot be empty or null");
         // create new lore
-        List<String> newLore = new ArrayList<>(
-                Optional.ofNullable(ItemStacks.getSafeItemMeta(currentBuilding).getLore())
-                        .orElse(new ArrayList<>())
-        );
-        // add elements to lore
-        newLore.addAll(Arrays.asList(lines));
-        // execute setlore and return this to continue
-        return setLore(newLore);
+        return this.lore(Arrays.asList(lines));
     }
 
     @NotNull
@@ -210,6 +216,7 @@ public class ItemStackBuilder {
      * @param value the value you want to write in this key
      * @return the builder to continue
      */
+    @NotNull
     public <T> ItemStackBuilder withNBTData(@NotNull String key, @NotNull T value) {
         NBTConfig config = new NBTConfig(Optional.ofNullable(ItemStacks.getNBTTagCompound(this.currentBuilding))
                 .orElse(new NBTTagCompound()));
