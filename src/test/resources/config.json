@@ -1,57 +1,55 @@
 {
-  "_id": "5fc7f974e5c03995d30be8a6",
-  "index": 6,
-  "guid": "8b450b2d-65a1-4996-b2aa-b95e5ae9f894",
-  "isActive": true,
-  "balance": "$2,144.53",
-  "picture": "http://placehold.it/32x32",
-  "age": 36,
-  "eyeColor": "brown",
-  "name": {
-    "first": "Hardy",
-    "last": "Fry"
+  "byte": 2,
+  "short": 46,
+  "integer": 13243463,
+  "long": 343423494964959360,
+  "boolean": false,
+  "float": 123.4643,
+  "double": 123434.466544356465432344,
+  "string": "Hello World",
+  "lists": {
+    "booleans": [
+      true,
+      false
+    ],
+    "ints": [
+      12,
+      -24,
+      32435
+    ],
+    "floats": [
+      3543.3543,
+      456.535643,
+      3.43345,
+      3443.533
+    ],
+    "nested": [
+      [
+        23,
+        3432
+      ],
+      [
+        34,
+        43453
+      ]
+    ]
   },
-  "company": "RENOVIZE",
-  "email": "hardy.fry@renovize.biz",
-  "phone": "+1 (875) 551-2138",
-  "address": "338 Christopher Avenue, Hiko, Alabama, 8004",
-  "about": "Irure consequat laborum fugiat et qui incididunt magna consequat enim in velit. Enim deserunt esse excepteur sint elit sint ullamco cillum tempor reprehenderit exercitation. Sint tempor nisi magna pariatur voluptate. Veniam eu nisi do ex id consectetur adipisicing voluptate fugiat fugiat amet tempor laboris sunt.",
-  "registered": "Sunday, August 10, 2014 8:55 PM",
-  "latitude": "-21.530328",
-  "longitude": "88.440565",
-  "tags": [
-    "eu",
-    "magna",
-    "laboris",
-    "aliquip",
-    "Lorem"
-  ],
-  "range": [
-    0,
-    1,
-    2,
-    3,
-    4,
-    5,
-    6,
-    7,
-    8,
-    9
-  ],
-  "friends": [
+  "developerList": [
     {
-      "id": 0,
-      "name": "Cindy Rutledge"
+      "id": 408,
+      "name": "Timeout",
+      "assistant": {
+        "id": 409,
+        "name": "Asedem"
+      }
     },
     {
-      "id": 1,
-      "name": "Burton Tillman"
-    },
-    {
-      "id": 2,
-      "name": "Nina Wyatt"
+      "id": 701,
+      "name": "Sether",
+      "assistant": {
+        "id": 702,
+        "name": "kaigoe"
+      }
     }
-  ],
-  "greeting": "Hello, Hardy! You have 8 unread messages.",
-  "favoriteFruit": "strawberry"
+  ]
 }
