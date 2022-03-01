@@ -3,8 +3,9 @@ package de.rytrox.spicy.reflect;
 import com.mojang.authlib.GameProfile;
 
 import net.minecraft.network.protocol.Packet;
-import net.minecraft.server.level.EntityPlayer;
-import net.minecraft.server.network.PlayerConnection;
+import net.minecraft.server.level.ServerPlayer;
+
+import net.minecraft.server.network.ServerGamePacketListenerImpl;
 
 import org.apache.commons.lang3.reflect.MethodUtils;
 import org.bukkit.entity.Player;
@@ -24,7 +25,7 @@ public class Players {
      */
     @Nullable
     public static GameProfile getGameProfile(@NotNull Player player) throws ReflectiveOperationException {
-        return (GameProfile) MethodUtils.invokeMethod(player, "getProfile", true);
+        return (GameProfile) MethodUtils.invokeMethod(getEntityPlayer(player), "fp", true);
     }
 
     /**
@@ -34,8 +35,8 @@ public class Players {
      * @throws ReflectiveOperationException if there was an error
      */
     @NotNull
-    public static EntityPlayer getEntityPlayer(@NotNull Player player) throws ReflectiveOperationException {
-        return (EntityPlayer) MethodUtils.invokeMethod(player, "getHandle", true);
+    public static ServerPlayer getEntityPlayer(@NotNull Player player) throws ReflectiveOperationException {
+        return (ServerPlayer) MethodUtils.invokeMethod(player, "getHandle", true);
     }
 
     /**
@@ -45,8 +46,8 @@ public class Players {
      * @throws ReflectiveOperationException if there was an error
      */
     @NotNull
-    public static PlayerConnection getPlayerConnection(@NotNull Player player) throws ReflectiveOperationException {
-        return getEntityPlayer(player).b;
+    public static ServerGamePacketListenerImpl getPlayerConnection(@NotNull Player player) throws ReflectiveOperationException {
+        return getEntityPlayer(player).connection;
     }
 
     /**
@@ -56,6 +57,6 @@ public class Players {
      * @throws ReflectiveOperationException if the object is not a packet
      */
     public static void sendPacket(@NotNull Player player, @NotNull Packet<?> packet) throws ReflectiveOperationException {
-        getPlayerConnection(player).a(packet);
+        getPlayerConnection(player).send(packet);
     }
 }
