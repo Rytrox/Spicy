@@ -25,7 +25,7 @@ public class Players {
      */
     @Nullable
     public static GameProfile getGameProfile(@NotNull Player player) throws ReflectiveOperationException {
-        return (GameProfile) MethodUtils.invokeMethod(getEntityPlayer(player), "fp", true);
+        return getEntityPlayer(player).getGameProfile();
     }
 
     /**
@@ -36,7 +36,7 @@ public class Players {
      */
     @NotNull
     public static ServerPlayer getEntityPlayer(@NotNull Player player) throws ReflectiveOperationException {
-        return (ServerPlayer) MethodUtils.invokeMethod(player, "getHandle", true);
+        return (ServerPlayer) MethodUtils.invokeExactMethod(player, "getHandle");
     }
 
     /**
