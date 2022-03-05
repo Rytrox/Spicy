@@ -4,7 +4,6 @@ import com.google.common.primitives.Bytes;
 
 import net.minecraft.nbt.*;
 
-import net.minecraft.network.chat.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.configuration.ConfigurationSection;
