@@ -17,11 +17,12 @@ jobs:
           java-version: '17'
           cache: maven
       - name: Setup Spigot
-        uses: SpraxDev/Action-SpigotMC@v3
+        uses: Rytrox/Action-SpigotMC@v3
         with:
           versions: 1.18.1
           generateSrc: false
           generateDoc: false
+          remapped: true
           disableJavaCheck: false
           buildToolProvider: SpigotMC
       - name: Build & Test
