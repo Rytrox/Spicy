@@ -17,7 +17,7 @@ jobs:
           java-version: '17'
           cache: maven
       - name: Setup Spigot
-        uses: Rytrox/Action-SpigotMC@v3
+        uses: Rytrox/Action-SpigotMC
         with:
           versions: 1.18.1
           generateSrc: false
