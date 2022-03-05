@@ -20,7 +20,7 @@ import java.util.logging.Level;
 
 public class NBTConfig extends MemoryConfiguration {
 
-    public NBTConfig(@NotNull NBTTagCompound compound) {
+    public NBTConfig(@NotNull CompoundTag compound) {
         Map<String, Object> readData = readTagCompound(compound);
 
         this.convertMapsToSections(readData, Objects.requireNonNull(this.getRoot()));
@@ -31,30 +31,30 @@ public class NBTConfig extends MemoryConfiguration {
 
     @Contract("_ -> new")
     public static @NotNull NBTConfig fromCompressedFile(@NotNull File compressedFile) throws IOException {
-        return new NBTConfig(Objects.requireNonNull(NBTCompressedStreamTools.a(compressedFile)));
+        return new NBTConfig(Objects.requireNonNull(NbtIo.readCompressed(compressedFile)));
     }
 
     @Contract("_ -> new")
     public static @NotNull NBTConfig fromUncompressedFile(@NotNull File uncompressedFile) throws IOException {
-        return new NBTConfig(Objects.requireNonNull(NBTCompressedStreamTools.b(uncompressedFile)));
+        return new NBTConfig(Objects.requireNonNull(NbtIo.read(uncompressedFile)));
     }
 
     @NotNull
-    private static Map<String, Object> readTagCompound(@NotNull NBTTagCompound section) {
+    private static Map<String, Object> readTagCompound(@NotNull CompoundTag section) {
         Map<String, Object> map = new HashMap<>();
 
-        for (String key : section.d()) {
-            switch(Objects.requireNonNull(section.c(key))) {
-                case NBTTagCompound s -> map.put(key, readTagCompound(s));
-                case NBTTagIntArray i -> {
+        for (String key : section.getAllKeys()) {
+            switch(Objects.requireNonNull(section.get(key))) {
+                case CompoundTag s -> map.put(key, readTagCompound(s));
+                case IntArrayTag i -> {
                     if(i.size() == 4) {
-                        map.put(key, Bukkit.getOfflinePlayer(GameProfileSerializer.a(i)));
+                        map.put(key, Bukkit.getOfflinePlayer(NbtUtils.loadUUID(i)));
                     } else map.put(key, readList(i));
                 }
-                case NBTList<? extends NBTBase> l -> map.put(key, readList(l));
-                case NBTNumber number -> map.put(key, number.k());
-                case NBTTagString string -> map.put(key, string.e_());
-                default -> throw new IllegalStateException("Unexpected value: " + section.c(key));
+                case CollectionTag<? extends Tag> l -> map.put(key, readList(l));
+                case NumericTag number -> map.put(key, number.getAsNumber());
+                case StringTag string -> map.put(key, string.getAsString());
+                default -> throw new IllegalStateException("Unexpected value: " + section.get(key));
             }
         }
 
@@ -62,26 +62,26 @@ public class NBTConfig extends MemoryConfiguration {
     }
 
     @NotNull
-    private static Object readList(@NotNull NBTList<? extends NBTBase> list) {
+    private static Object readList(@NotNull CollectionTag<? extends Tag> list) {
         // Convert TagList to List with elements
         List<Object> elements = new LinkedList<>();
 
         switch (list) {
-            case NBTTagByteArray byteArray -> elements.addAll(Bytes.asList(byteArray.d()));
-            case NBTTagIntArray i -> {
+            case ByteArrayTag byteArray -> elements.addAll(Bytes.asList(byteArray.getAsByteArray()));
+            case IntArrayTag i -> {
                 if(i.size() == 4) {
                     // Try convert to OfflinePlayer here! That's why this method returns Object
-                    return Bukkit.getOfflinePlayer(GameProfileSerializer.a(i));
-                } else elements.addAll(Arrays.stream(i.f()).boxed().toList());
+                    return Bukkit.getOfflinePlayer(NbtUtils.loadUUID(i));
+                } else elements.addAll(Arrays.stream(i.getAsIntArray()).boxed().toList());
             }
-            case NBTTagLongArray longArray -> elements.addAll(Arrays.stream(longArray.f()).boxed().toList());
+            case LongArrayTag longArray -> elements.addAll(Arrays.stream(longArray.getAsLongArray()).boxed().toList());
             default ->
                 list.forEach(element -> {
                     switch(element) {
-                        case NBTTagCompound s -> elements.add(readTagCompound(s));
-                        case NBTList<? extends NBTBase> l -> elements.add(readList(l));
-                        case NBTTagString s -> elements.add(s.e_());
-                        case NBTNumber n -> elements.add(n.k());
+                        case CompoundTag s -> elements.add(readTagCompound(s));
+                        case CollectionTag<? extends Tag> l -> elements.add(readList(l));
+                        case StringTag s -> elements.add(s.getAsString());
+                        case NumericTag n -> elements.add(n.getAsNumber());
                         default -> throw new IllegalStateException("Unexpected value in List found " + element);
                     }
                 });
@@ -91,25 +91,25 @@ public class NBTConfig extends MemoryConfiguration {
     }
 
     @NotNull
-    private static NBTTagCompound convertMapToCompound(@NotNull Map<?, ?> map) {
-        NBTTagCompound compound = new NBTTagCompound();
+    private static CompoundTag convertMapToCompound(@NotNull Map<?, ?> map) {
+        CompoundTag compound = new CompoundTag();
 
         map.forEach((a, value) -> {
             if(a instanceof String key && value != null) {
                 switch(value) {
-                    case Long l -> compound.a(key, l);
-                    case Double d -> compound.a(key, d);
-                    case Integer i -> compound.a(key, i);
-                    case Float f -> compound.a(key, f);
-                    case Short s -> compound.a(key, s);
-                    case Byte b -> compound.a(key, b);
-                    case Boolean b -> compound.a(key, b);
-                    case Character c -> compound.a(key, c);
-                    case String s -> compound.a(key, s);
-                    case UUID uuid -> compound.a(key, uuid);
-                    case OfflinePlayer p -> compound.a(key, p.getUniqueId());
-                    case Map m -> compound.a(key, convertMapToCompound(m));
-                    case List l -> compound.a(key, convertListToNBTList(l));
+                    case Long l -> compound.putLong(key, l);
+                    case Double d -> compound.putDouble(key, d);
+                    case Integer i -> compound.putInt(key, i);
+                    case Float f -> compound.putFloat(key, f);
+                    case Short s -> compound.putShort(key, s);
+                    case Byte b -> compound.putByte(key, b);
+                    case Boolean b -> compound.putBoolean(key, b);
+                    case Character c -> compound.putInt(key, c);
+                    case String s -> compound.putString(key, s);
+                    case UUID uuid -> compound.putUUID(key, uuid);
+                    case OfflinePlayer p -> compound.putUUID(key, p.getUniqueId());
+                    case Map m -> compound.put(key, convertMapToCompound(m));
+                    case List l -> compound.put(key, convertListToNBTList(l));
                     default -> Bukkit.getLogger().log(Level.WARNING, "Unable to convert type " + value.getClass());
                 }
             }
@@ -119,22 +119,22 @@ public class NBTConfig extends MemoryConfiguration {
     }
 
     @NotNull
-    private static NBTList<? extends NBTBase> convertListToNBTList(@NotNull List<?> list) {
-        NBTTagList nbtList = new NBTTagList();
+    private static CollectionTag<? extends Tag> convertListToNBTList(@NotNull List<?> list) {
+        ListTag nbtList = new ListTag();
 
         list.forEach(element -> {
             switch (element) {
-                case Long l -> nbtList.add(NBTTagLong.a(l));
-                case Double d -> nbtList.add(NBTTagDouble.a(d));
-                case Integer i -> nbtList.add(NBTTagInt.a(i));
-                case Float f -> nbtList.add(NBTTagFloat.a(f));
-                case Short s -> nbtList.add(NBTTagShort.a(s));
-                case Byte b -> nbtList.add(NBTTagByte.a(b));
-                case Boolean b -> nbtList.add(NBTTagByte.a(b));
-                case Character c -> nbtList.add(NBTTagString.a(String.valueOf(c)));
-                case String s -> nbtList.add(NBTTagString.a(s));
-                case OfflinePlayer p -> nbtList.add(GameProfileSerializer.a(p.getUniqueId()));
-                case UUID uuid -> nbtList.add(GameProfileSerializer.a(uuid));
+                case Long l -> nbtList.add(LongTag.valueOf(l));
+                case Double d -> nbtList.add(DoubleTag.valueOf(d));
+                case Integer i -> nbtList.add(IntTag.valueOf(i));
+                case Float f -> nbtList.add(FloatTag.valueOf(f));
+                case Short s -> nbtList.add(ShortTag.valueOf(s));
+                case Byte b -> nbtList.add(ByteTag.valueOf(b));
+                case Boolean b -> nbtList.add(ByteTag.valueOf(b));
+                case Character c -> nbtList.add(IntTag.valueOf(c));
+                case String s -> nbtList.add(StringTag.valueOf(s));
+                case OfflinePlayer p -> nbtList.add(NbtUtils.createUUID(p.getUniqueId()));
+                case UUID uuid -> nbtList.add(NbtUtils.createUUID(uuid));
                 case Map m -> nbtList.add(convertMapToCompound(m));
                 case List l -> nbtList.add(convertListToNBTList(l));
                 default -> Bukkit.getLogger().log(Level.WARNING, "Unable to convert type " + element.getClass());
@@ -160,7 +160,7 @@ public class NBTConfig extends MemoryConfiguration {
      * @return the NBTTagCompounds of this config
      */
     @NotNull
-    public NBTTagCompound save() {
+    public CompoundTag save() {
         Map<String, Object> map = Optional.ofNullable(this.getRoot())
                 .map((root) -> root.getValues(true))
                 .orElse(new HashMap<>());
@@ -175,7 +175,7 @@ public class NBTConfig extends MemoryConfiguration {
      * @throws IOException if the file cannot be written
      */
     public void saveCompressed(@NotNull File file) throws IOException {
-        NBTCompressedStreamTools.a(save(), file);
+        NbtIo.writeCompressed(save(), file);
     }
 
     /**
@@ -185,7 +185,7 @@ public class NBTConfig extends MemoryConfiguration {
      * @throws IOException if the file cannot be written
      */
     public void saveUncompressed(@NotNull File file) throws IOException {
-        NBTCompressedStreamTools.b(save(), file);
+        NbtIo.write(save(), file);
     }
 
     /*

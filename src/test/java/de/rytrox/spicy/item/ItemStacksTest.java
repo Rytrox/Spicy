@@ -5,28 +5,23 @@ import be.seeseemelk.mockbukkit.MockBukkit;
 import com.google.gson.JsonObject;
 
 import de.rytrox.spicy.reflect.Reflections;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.level.IMaterial;
+
 import org.apache.commons.lang.WordUtils;
-import org.apache.commons.lang3.reflect.FieldUtils;
 import org.apache.commons.lang3.reflect.MethodUtils;
 import org.bukkit.Material;
 import org.bukkit.craftbukkit.v1_18_R1.inventory.CraftItemStack;
-import org.bukkit.craftbukkit.v1_18_R1.util.CraftMagicNumbers;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
-import java.sql.Ref;
 
 import static org.junit.Assert.*;
 

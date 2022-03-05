@@ -11,7 +11,7 @@ import java.util.logging.Level;
 
 import de.rytrox.spicy.reflect.Reflections;
 
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundTag;
 
 import org.apache.commons.lang3.reflect.MethodUtils;
 import org.apache.commons.lang.WordUtils;
@@ -108,7 +108,7 @@ public final class ItemStacks {
         // only continue if the item could be found
         // otherwise return ItemStack type name
         return Optional.ofNullable(asNMSCopy(itemStack))
-                .map((item) -> item.v().a())
+                .map((item) -> item.getDisplayName().getString())
                 .orElse(WordUtils.capitalize(itemStack.getType().toString()));
     }
 
@@ -171,10 +171,10 @@ public final class ItemStacks {
     }
 
     @Nullable
-    public static NBTTagCompound getNBTTagCompound(@NotNull ItemStack item) {
+    public static CompoundTag getNBTTagCompound(@NotNull ItemStack item) {
         // return null if itemstack is null otherwise return nbt-tag compound
         return Optional.ofNullable(asNMSCopy(item))
-                .map(net.minecraft.world.item.ItemStack::s)
+                .map(net.minecraft.world.item.ItemStack::getOrCreateTag)
                 .orElse(null);
     }
 
@@ -190,7 +190,7 @@ public final class ItemStacks {
     @Deprecated
     public static boolean getNBTBoolean(ItemStack item, String key) {
         return Optional.ofNullable(getNBTTagCompound(item))
-                .map((compound) -> compound.q(key))
+                .map((compound) -> compound.getBoolean(key))
                 .orElse(false);
     }
 
@@ -207,8 +207,8 @@ public final class ItemStacks {
     @Deprecated
     public static boolean getNBTBoolean(ItemStack item, String key, boolean def) {
         return Optional.ofNullable(getNBTTagCompound(item))
-                .filter((compound) -> compound.e(key))
-                .map((compound) -> compound.q(key))
+                .filter((compound) -> compound.contains(key))
+                .map((compound) -> compound.getBoolean(key))
                 .orElse(def);
     }
 
@@ -224,7 +224,7 @@ public final class ItemStacks {
     @Deprecated
     public static byte getNBTByte(ItemStack item, String key) {
         return Optional.ofNullable(getNBTTagCompound(item))
-                .map((compound) -> compound.f(key))
+                .map((compound) -> compound.getByte(key))
                 .orElse((byte) 0);
     }
 
@@ -241,8 +241,8 @@ public final class ItemStacks {
     @Deprecated
     public static byte getNBTByte(ItemStack item, String key, byte def) {
         return Optional.ofNullable(getNBTTagCompound(item))
-                .filter((compound) -> compound.e(key))
-                .map((compound) -> compound.f(key))
+                .filter((compound) -> compound.contains(key))
+                .map((compound) -> compound.getByte(key))
                 .orElse(def);
     }
 
@@ -258,7 +258,7 @@ public final class ItemStacks {
     @Deprecated
     public static short getNBTShort(ItemStack item, String key) {
         return Optional.ofNullable(getNBTTagCompound(item))
-                .map((compound) -> compound.g(key))
+                .map((compound) -> compound.getShort(key))
                 .orElse((short) 0);
     }
 
@@ -275,8 +275,8 @@ public final class ItemStacks {
     @Deprecated
     public static short getNBTShort(ItemStack item, String key, short def) {
         return Optional.ofNullable(getNBTTagCompound(item))
-                .filter((compound) -> compound.e(key))
-                .map((compound) -> compound.g(key))
+                .filter((compound) -> compound.contains(key))
+                .map((compound) -> compound.getShort(key))
                 .orElse(def);
     }
 
@@ -292,7 +292,7 @@ public final class ItemStacks {
     @Deprecated
     public static int getNBTInt(ItemStack item, String key) {
         return Optional.ofNullable(getNBTTagCompound(item))
-                .map((compound) -> compound.h(key))
+                .map((compound) -> compound.getInt(key))
                 .orElse(0);
     }
 
@@ -309,8 +309,8 @@ public final class ItemStacks {
     @Deprecated
     public static int getNBTInt(ItemStack item, String key, int def) {
         return Optional.ofNullable(getNBTTagCompound(item))
-                .filter((compound) -> compound.e(key))
-                .map((compound) -> compound.h(key))
+                .filter((compound) -> compound.contains(key))
+                .map((compound) -> compound.getInt(key))
                 .orElse(def);
     }
 
@@ -326,7 +326,7 @@ public final class ItemStacks {
     @Deprecated
     public static float getNBTFloat(ItemStack item, String key) {
         return Optional.ofNullable(getNBTTagCompound(item))
-                .map((compound) -> compound.j(key))
+                .map((compound) -> compound.getFloat(key))
                 .orElse(0F);
     }
 
@@ -343,8 +343,8 @@ public final class ItemStacks {
     @Deprecated
     public static float getNBTFloat(ItemStack item, String key, float def) {
         return Optional.ofNullable(getNBTTagCompound(item))
-                .filter((compound) -> compound.e(key))
-                .map((compound) -> compound.j(key))
+                .filter((compound) -> compound.contains(key))
+                .map((compound) -> compound.getFloat(key))
                 .orElse(def);
     }
 
@@ -360,7 +360,7 @@ public final class ItemStacks {
     @Deprecated
     public static double getNBTDouble(ItemStack item, String key) {
         return Optional.ofNullable(getNBTTagCompound(item))
-                .map((compound) -> compound.k(key))
+                .map((compound) -> compound.getDouble(key))
                 .orElse(0D);
     }
 
@@ -377,8 +377,8 @@ public final class ItemStacks {
     @Deprecated
     public static double getNBTDouble(ItemStack item, String key, double def) {
         return Optional.ofNullable(getNBTTagCompound(item))
-                .filter((compound) -> compound.e(key))
-                .map((compound) -> compound.k(key))
+                .filter((compound) -> compound.contains(key))
+                .map((compound) -> compound.getDouble(key))
                 .orElse(def);
     }
 
@@ -394,7 +394,7 @@ public final class ItemStacks {
     @Deprecated
     public static String getNBTString(ItemStack item, String key) {
         return Optional.ofNullable(getNBTTagCompound(item))
-                .map((compound) -> compound.l(key))
+                .map((compound) -> compound.getString(key))
                 .orElse("");
     }
 
@@ -411,8 +411,8 @@ public final class ItemStacks {
     @Deprecated
     public static String getNBTDouble(ItemStack item, String key, String def) {
         return Optional.ofNullable(getNBTTagCompound(item))
-                .filter((compound) -> compound.e(key))
-                .map((compound) -> compound.l(key))
+                .filter((compound) -> compound.contains(key))
+                .map((compound) -> compound.getString(key))
                 .orElse(def);
     }
 
@@ -428,7 +428,7 @@ public final class ItemStacks {
     @Deprecated
     public static byte[] getNBTByteArray(ItemStack item, String key) {
         return Optional.ofNullable(getNBTTagCompound(item))
-                .map((compound) -> compound.m(key))
+                .map((compound) -> compound.getByteArray(key))
                 .orElse(new byte[0]);
     }
 
@@ -445,8 +445,8 @@ public final class ItemStacks {
     @Deprecated
     public static byte[] getNBTByteArray(ItemStack item, String key, byte[] def) {
         return Optional.ofNullable(getNBTTagCompound(item))
-                .filter((compound) -> compound.e(key))
-                .map((compound) -> compound.m(key))
+                .filter((compound) -> compound.contains(key))
+                .map((compound) -> compound.getByteArray(key))
                 .orElse(def);
     }
 
@@ -463,7 +463,7 @@ public final class ItemStacks {
     @Deprecated
     public static int[] getNBTIntArray(ItemStack item, String key) {
         return Optional.ofNullable(getNBTTagCompound(item))
-                .map((compound) -> compound.n(key))
+                .map((compound) -> compound.getIntArray(key))
                 .orElse(new int[0]);
     }
 
@@ -480,8 +480,8 @@ public final class ItemStacks {
     @Deprecated
     public static int[] getNBTIntArray(ItemStack item, String key, int[] def) {
         return Optional.ofNullable(getNBTTagCompound(item))
-                .filter((compound) -> compound.e(key))
-                .map((compound) -> compound.n(key))
+                .filter((compound) -> compound.contains(key))
+                .map((compound) -> compound.getIntArray(key))
                 .orElse(def);
     }
 
@@ -497,7 +497,7 @@ public final class ItemStacks {
     @Deprecated
     public static long[] getNBTLongArray(ItemStack item, String key) {
         return Optional.ofNullable(getNBTTagCompound(item))
-                .map((compound) -> compound.o(key))
+                .map((compound) -> compound.getLongArray(key))
                 .orElse(new long[0]);
     }
 
@@ -514,8 +514,8 @@ public final class ItemStacks {
     @Deprecated
     public static long[] getNBTLongArray(ItemStack item, String key, long[] def) {
         return Optional.ofNullable(getNBTTagCompound(item))
-                .filter((compound) -> compound.e(key))
-                .map((compound) -> compound.o(key))
+                .filter((compound) -> compound.contains(key))
+                .map((compound) -> compound.getLongArray(key))
                 .orElse(def);
     }
 }

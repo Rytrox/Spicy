@@ -1,16 +1,14 @@
 package de.rytrox.spicy.item;
 
 import java.util.*;
-import java.util.logging.Level;
 
 import de.rytrox.spicy.config.NBTConfig;
+
 import net.minecraft.nbt.*;
-import net.minecraft.network.chat.IChatBaseComponent;
+
 import org.apache.commons.lang.Validate;
 import org.apache.commons.lang3.reflect.FieldUtils;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.craftbukkit.v1_18_R1.util.CraftChatMessage;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
@@ -189,15 +187,13 @@ public class ItemStackBuilder {
     }
 
     @NotNull
-    public ItemStackBuilder withNBTData(@NotNull NBTTagCompound compound) {
+    public ItemStackBuilder withNBTData(@NotNull CompoundTag compound) {
         try {
             net.minecraft.world.item.ItemStack handle = (net.minecraft.world.item.ItemStack)
                     FieldUtils.readField(this.currentBuilding, "handle", true);
 
-            NBTTagCompound merged = Optional.ofNullable(handle.s())
-                    .orElse(new NBTTagCompound()).a(compound);
+            CompoundTag merged = handle.getOrCreateTag();
 
-            handle.c(merged);
 
             return this;
         } catch (IllegalAccessException e) {
@@ -219,7 +215,7 @@ public class ItemStackBuilder {
     @NotNull
     public <T> ItemStackBuilder withNBTData(@NotNull String key, @NotNull T value) {
         NBTConfig config = new NBTConfig(Optional.ofNullable(ItemStacks.getNBTTagCompound(this.currentBuilding))
-                .orElse(new NBTTagCompound()));
+                .orElse(new CompoundTag()));
 
         config.set(key, value);
 

@@ -1,7 +1,7 @@
 package de.rytrox.spicy.config;
 
 import be.seeseemelk.mockbukkit.MockBukkit;
-import net.minecraft.core.MinecraftSerializableUUID;
+import net.minecraft.core.SerializableUUID;
 import net.minecraft.nbt.*;
 
 import org.bukkit.Bukkit;
@@ -24,79 +24,79 @@ public class NBTConfigTest {
     @Rule
     public final TemporaryFolder temporaryFolder = new TemporaryFolder();
 
-    private NBTTagCompound testCompound;
+    private CompoundTag testCompound;
 
     @Before
     public void prepareConfig() {
         MockBukkit.mock();
 
-        testCompound = new NBTTagCompound();
+        testCompound = new CompoundTag();
 
         // Map all primitives
-        testCompound.a("boolean", true);
-        testCompound.a("byte", (byte) 5);
-        testCompound.a("short", (short) 2463);
-        testCompound.a("integer", 343575324);
-        testCompound.a("long", Long.MAX_VALUE);
-        testCompound.a("char", 'r');
-        testCompound.a("float", 4.0F);
-        testCompound.a("double", 2356.232535D);
+        testCompound.putBoolean("boolean", true);
+        testCompound.putByte("byte", (byte) 5);
+        testCompound.putShort("short", (short) 2463);
+        testCompound.putInt("integer", 343575324);
+        testCompound.putLong("long", Long.MAX_VALUE);
+        testCompound.putInt("char", 'r');
+        testCompound.putFloat("float", 4.0F);
+        testCompound.putDouble("double", 2356.232535D);
 
         // Supported full classes
-        testCompound.a("string", "Hello World");
-        testCompound.a("uuid", UUID.randomUUID());
-        testCompound.a("offlineplayer", UUID.fromString("94dd234a-2320-4f17-9f40-a1cc80afab2d"));
+        testCompound.putString("string", "Hello World");
+        testCompound.putUUID("uuid", UUID.randomUUID());
+        testCompound.putUUID("offlineplayer", UUID.fromString("94dd234a-2320-4f17-9f40-a1cc80afab2d"));
 
         // Support array classes
-        testCompound.a("intArray", new int[] { 1, 2, 3, 4, 5}); // size 4 is a UUID!
-        testCompound.a("longArray", new long[] { 6L, 7L, 8L, 9L});
-        testCompound.a("byteArray", new byte[] { 10, 23, 0 });
+        testCompound.putIntArray("intArray", new int[] { 1, 2, 3, 4, 5}); // size 4 is a UUID!
+        testCompound.putLongArray("longArray", new long[] { 6L, 7L, 8L, 9L});
+        testCompound.putByteArray("byteArray", new byte[] { 10, 23, 0 });
 
         // Support List classes
-        NBTTagList list = new NBTTagList();
-        list.add(NBTTagString.a("Hello"));
-        list.add(NBTTagString.a("World"));
-        list.add(NBTTagString.a("Test"));
-        testCompound.a("stringList", list);
+        ListTag list = new ListTag();
+        list.add(StringTag.valueOf("Hello"));
+        list.add(StringTag.valueOf("World"));
+        list.add(StringTag.valueOf("Test"));
+        testCompound.put("stringList", list);
 
-        NBTTagList intList = new NBTTagList();
-        intList.add(NBTTagLong.a(12));
-        intList.add(NBTTagLong.a(1));
-        intList.add(NBTTagLong.a(12467));
-        intList.add(NBTTagLong.a(76433));
-        testCompound.a("longList", intList);
+        ListTag intList = new ListTag();
+        intList.add(LongTag.valueOf(12));
+        intList.add(LongTag.valueOf(1));
+        intList.add(LongTag.valueOf(12467));
+        intList.add(LongTag.valueOf(76433));
+        testCompound.put("longList", intList);
 
-        NBTTagList developerList = new NBTTagList();
-        NBTTagCompound timeout = new NBTTagCompound();
-        timeout.a("name", "Timeout");
-        timeout.a("id", 408);
-        timeout.a("player", UUID.fromString("94dd234a-2320-4f17-9f40-a1cc80afab2d"));
-        NBTTagCompound asedem = new NBTTagCompound();
-        asedem.a("name", "Asedem");
-        asedem.a("id", 409);
-        asedem.a("player", UUID.fromString("121a9207-cd9a-4717-ba06-bb96667492f1"));
-        timeout.a("assistant", asedem);
+        ListTag developerList = new ListTag();
+        CompoundTag timeout = new CompoundTag();
+        timeout.putString("name", "Timeout");
+        timeout.putInt("id", 408);
+        timeout.putUUID("player", UUID.fromString("94dd234a-2320-4f17-9f40-a1cc80afab2d"));
+        CompoundTag asedem = new CompoundTag();
+        asedem.putString("name", "Asedem");
+        asedem.putInt("id", 409);
+        asedem.putUUID("player", UUID.fromString("121a9207-cd9a-4717-ba06-bb96667492f1"));
+        timeout.put("assistant", asedem);
 
-        NBTTagCompound sether = new NBTTagCompound();
-        sether.a("name", "Sether");
-        sether.a("id", 701);
-        sether.a("player", UUID.fromString("58a6382a-3b85-4d7f-8a6a-0b920ecb88bd"));
-        NBTTagCompound kaigoe = new NBTTagCompound();
-        kaigoe.a("name", "kaigoe");
-        kaigoe.a("id", 702);
-        kaigoe.a("player", UUID.fromString("b24b275f-23ee-4c3f-ba98-6bce8442bd8a"));
-        sether.a("assistant", kaigoe);
+        CompoundTag sether = new CompoundTag();
+        sether.putString("name", "Sether");
+        sether.putInt("id", 701);
+        sether.putUUID("player", UUID.fromString("58a6382a-3b85-4d7f-8a6a-0b920ecb88bd"));
+        CompoundTag kaigoe = new CompoundTag();
+        kaigoe.putString("name", "kaigoe");
+        kaigoe.putInt("id", 702);
+        kaigoe.putUUID("player", UUID.fromString("b24b275f-23ee-4c3f-ba98-6bce8442bd8a"));
+        sether.put("assistant", kaigoe);
 
         developerList.add(timeout);
         developerList.add(sether);
-        testCompound.a("developerList", developerList);
+        testCompound.put("developerList", developerList);
 
-        NBTTagList team = new NBTTagList();
-        team.add(new NBTTagIntArray(MinecraftSerializableUUID.a(UUID.fromString("94dd234a-2320-4f17-9f40-a1cc80afab2d"))));
-        team.add(new NBTTagIntArray(MinecraftSerializableUUID.a(UUID.fromString("121a9207-cd9a-4717-ba06-bb96667492f1"))));
-        team.add(new NBTTagIntArray(MinecraftSerializableUUID.a(UUID.fromString("58a6382a-3b85-4d7f-8a6a-0b920ecb88bd"))));
-        team.add(new NBTTagIntArray(MinecraftSerializableUUID.a(UUID.fromString("b24b275f-23ee-4c3f-ba98-6bce8442bd8a"))));
-        testCompound.a("teamList", team);
+        ListTag team = new ListTag();
+        team.add(new IntArrayTag(SerializableUUID.uuidToIntArray(UUID.fromString("94dd234a-2320-4f17-9f40-a1cc80afab2d"))));
+        team.add(new IntArrayTag(SerializableUUID.uuidToIntArray(UUID.fromString("121a9207-cd9a-4717-ba06-bb96667492f1"))));
+        team.add(new IntArrayTag(SerializableUUID.uuidToIntArray(UUID.fromString("58a6382a-3b85-4d7f-8a6a-0b920ecb88bd"))));
+        team.add(new IntArrayTag(SerializableUUID.uuidToIntArray(UUID.fromString("b24b275f-23ee-4c3f-ba98-6bce8442bd8a"))));
+        testCompound.put("teamList", team);
     }
 
     @Test
@@ -124,7 +124,7 @@ public class NBTConfigTest {
         assertEquals(2356.232535D, config.getDouble("double"), 0);
 
         assertEquals("Hello World", config.getString("string"));
-        assertEquals(Bukkit.getOfflinePlayer(testCompound.a("uuid")).getUniqueId(),
+        assertEquals(testCompound.getUUID("uuid"),
                 Objects.requireNonNull(config.getOfflinePlayer("uuid")).getUniqueId());
         assertEquals(UUID.fromString("94dd234a-2320-4f17-9f40-a1cc80afab2d"),
                 Objects.requireNonNull(config.getOfflinePlayer("offlineplayer")).getUniqueId());
@@ -261,22 +261,22 @@ public class NBTConfigTest {
 
     @Test
     public void shouldSaveConfigInCompound() {
-        NBTTagCompound compound = new NBTTagCompound();
+        CompoundTag compound = new CompoundTag();
 
-        compound.a("string", "Testwert1");
-        compound.a("int", 124);
-        compound.a("byte", (byte) 4);
-        compound.a("short", (short) 16);
+        compound.putString("string", "Testwert1");
+        compound.putInt("int", 124);
+        compound.putByte("byte", (byte) 4);
+        compound.putShort("short", (short) 16);
 
         NBTConfig config = new NBTConfig(compound);
 
-        NBTTagCompound saved = config.save();
+        CompoundTag saved = config.save();
 
         assertEquals(saved, compound);
-        assertEquals("Testwert1", Objects.requireNonNull(saved.c("string")).e_());
-        assertEquals(124, ((NBTTagInt) Objects.requireNonNull(saved.c("int"))).k());
-        assertEquals((byte) 4, ((NBTTagByte) Objects.requireNonNull(saved.c("byte"))).k());
-        assertEquals((short) 16, ((NBTTagShort) Objects.requireNonNull(saved.c("short"))).k());
+        assertEquals("Testwert1", saved.getString("string"));
+        assertEquals(124, saved.getInt("int"));
+        assertEquals((byte) 4, saved.getByte("byte"));
+        assertEquals((short) 16, saved.getShort("short"));
     }
 
     @After
