@@ -193,7 +193,7 @@ public class ItemStackBuilder {
                     FieldUtils.readField(this.currentBuilding, "handle", true);
 
             CompoundTag merged = handle.getOrCreateTag();
-
+            merged.merge(compound);
 
             return this;
         } catch (IllegalAccessException e) {
