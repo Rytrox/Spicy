@@ -9,7 +9,7 @@ import de.rytrox.spicy.reflect.Reflections;
 import org.apache.commons.lang.WordUtils;
 import org.apache.commons.lang3.reflect.MethodUtils;
 import org.bukkit.Material;
-import org.bukkit.craftbukkit.v1_18_R1.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.v1_18_R2.inventory.CraftItemStack;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.junit.After;
@@ -71,7 +71,7 @@ public class ItemStacksTest {
         assertTrue(base.matches("^([A-Za-z0-9+/]{4})*([A-Za-z0-9+/]{3}=|[A-Za-z0-9+/]{2}==)?$"));
     }
 
-    // https://github.com/MockBukkit/MockBukkit/issues/300
+//    // https://github.com/MockBukkit/MockBukkit/issues/300
 //    @Test
 //    public void shouldDecodeBase64ToItemStack() throws IOException, ClassNotFoundException {
 //        // Unable to mock this test...

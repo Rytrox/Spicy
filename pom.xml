@@ -5,15 +5,15 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>de.rytrox</groupId>
     <artifactId>spicy</artifactId>
-    <version>1.0_1181</version>
+    <version>1.0_1182</version>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <powermock.version>2.0.9</powermock.version>
         <java.version>17</java.version>
-        <mockito.version>4.3.1</mockito.version>
+        <mockito.version>4.5.1</mockito.version>
         <annotations.version>23.0.0</annotations.version>
-        <mockserver.version>5.12.0</mockserver.version>
+        <mockserver.version>5.13.2</mockserver.version>
     </properties>
 
     <build>
@@ -119,40 +119,39 @@
                 <artifactId>jacoco-maven-plugin</artifactId>
             </plugin>
 
-            <plugin>
-                <groupId>net.md-5</groupId>
-                <artifactId>specialsource-maven-plugin</artifactId>
-                <version>1.2.3</version>
-                <executions>
-                    <execution>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>remap</goal>
-                        </goals>
-                        <id>remap-obf</id>
-                        <configuration>
-                            <srgIn>org.spigotmc:minecraft-server:1.18.1-R0.1-SNAPSHOT:txt:maps-mojang</srgIn>
-                            <reverse>true</reverse>
-                            <remappedDependencies>org.spigotmc:spigot:1.18.1-R0.1-SNAPSHOT:jar:remapped-mojang</remappedDependencies>
-                            <remappedArtifactAttached>true</remappedArtifactAttached>
-                            <remappedClassifierName>remapped-obf</remappedClassifierName>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>remap</goal>
-                        </goals>
-                        <id>remap-spigot</id>
-                        <configuration>
-                            <finalName>${project.artifactId}-${project.version}-production</finalName>
-                            <inputFile>${project.build.directory}/${project.artifactId}-${project.version}-remapped-obf.jar</inputFile>
-                            <srgIn>org.spigotmc:minecraft-server:1.18.1-R0.1-SNAPSHOT:csrg:maps-spigot</srgIn>
-                            <remappedDependencies>org.spigotmc:spigot:1.18.1-R0.1-SNAPSHOT:jar:remapped-obf</remappedDependencies>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
+<!--            <plugin>-->
+<!--                <groupId>net.md-5</groupId>-->
+<!--                <artifactId>specialsource-maven-plugin</artifactId>-->
+<!--                <version>1.2.3</version>-->
+<!--                <executions>-->
+<!--                    <execution>-->
+<!--                        <phase>package</phase>-->
+<!--                        <goals>-->
+<!--                            <goal>remap</goal>-->
+<!--                        </goals>-->
+<!--                        <id>remap-obf</id>-->
+<!--                        <configuration>-->
+<!--                            <srgIn>org.spigotmc:minecraft-server:1.18.2-R0.1-SNAPSHOT:txt:maps-mojang</srgIn>-->
+<!--                            <reverse>true</reverse>-->
+<!--                            <remappedDependencies>org.spigotmc:spigot:1.18.2-R0.1-SNAPSHOT:jar:remapped-mojang</remappedDependencies>-->
+<!--                            <remappedArtifactAttached>true</remappedArtifactAttached>-->
+<!--                            <remappedClassifierName>remapped-obf</remappedClassifierName>-->
+<!--                        </configuration>-->
+<!--                    </execution>-->
+<!--                    <execution>-->
+<!--                        <phase>package</phase>-->
+<!--                        <goals>-->
+<!--                            <goal>remap</goal>-->
+<!--                        </goals>-->
+<!--                        <id>remap-spigot</id>-->
+<!--                        <configuration>-->
+<!--                            <inputFile>${project.build.directory}/${project.artifactId}-${project.version}-remapped-obf.jar</inputFile>-->
+<!--                            <srgIn>org.spigotmc:minecraft-server:1.18.2-R0.1-SNAPSHOT:csrg:maps-spigot</srgIn>-->
+<!--                            <remappedDependencies>org.spigotmc:spigot:1.18.2-R0.1-SNAPSHOT:jar:remapped-obf</remappedDependencies>-->
+<!--                        </configuration>-->
+<!--                    </execution>-->
+<!--                </executions>-->
+<!--            </plugin>-->
         </plugins>
     </build>
 
@@ -160,7 +159,7 @@
         <dependency>
             <groupId>org.spigotmc</groupId>
             <artifactId>spigot</artifactId>
-            <version>1.18.1-R0.1-SNAPSHOT</version>
+            <version>1.18.2-R0.1-SNAPSHOT</version>
             <classifier>remapped-mojang</classifier>
             <scope>provided</scope>
         </dependency>
@@ -186,7 +185,7 @@
         <dependency>
             <groupId>com.github.seeseemelk</groupId>
             <artifactId>MockBukkit-v1.18</artifactId>
-            <version>1.15.5</version>
+            <version>1.24.1</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -220,13 +219,13 @@
         <dependency>
             <groupId>net.bytebuddy</groupId>
             <artifactId>byte-buddy</artifactId>
-            <version>1.12.4</version>
+            <version>1.12.9</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>net.bytebuddy</groupId>
             <artifactId>byte-buddy-agent</artifactId>
-            <version>1.12.4</version>
+            <version>1.12.9</version>
             <scope>test</scope>
         </dependency>
         <dependency>
