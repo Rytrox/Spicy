@@ -131,7 +131,7 @@ public class Mineskin implements Serializable {
     }
 
     /**
-     * Returns if its a private or a public API-Skin
+     * Returns if it's a private or a public API-Skin
      *
      * @return true if it's private, false otherwise
      */

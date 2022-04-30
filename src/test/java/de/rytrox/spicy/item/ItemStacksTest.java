@@ -7,7 +7,6 @@ import com.google.gson.JsonObject;
 import de.rytrox.spicy.reflect.Reflections;
 
 import org.apache.commons.lang.WordUtils;
-import org.apache.commons.lang3.reflect.MethodUtils;
 import org.bukkit.Material;
 import org.bukkit.craftbukkit.v1_18_R2.inventory.CraftItemStack;
 import org.bukkit.inventory.ItemStack;
@@ -21,7 +20,6 @@ import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 
 import static org.junit.Assert.*;
 
@@ -100,81 +98,6 @@ public class ItemStacksTest {
 //    }
 
     @Test
-    public void shouldCatchIllegalAccessExceptionInNMSCopy() {
-        try(MockedStatic<MethodUtils> methodUtils = Mockito.mockStatic(MethodUtils.class);
-            MockedStatic<Reflections> reflections = Mockito.mockStatic(Reflections.class)) {
-            reflections.when(() -> Reflections.getCraftBukkitClass(Mockito.eq("inventory.CraftItemStack")))
-                            .thenAnswer((invocationOnMock) -> CraftItemStack.class);
-
-            methodUtils.when(() -> MethodUtils.invokeStaticMethod(Mockito.any(Class.class), Mockito.eq("asNMSCopy"), Mockito.eq(itemStack)))
-                    .thenThrow(IllegalAccessException.class);
-
-            net.minecraft.world.item.ItemStack copy = ItemStacks.asNMSCopy(itemStack);
-            assertNull(copy);
-        }
-    }
-
-    @Test
-    public void shouldCatchIllegalArgumentExceptionInNMSCopy() {
-        try(MockedStatic<MethodUtils> methodUtils = Mockito.mockStatic(MethodUtils.class);
-            MockedStatic<Reflections> reflections = Mockito.mockStatic(Reflections.class)) {
-            reflections.when(() -> Reflections.getCraftBukkitClass(Mockito.eq("inventory.CraftItemStack")))
-                    .thenAnswer((invocationOnMock) -> CraftItemStack.class);
-
-            methodUtils.when(() -> MethodUtils.invokeStaticMethod(Mockito.any(Class.class), Mockito.eq("asNMSCopy"), Mockito.eq(itemStack)))
-                    .thenThrow(IllegalArgumentException.class);
-
-            net.minecraft.world.item.ItemStack copy = ItemStacks.asNMSCopy(itemStack);
-            assertNull(copy);
-        }
-    }
-
-    @Test
-    public void shouldCatchInvocationTargetExceptionInNMSCopy() {
-        try(MockedStatic<MethodUtils> methodUtils = Mockito.mockStatic(MethodUtils.class);
-            MockedStatic<Reflections> reflections = Mockito.mockStatic(Reflections.class)) {
-            reflections.when(() -> Reflections.getCraftBukkitClass(Mockito.eq("inventory.CraftItemStack")))
-                    .thenAnswer((invocationOnMock) -> CraftItemStack.class);
-
-            methodUtils.when(() -> MethodUtils.invokeStaticMethod(Mockito.any(Class.class), Mockito.eq("asNMSCopy"), Mockito.eq(itemStack)))
-                    .thenThrow(InvocationTargetException.class);
-
-            net.minecraft.world.item.ItemStack copy = ItemStacks.asNMSCopy(itemStack);
-            assertNull(copy);
-        }
-    }
-
-    @Test
-    public void shouldCatchSecurityExceptionInNMSCopy() {
-        try(MockedStatic<MethodUtils> methodUtils = Mockito.mockStatic(MethodUtils.class);
-            MockedStatic<Reflections> reflections = Mockito.mockStatic(Reflections.class)) {
-            reflections.when(() -> Reflections.getCraftBukkitClass(Mockito.eq("inventory.CraftItemStack")))
-                    .thenAnswer((invocationOnMock) -> CraftItemStack.class);
-
-            methodUtils.when(() -> MethodUtils.invokeStaticMethod(Mockito.any(Class.class), Mockito.eq("asNMSCopy"), Mockito.eq(itemStack)))
-                    .thenThrow(SecurityException.class);
-
-            net.minecraft.world.item.ItemStack copy = ItemStacks.asNMSCopy(itemStack);
-            assertNull(copy);
-        }
-    }
-
-    @Test
-    public void shouldCatchNoSuchMethodExceptionInNMSCopy() {
-        try(MockedStatic<MethodUtils> methodUtils = Mockito.mockStatic(MethodUtils.class);
-            MockedStatic<Reflections> reflections = Mockito.mockStatic(Reflections.class)) {
-            reflections.when(() -> Reflections.getCraftBukkitClass(Mockito.eq("inventory.CraftItemStack")))
-                    .thenAnswer((invocationOnMock) -> CraftItemStack.class);
-
-            methodUtils.when(() -> MethodUtils.invokeStaticMethod(Mockito.any(Class.class), Mockito.eq("asNMSCopy"), Mockito.eq(itemStack)))
-                    .thenThrow(NoSuchMethodException.class);
-
-            net.minecraft.world.item.ItemStack copy = ItemStacks.asNMSCopy(itemStack);
-            assertNull(copy);
-        }
-    }
-
-    @Test
     public void shouldGetCustomNameAsDisplayName() {
         ItemStack itemStack = new ItemStack(this.itemStack);
         ItemMeta meta = itemStack.getItemMeta();
@@ -210,7 +133,7 @@ public class ItemStacksTest {
     }
 
     @Test(expected = IllegalStateException.class)
-    public void shouldThrowErrorWhenItemMetaIsNull() throws IllegalAccessException {
+    public void shouldThrowErrorWhenItemMetaIsNull() {
         ItemStack itemStack = Mockito.mock(ItemStack.class);
         Mockito.doReturn(null).when(itemStack).getItemMeta();
 
