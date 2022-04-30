@@ -1,7 +1,6 @@
 package de.rytrox.spicy.skin.mineskin;
 
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 class GenerateOptions {
 

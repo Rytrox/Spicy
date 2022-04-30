@@ -1,6 +1,7 @@
 package de.rytrox.spicy.sql;
 
 import com.mysql.cj.jdbc.MysqlDataSource;
+
 import org.intellij.lang.annotations.Language;
 import org.jetbrains.annotations.NotNull;
 
