@@ -9,5 +9,3 @@ LibsRebuild.iml
 /logs
 
 src/test/resources/mysql.yml
-
-src/test/resources/database.db
