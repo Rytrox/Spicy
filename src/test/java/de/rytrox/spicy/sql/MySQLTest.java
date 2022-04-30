@@ -3,22 +3,22 @@ package de.rytrox.spicy.sql;
 import be.seeseemelk.mockbukkit.MockBukkit;
 import de.rytrox.spicy.config.UTFConfig;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 import java.nio.file.Paths;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class MySQLTest {
 
-    private MySQL mysql;
+    private static MySQL mysql;
 
-    private UTFConfig config;
+    private static UTFConfig config;
 
-    @Before
-    public void startMock() {
+    @BeforeAll
+    public static void startMock() {
         MockBukkit.mock();
 
         // DriverManager.registerDriver(new Driver());
@@ -37,8 +37,8 @@ public class MySQLTest {
         assertNotNull(builder);
     }
 
-    @After
-    public void tearDown() {
+    @AfterAll
+    public static void tearDown() {
         MockBukkit.unmock();
     }
 }

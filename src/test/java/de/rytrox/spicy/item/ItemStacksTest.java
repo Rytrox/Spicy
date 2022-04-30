@@ -11,30 +11,30 @@ import org.bukkit.Material;
 import org.bukkit.craftbukkit.v1_18_R2.inventory.CraftItemStack;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.io.IOException;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class ItemStacksTest {
 
     private final ItemStack itemStack = new ItemStack(Material.STONE);
 
-    @Before
-    public void setup() {
+    @BeforeAll
+    public static void setup() {
         MockBukkit.mock();
     }
 
-    @After
-    public void tearDown() {
+    @AfterAll
+    public static void tearDown() {
         MockBukkit.unmock();
     }
 
@@ -132,13 +132,11 @@ public class ItemStacksTest {
         assertEquals(itemStack.getItemMeta(), meta);
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test
     public void shouldThrowErrorWhenItemMetaIsNull() {
         ItemStack itemStack = Mockito.mock(ItemStack.class);
         Mockito.doReturn(null).when(itemStack).getItemMeta();
 
-        ItemStacks.getSafeItemMeta(itemStack);
-
-        fail();
+        assertThrows(IllegalStateException.class, () -> ItemStacks.getSafeItemMeta(itemStack));
     }
 }

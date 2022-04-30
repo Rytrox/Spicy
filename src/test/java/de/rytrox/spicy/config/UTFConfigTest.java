@@ -2,27 +2,28 @@ package de.rytrox.spicy.config;
 
 import be.seeseemelk.mockbukkit.MockBukkit;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class UTFConfigTest {
 
-    @Rule
-    public TemporaryFolder temporaryFolder = new TemporaryFolder();
+    @TempDir
+    public Path temporaryFolder;
 
-    @Before
-    public void init() {
+    @BeforeAll
+    public static void init() {
         MockBukkit.mock();
     }
 
@@ -87,7 +88,7 @@ public class UTFConfigTest {
     @Test
     public void saveConfigWithCommentsCorrectly() throws IOException {
         UTFConfig config = new UTFConfig(Paths.get("src", "test", "resources", "config.yml").toFile());
-        File file = temporaryFolder.newFile();
+        File file = Files.createFile(temporaryFolder.resolve(Paths.get("file.yml"))).toFile();
         config.save(file);
 
         FileReader reader = new FileReader(file);
@@ -98,8 +99,8 @@ public class UTFConfigTest {
                 .toList().size());
     }
 
-    @After
-    public void tearDown() {
+    @AfterAll
+    public static void tearDown() {
         MockBukkit.unmock();
     }
 

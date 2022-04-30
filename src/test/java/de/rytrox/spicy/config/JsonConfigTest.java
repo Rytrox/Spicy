@@ -5,32 +5,32 @@ import be.seeseemelk.mockbukkit.MockBukkit;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.bukkit.configuration.file.FileConfigurationOptions;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.io.TempDir;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class JsonConfigTest {
 
-    @Rule
-    public TemporaryFolder temporaryFolder = new TemporaryFolder();
+    @TempDir
+    public Path temporaryFolder;
 
-    @Before
-    public void mockServer() {
+    @BeforeAll
+    public static void mockServer() {
         MockBukkit.mock();
     }
 
@@ -132,7 +132,7 @@ public class JsonConfigTest {
         Path file = Paths.get("src", "test", "resources", "config.json");
         JsonConfig config = new JsonConfig(file.toFile());
 
-        File saved = temporaryFolder.newFile();
+        File saved = Files.createFile(temporaryFolder.resolve(Paths.get("test.json"))).toFile();
         config.save(saved);
 
         JsonConfig config1 = new JsonConfig(saved);
@@ -151,48 +151,48 @@ public class JsonConfigTest {
         assertFalse(options.copyHeader());
     }
 
-    @Test(expected = UnsupportedOperationException.class)
+    @Test
     public void shouldNotAllowHeaderInsertion() {
         JsonConfig config = new JsonConfig();
         FileConfigurationOptions options = config.options();
 
-        options.setHeader(new ArrayList<>());
+        assertThrows(UnsupportedOperationException.class, () -> options.setHeader(new ArrayList<>()));
     }
 
-    @Test(expected = UnsupportedOperationException.class)
+    @Test
     public void shouldNotAllowFooterInsertion() {
         JsonConfig config = new JsonConfig();
         FileConfigurationOptions options = config.options();
 
-        options.setFooter(new ArrayList<>());
+        assertThrows(UnsupportedOperationException.class, () -> options.setFooter(new ArrayList<>()));
     }
 
-    @Test(expected = UnsupportedOperationException.class)
+    @Test
     public void shouldNotAllowHeaderInsertionOverDeprecatedMethod() {
         JsonConfig config = new JsonConfig();
         FileConfigurationOptions options = config.options();
 
-        options.header("");
+        assertThrows(UnsupportedOperationException.class, () -> options.header(""));
     }
 
-    @Test(expected = UnsupportedOperationException.class)
+    @Test
     public void shouldNotAllowParseComments() {
         JsonConfig config = new JsonConfig();
         FileConfigurationOptions options = config.options();
 
-        options.parseComments(true);
+        assertThrows(UnsupportedOperationException.class, () -> options.parseComments(true));
     }
 
-    @Test(expected = UnsupportedOperationException.class)
+    @Test
     public void shouldNotAllowCopyHeader() {
         JsonConfig config = new JsonConfig();
         FileConfigurationOptions options = config.options();
 
-        options.copyHeader(true);
+        assertThrows(UnsupportedOperationException.class, () -> options.copyHeader(true));
     }
 
-    @After
-    public void tearDown() {
+    @AfterAll
+    public static void tearDown() {
         MockBukkit.unmock();
     }
 

@@ -4,14 +4,15 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
-import org.junit.Test;
+
+import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.UUID;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class MineskinTest {
 
@@ -36,12 +37,11 @@ public class MineskinTest {
         assertEquals(targetGameProfile, mineskin.getData());
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void shouldNotConvertIllegalJson() throws IOException {
         JsonObject object = JsonParser.parseString(Files.readString(Paths.get("src", "test", "resources", "mineskin", "skin.json"))).getAsJsonObject();
         object.addProperty("uuid", "Hello World");
 
-        new Mineskin(object);
-        fail();
+        assertThrows(IllegalArgumentException.class, () -> new Mineskin(object));
     }
 }

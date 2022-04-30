@@ -1,31 +1,25 @@
 package de.rytrox.spicy.skin.mineskin;
 
 import org.apache.commons.io.FileUtils;
-import org.junit.BeforeClass;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 import org.mockserver.integration.ClientAndServer;
-import org.mockserver.junit.MockServerRule;
 import org.mockserver.model.JsonBody;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
-import java.util.Arrays;
 import java.util.UUID;
 import java.util.concurrent.*;
 
 import static org.mockserver.model.HttpRequest.*;
 import static org.mockserver.model.HttpResponse.*;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockserver.integration.ClientAndServer.startClientAndServer;
 
 public class MineskinHandlerTest {
 
-    @Rule
-    public MockServerRule rule = new MockServerRule(this);
-
-    @BeforeClass
+    @BeforeAll
     public static void setupServer() throws IOException {
         MineskinHandler.GET_UUID = "http://localhost:1080/get/uuid/";
         MineskinHandler.GENERATE_URL = "http://localhost:1080/generate/url";

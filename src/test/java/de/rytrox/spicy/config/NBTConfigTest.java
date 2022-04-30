@@ -4,32 +4,36 @@ import be.seeseemelk.mockbukkit.MockBukkit;
 import net.minecraft.core.SerializableUUID;
 import net.minecraft.nbt.*;
 
-import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class NBTConfigTest {
 
-    @Rule
-    public final TemporaryFolder temporaryFolder = new TemporaryFolder();
+    @TempDir
+    public Path temporaryFolder;
 
     private CompoundTag testCompound;
 
-    @Before
-    public void prepareConfig() {
+    @BeforeAll
+    public static void setupServer() {
         MockBukkit.mock();
+    }
 
+    @BeforeEach
+    public void prepareConfig() {
         testCompound = new CompoundTag();
 
         // Map all primitives
@@ -243,8 +247,8 @@ public class NBTConfigTest {
     public void shouldSaveConfigInFile() throws IOException {
         NBTConfig config = new NBTConfig(testCompound);
 
-        File file = temporaryFolder.newFile();
-        File compressed = temporaryFolder.newFile();
+        File file = Files.createFile(temporaryFolder.resolve(Paths.get("file.dat"))).toFile();
+        File compressed = Files.createFile(temporaryFolder.resolve(Paths.get("compressed.dat"))).toFile();
 
         config.saveUncompressed(file);
         assertTrue(file.length() > 0L);
@@ -279,8 +283,8 @@ public class NBTConfigTest {
         assertEquals((short) 16, saved.getShort("short"));
     }
 
-    @After
-    public void tearDown() {
+    @AfterAll
+    public static void tearDown() {
         MockBukkit.unmock();
     }
 }

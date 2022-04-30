@@ -2,11 +2,11 @@ package de.rytrox.spicy.skin.mineskin;
 
 import com.google.gson.JsonParser;
 import org.apache.commons.lang3.reflect.FieldUtils;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -14,9 +14,9 @@ import java.nio.file.Paths;
 import java.util.UUID;
 import java.util.concurrent.*;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class MineskinBuilderTest {
 
     @Test
