@@ -3,10 +3,9 @@ package de.rytrox.spicy.log;
 import be.seeseemelk.mockbukkit.MockBukkit;
 
 import de.rytrox.spicy.SpicyTestPlugin;
-
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,15 +13,15 @@ import java.util.logging.ConsoleHandler;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class ColoredLoggerTest {
 
-    private SpicyTestPlugin plugin;
-    private LogLogger logLogger;
+    private static SpicyTestPlugin plugin;
+    private static LogLogger logLogger;
 
-    @Before
-    public void setup() {
+    @BeforeAll
+    public static void setup() {
         MockBukkit.mock();
 
         logLogger = new LogLogger();
@@ -48,8 +47,8 @@ public class ColoredLoggerTest {
         assertNotEquals("&1Das &2ist &3ein &4kleiner &5Test", logLogger.messages.remove(0));
     }
 
-    @After
-    public void tearDown() {
+    @AfterAll
+    public static void tearDown() {
         MockBukkit.unmock();
 
     }

@@ -3,9 +3,8 @@ package de.rytrox.spicy.sql;
 import de.rytrox.spicy.sql.entity.Developer;
 import de.rytrox.spicy.sql.entity.DeveloperWithoutMatchingConstructor;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 import java.nio.file.Paths;
 
@@ -13,37 +12,37 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class QueryBuilderTest {
 
-    private SQLite datasource;
+    private static SQLite datasource;
 
     private final CountDownLatch lock = new CountDownLatch(1);
 
-    @Before
-    public void setupDatasource() {
-        this.datasource = new SQLite(Paths.get("src", "test", "resources", "database.db").toFile());
+    @BeforeAll
+    public static void setupDatasource() {
+        datasource = new SQLite(Paths.get("src", "test", "resources", "database.db").toFile());
     }
 
-    @Test(expected = RuntimeException.class)
+    @Test
     public void shouldNotConvertIntoNonEntity() {
-        datasource.prepare("SELECT * FROM Developers")
+        assertThrows(RuntimeException.class, () -> datasource.prepare("SELECT * FROM Developers")
                 .query(DeveloperWithoutMatchingConstructor.class)
                 .subscribe((res) -> {
                     // Hier ist gewaltig was schiefgelaufen, wenn das eintritt...
-                    Assert.fail();
-                });
+                    fail();
+                }));
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test
     public void shouldFailOnSyntaxError() {
-        datasource.prepare("SELECT FROM Developers")
+        assertThrows(IllegalStateException.class, () -> datasource.prepare("SELECT FROM Developers")
                 .query(Developer.class)
                 .subscribe((res) -> {
                     // Hier ist gewaltig was schiefgelaufen, wenn das eintritt...
-                    Assert.fail();
-                });
+                    fail();
+                }));
     }
 
     @Test
@@ -66,18 +65,18 @@ public class QueryBuilderTest {
                     Developer timeout = developers.get(0);
                     Developer sether = developers.get(1);
 
-                    Assert.assertEquals(701, sether.getId());
-                    Assert.assertEquals("Sether", sether.getName());
+                    assertEquals(701, sether.getId());
+                    assertEquals("Sether", sether.getName());
 
-                    Assert.assertEquals(408, timeout.getId());
-                    Assert.assertEquals("Timeout", timeout.getName());
+                    assertEquals(408, timeout.getId());
+                    assertEquals("Timeout", timeout.getName());
 
                     resultPassed.set(true);
                     lock.countDown();
                 });
 
-        Assert.assertTrue(lock.await(3, TimeUnit.SECONDS));
-        Assert.assertTrue(resultPassed.get());
+        assertTrue(lock.await(3, TimeUnit.SECONDS));
+        assertTrue(resultPassed.get());
     }
 
     @Test
@@ -88,11 +87,11 @@ public class QueryBuilderTest {
                     Developer timeout = developers.get(0);
                     Developer sether = developers.get(1);
 
-                    Assert.assertEquals(701, sether.getId());
-                    Assert.assertEquals("Sether", sether.getName());
+                    assertEquals(701, sether.getId());
+                    assertEquals("Sether", sether.getName());
 
-                    Assert.assertEquals(408, timeout.getId());
-                    Assert.assertEquals("Timeout", timeout.getName());
+                    assertEquals(408, timeout.getId());
+                    assertEquals("Timeout", timeout.getName());
                 });
     }
 

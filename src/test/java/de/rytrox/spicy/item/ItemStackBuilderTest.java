@@ -1,25 +1,26 @@
 package de.rytrox.spicy.item;
 
 import be.seeseemelk.mockbukkit.MockBukkit;
+
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class ItemStackBuilderTest {
 
-    @Before
-    public void mock() {
+    @BeforeAll
+    public static void mock() {
         MockBukkit.mock();
     }
 
@@ -153,15 +154,15 @@ public class ItemStackBuilderTest {
         assertEquals(23, builder.currentBuilding.getAmount());
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void shouldNotSetNegativeAmount() {
         ItemStackBuilder builder = new ItemStackBuilder();
 
-        builder.amount(-23);
+        assertThrows(IllegalArgumentException.class, () -> builder.amount(-23));
     }
 
-    @After
-    public void unmock() {
+    @AfterAll
+    public static void unmock() {
         MockBukkit.unmock();
     }
 }

@@ -1,30 +1,33 @@
 package de.rytrox.spicy.config;
 
 import be.seeseemelk.mockbukkit.MockBukkit;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
+
+import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.io.TempDir;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class ConfigCreatorTest {
 
     private ConfigCreator creator;
 
-    @Rule
-    public TemporaryFolder temporaryFolder = new TemporaryFolder();
+    @TempDir
+    public Path temporaryFolder;
 
-    @Before
-    public void start() throws IOException {
+    @BeforeAll
+    public static void setupServer() {
         MockBukkit.mock();
-        creator = new ConfigCreator(temporaryFolder.newFolder(), Paths.get(""));
+    }
+
+    @BeforeEach
+    public void start() {
+        creator = new ConfigCreator(temporaryFolder.toFile(), Paths.get(""));
     }
 
     @Test
@@ -42,8 +45,8 @@ public class ConfigCreatorTest {
         assertTrue(file.length() > 0);
     }
 
-    @After
-    public void tearDown() {
+    @AfterAll
+    public static void tearDown() {
         MockBukkit.unmock();
     }
 }

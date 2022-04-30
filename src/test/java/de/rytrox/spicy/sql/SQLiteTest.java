@@ -1,20 +1,20 @@
 package de.rytrox.spicy.sql;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 import org.mockito.MockedStatic;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.nio.file.Paths;
 import java.sql.Driver;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class SQLiteTest {
 
     @Test
@@ -26,13 +26,13 @@ public class SQLiteTest {
         assertNotNull(builder);
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test
     public void shouldThrowExceptionWhenDriverCouldNotBeRegistered() {
         try(MockedStatic<DriverManager> manager = mockStatic(DriverManager.class)) {
             manager.when(() -> DriverManager.registerDriver(any(Driver.class)))
                     .thenThrow(SQLException.class);
 
-            new SQLite(Paths.get("test.db").toFile());
+            assertThrows(IllegalStateException.class, () -> new SQLite(Paths.get("test.db").toFile()));
         }
     }
 }

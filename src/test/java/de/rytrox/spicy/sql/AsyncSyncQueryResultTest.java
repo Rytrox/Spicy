@@ -1,9 +1,10 @@
 package de.rytrox.spicy.sql;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Arrays;
 import java.util.List;
@@ -12,25 +13,24 @@ import java.util.concurrent.CountDownLatch;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-import static org.mockito.Mockito.*;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class AsyncSyncQueryResultTest {
 
     @Mock
     private CompletableFuture<List<Object>> mock;
 
-    private CountDownLatch lock = new CountDownLatch(1);
+    private final CountDownLatch lock = new CountDownLatch(1);
 
     @Test
     public void shouldCallSubscribeWithFutureData() {
         AsyncQueryResult<Object> result = new AsyncQueryResult<>(mock);
-        Consumer<List<Object>> subscription = mock(Consumer.class);
+        Consumer subscription = Mockito.mock(Consumer.class);
 
         result.subscribe(subscription);
 
-        verify(mock, times(1)).thenAcceptAsync(subscription);
+        Mockito.verify(mock).thenAcceptAsync(subscription);
     }
 
     @Test
