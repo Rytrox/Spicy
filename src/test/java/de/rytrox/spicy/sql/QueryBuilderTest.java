@@ -96,6 +96,27 @@ public class QueryBuilderTest {
     }
 
     @Test
+    public void shouldConvertSQLSelectToJavaDefaultType() {
+        datasource.prepare("SELECT id FROM Developers")
+                .query(Integer.class)
+                .subscribe((ids) -> {
+                    assertTrue(ids.contains(701));
+                    assertTrue(ids.contains(408));
+                });
+    }
+
+    @Test
+    public void shouldNotConvertSQLSelectToJavaDefaultTypeWhenMultipleColumns() {
+        assertThrows(RuntimeException.class, () ->
+                datasource.prepare("SELECT id, name FROM Developers")
+                        .query(Integer.class)
+                        .subscribe((ids) -> {
+                            fail();
+                        })
+        );
+    }
+
+    @Test
     public void shouldExecuteAsyncSQLInsert() throws InterruptedException {
         AtomicBoolean result = new AtomicBoolean(false);
 
