@@ -30,20 +30,32 @@ public record QueryBuilder(DataSource source, String query, Object... args) {
     @NotNull
     private <T> List<T> convertResultSetToEntities(@NotNull Class<T> targetClass,
                                                    @NotNull ResultSet resultSet) throws SQLException {
+        List<T> entities = new LinkedList<>();
         try {
             Constructor<T> constructor = targetClass.getConstructor(ResultSet.class);
-
-            List<T> entities = new LinkedList<>();
 
             while(resultSet.next()) {
                 entities.add(constructor.newInstance(resultSet));
             }
-
-            return entities;
+        } catch (NoSuchMethodException e) {
+            // try to convert it manually if it's just one column
+            if(resultSet.getMetaData().getColumnCount() == 1) {
+                while(resultSet.next()) {
+                    try {
+                        entities.add(resultSet.getObject(1, targetClass));
+                    } catch(SQLFeatureNotSupportedException exception) {
+                        // SQLite is a pain...
+                        entities.add((T) resultSet.getObject(1));
+                    }
+                }
+            } else throw new RuntimeException("Cannot convert ResultSet into Class " + targetClass.getName() +
+                    ". Be sure the constructor " + targetClass.getName() + "(ResultSet) exist and has accessor public.", e);
         } catch (ReflectiveOperationException e) {
             throw new RuntimeException("Cannot convert ResultSet into Class " + targetClass.getName() +
-                    ". Be sure the constructor " + targetClass.getName() + "(ResultSet) exist and has accessor public.");
+                    ". Be sure the constructor " + targetClass.getName() + "(ResultSet) exist and has accessor public.", e);
         }
+
+        return entities;
     }
 
     /**
@@ -81,7 +93,7 @@ public record QueryBuilder(DataSource source, String query, Object... args) {
 
             return new SyncQueryResult<>(convertResultSetToEntities(targetClass, statement.executeQuery()));
         } catch (SQLException exception) {
-            throw new IllegalStateException("Cannot execute SQL-Statement. Inner exception was: " + exception);
+            throw new IllegalStateException("Cannot execute SQL-Statement. Inner exception was: " + exception, exception);
         }
     }
 
