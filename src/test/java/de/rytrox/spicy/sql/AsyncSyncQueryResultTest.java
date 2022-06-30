@@ -41,7 +41,7 @@ public class AsyncSyncQueryResultTest {
 
         Function<Integer, String> convertFunction = String::valueOf;
 
-        QueryResult<String> resultAfterMap = result.map(convertFunction);
+        AsyncQueryResult<String> resultAfterMap = result.map(convertFunction);
         resultAfterMap.subscribe((res) -> {
             assertEquals("0", res.get(0));
             assertEquals("1", res.get(1));

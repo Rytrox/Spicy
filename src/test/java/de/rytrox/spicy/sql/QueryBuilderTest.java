@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 
 import java.nio.file.Paths;
 
+import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -28,31 +29,26 @@ public class QueryBuilderTest {
     @Test
     public void shouldNotConvertIntoNonEntity() {
         assertThrows(RuntimeException.class, () -> datasource.prepare("SELECT * FROM Developers")
-                .query(DeveloperWithoutMatchingConstructor.class)
-                .subscribe((res) -> {
-                    // Hier ist gewaltig was schiefgelaufen, wenn das eintritt...
-                    fail();
-                }));
+                .querySync(DeveloperWithoutMatchingConstructor.class)
+                .get());
+
     }
 
     @Test
     public void shouldFailOnSyntaxError() {
         assertThrows(IllegalStateException.class, () -> datasource.prepare("SELECT FROM Developers")
-                .query(Developer.class)
-                .subscribe((res) -> {
-                    // Hier ist gewaltig was schiefgelaufen, wenn das eintritt...
-                    fail();
-                }));
+                .querySync(Developer.class)
+                .get());
     }
 
     @Test
     public void shouldAllowWildcardNotationInStatement() {
-        datasource.prepare("SELECT * FROM Developers WHERE id = ? AND name = ?", 408, "Timeout")
-                .query(Developer.class)
-                .subscribe((res) -> {
-                    assertEquals(408, res.get(0).getId());
-                    assertEquals("Timeout", res.get(0).getName());
-                });
+        List<Developer> developers = datasource.prepare("SELECT * FROM Developers WHERE id = ? AND name = ?", 408, "Timeout")
+                .querySync(Developer.class)
+                .get();
+
+        assertEquals(408, developers.get(0).getId());
+        assertEquals("Timeout", developers.get(0).getName());
     }
 
     @Test
@@ -60,7 +56,7 @@ public class QueryBuilderTest {
         AtomicBoolean resultPassed = new AtomicBoolean(false);
 
         datasource.prepare("SELECT * FROM Developers")
-                .queryAsync(Developer.class)
+                .query(Developer.class)
                 .subscribe((developers) -> {
                     Developer timeout = developers.get(0);
                     Developer sether = developers.get(1);
@@ -81,38 +77,36 @@ public class QueryBuilderTest {
 
     @Test
     public void shouldExecuteSQLSelect() {
-        datasource.prepare("SELECT * FROM Developers")
-                .query(Developer.class)
-                .subscribe((developers) -> {
-                    Developer timeout = developers.get(0);
-                    Developer sether = developers.get(1);
+        List<Developer> developers = datasource.prepare("SELECT * FROM Developers")
+                .querySync(Developer.class)
+                .get();
 
-                    assertEquals(701, sether.getId());
-                    assertEquals("Sether", sether.getName());
+        Developer timeout = developers.get(0);
+        Developer sether = developers.get(1);
 
-                    assertEquals(408, timeout.getId());
-                    assertEquals("Timeout", timeout.getName());
-                });
+        assertEquals(701, sether.getId());
+        assertEquals("Sether", sether.getName());
+
+        assertEquals(408, timeout.getId());
+        assertEquals("Timeout", timeout.getName());
     }
 
     @Test
     public void shouldConvertSQLSelectToJavaDefaultType() {
-        datasource.prepare("SELECT id FROM Developers")
-                .query(Integer.class)
-                .subscribe((ids) -> {
-                    assertTrue(ids.contains(701));
-                    assertTrue(ids.contains(408));
-                });
+        List<Integer> ids = datasource.prepare("SELECT id FROM Developers")
+                .querySync(Integer.class)
+                .get();
+
+        assertTrue(ids.contains(701));
+        assertTrue(ids.contains(408));
     }
 
     @Test
     public void shouldNotConvertSQLSelectToJavaDefaultTypeWhenMultipleColumns() {
         assertThrows(RuntimeException.class, () ->
                 datasource.prepare("SELECT id, name FROM Developers")
-                        .query(Integer.class)
-                        .subscribe((ids) -> {
-                            fail();
-                        })
+                        .querySync(Integer.class)
+                        .get()
         );
     }
 
@@ -121,7 +115,7 @@ public class QueryBuilderTest {
         AtomicBoolean result = new AtomicBoolean(false);
 
         datasource.prepare("INSERT INTO Developers(id, name) VALUES (404, 'Not Found')")
-                .insertAsync()
+                .executeUpdate()
                 .thenRun(() -> {
 
                     datasource.prepare("SELECT * FROM Developers WHERE id = 404")
@@ -133,7 +127,7 @@ public class QueryBuilderTest {
                                 result.set(true);
 
                                 datasource.prepare("DELETE FROM Developers WHERE id = 404")
-                                        .execute();
+                                        .executeSync();
                                 lock.countDown();
                             });
                 });
@@ -144,19 +138,18 @@ public class QueryBuilderTest {
 
     @Test
     public void shouldExecuteSQLInsert() {
-        datasource.prepare("INSERT INTO Developers(id, name) VALUES (404, 'Not Found')")
-                .insert();
+        datasource.prepare("INSERT INTO Developers(id, name) VALUES (409, 'Conflict')")
+                .executeUpdateSync();
 
-        datasource.prepare("SELECT * FROM Developers WHERE id = 404")
-                .query(Developer.class)
-                .subscribe((res) -> {
-                    assertEquals(404, res.get(0).getId());
-                    assertEquals("Not Found", res.get(0).getName());
+        List<Developer> res = datasource.prepare("SELECT * FROM Developers WHERE id = 409")
+                .querySync(Developer.class)
+                .get();
 
+        assertEquals(409, res.get(0).getId());
+        assertEquals("Conflict", res.get(0).getName());
 
-                    datasource.prepare("DELETE FROM Developers WHERE id = 404")
-                            .execute();
-                });
+        datasource.prepare("DELETE FROM Developers WHERE id = 409")
+                .executeSync();
     }
 
     @Test
@@ -164,10 +157,10 @@ public class QueryBuilderTest {
         AtomicBoolean result = new AtomicBoolean(false);
 
         datasource.prepare("UPDATE Developers SET name = 'Sether701' WHERE id = 701")
-                .updateAsync()
+                .executeUpdate()
                 .thenAccept((res) -> {
                     datasource.prepare("UPDATE Developers SET name = 'Sether' WHERE id = 701")
-                            .update();
+                            .executeUpdateSync();
 
                     assertEquals(1, res.intValue());
                     result.set(true);
@@ -182,9 +175,9 @@ public class QueryBuilderTest {
     @Test
     public void shouldExecuteSQLUpdate() {
         assertEquals(1, datasource.prepare("UPDATE Developers SET name = 'Sether701' WHERE id = 701")
-                .update());
+                .executeUpdateSync());
 
         datasource.prepare("UPDATE Developers SET name = 'Sether' WHERE id = 701")
-                .update();
+                .executeUpdateSync();
     }
 }
