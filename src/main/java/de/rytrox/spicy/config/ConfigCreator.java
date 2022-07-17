@@ -47,6 +47,20 @@ public record ConfigCreator(File pluginDataFolder, Path configDirectory) {
 	 * If the specified file cannot be found, a FileNotFoundException is thrown.
 	 *
 	 * @param fromPath the subpath of the config you want to load from
+	 * @return the file with the content inside the datafolder
+	 * @throws IOException              if your disk is unwritable or any path could not be found
+	 * @throws IllegalArgumentException if any argument is null
+	 */
+	@NotNull
+	public File copyDefaultFile(@NotNull Path fromPath) throws IOException {
+		return copyDefaultFile(fromPath, Paths.get(""));
+	}
+
+	/**
+	 * Copies a file and its content from the Java archive to the specified toPath location in the plugin's folder.
+	 * If the specified file cannot be found, a FileNotFoundException is thrown.
+	 *
+	 * @param fromPath the subpath of the config you want to load from
 	 * @param toPath   the subpath where the file should be copied
 	 * @return the file with the content inside the datafolder
 	 * @throws IOException              if your disk is unwritable or any path could not be found

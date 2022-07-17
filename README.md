@@ -266,3 +266,301 @@ datasource.prepare("INSERT INTO Foo(id, name) VALUES (404, 'Not Found')")
         });
 ```
 
+# 2. Colored Logging
+With the ColoredLogger-Module you can use Minecraft-ColorCodes into your Plugin-Logger.
+As you know, every plugin has its own logger. By using the Colored-Logger Module you can activate a Module,
+that replaces Minecraft-ColorCodes with ANSI-Colors that can be read by the console. 
+
+To activate it you simply have to do this inside your Main-Class:
+
+```java
+import de.rytrox.spicy.log.ColoredLogger;
+import org.bukkit.plugin.java.JavaPlugin;
+
+public class Main extends JavaPlugin {
+    
+    ...
+
+    @Override
+    public void onEnable() {
+        ColoredLogger.enableColoredLogging('&', getLogger(), "&8[&6Your Prefix&8]");
+ 
+        ...
+    }
+    
+    ...
+}
+```
+Now when you log something like `plugin.getLogger().log(Level.INFO, "&7Tell a &astory&7.");` it looks like 
+"<span style="color: #555555">[</span><span style="color: #FFAA00">Your Plugin</span><span style="color: #555555">]</span> <span style="color: #AAAAAA">Tell a </span><span style="color: #55FF55">story</span><span style="color: #AAAAAA">.</span>"
+
+# 3. Configurations
+## 3.1 Creating custom configurations
+If you created local default configurations inside your `src/main/resources` folder, and you want to copy this into your plugins folder, you can use the ConfigCreator.
+The ConfigCreator is a class, that copies files from your jar into the plugins-folder or create new empty files. 
+
+### 3.1.1 Copy custom file from jar into plugin folder
+The ConfigCreator can copy default configurations into plugins folder.
+If the file already exists inside the plugin folder, this method will do nothing.
+
+Be sure to ignore the `src/main/resources` path inside your code, since all content inside this folder will be put in the root level of your jar
+
+Usage:
+
+```java
+import de.rytrox.spicy.config.ConfigCreator;
+import org.bukkit.plugin.java.JavaPlugin;
+
+import java.nio.file.Paths;
+
+public class Main extends JavaPlugin {
+
+    @Override
+    public void onEnable() {
+        ConfigCreator creator = new ConfigCreator(getDataFolder());
+
+        // load src/main/resources/config.yml inside jar into /config.yml inside the plugins folder
+        creator.copyDefaultFile(Paths.get("config.yml"));
+    }
+}
+```
+
+### 3.1.2 Create empty file
+You can also create empty configurations.
+
+Usage:
+
+```java
+import de.rytrox.spicy.config.ConfigCreator;
+import org.bukkit.plugin.java.JavaPlugin;
+
+import java.nio.file.Paths;
+
+public class Main extends JavaPlugin {
+
+    @Override
+    public void onEnable() {
+        ConfigCreator creator = new ConfigCreator(getDataFolder());
+
+        // Creates empty.yml inside plugins folder
+        creator.createFile(Paths.get("empty.yml"));
+    }
+}
+```
+
+## 3.2 Json Configurations
+Spicy provides a Bukkit configuration that can be saved to a JSON-File.
+
+### 3.2.1 Loading a JSON-File
+Spicy can load JSON by using the Constructor of JsonConfig. 
+InputStreams, Strings and Files can be loaded by Spicy
+
+Usage:
+```java
+import de.rytrox.spicy.config.ConfigCreator;
+import de.rytrox.spicy.config.JsonConfig;
+import org.bukkit.plugin.java.JavaPlugin;
+
+import java.io.File;
+import java.io.InputStream;
+
+public class Main extends JavaPlugin {
+
+    @Override
+    public void onEnable() {
+        // Load a JSON file
+        JsonConfig fileConfig = new JsonConfig(new File(getDataFolder(), "config.json"));
+
+        // Loads a JSON string
+        JsonConfig stringConfig = new JsonConfig("{}");
+
+        // Loads a JSON from InputStreams
+        InputStream stream; // Let's assume that this is your InputStream that is initialized
+        JsonConfig streamConfig = new JsonConfig(stream);
+    }
+}
+```
+
+### 3.2.2 Saving a JSON-File
+JsonConfigs can be saved like any other Spigot Config by using the save Method
+
+Usage:
+
+```java
+import de.rytrox.spicy.config.ConfigCreator;
+import de.rytrox.spicy.config.JsonConfig;
+import org.bukkit.plugin.java.JavaPlugin;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.logging.Level;
+
+public class Main extends JavaPlugin {
+
+    private JsonConfig config;
+
+    @Override
+    public void onEnable() {
+        config = new JsonConfig(new File(getDataFolder(), "config.json"));
+    }
+
+    public void saveJsonConfig() {
+        try {
+            config.save(new File(getDataFolder(), "config.json"));
+        } catch (IOException e) {
+            getLogger().log(Level.WARNING, "Cannot save config.json in data folder", e);
+        }
+    }
+}
+```
+
+## 3.3 Yaml Configuration that uses UTF-8 standardformat
+By default, Bukkit is using the normal Charset of your OS. 
+On other machines that can be problematic if you're using special characters like 'ä', 'ö', 'ü', 'ß'.
+
+### 3.3.1 Loading a UTF-File
+Spicy can load in UTF-8 Charset by using the Constructor of UTFConfig.
+InputStreams, Strings and Files can be loaded by Spicy
+
+Usage:
+```java
+import de.rytrox.spicy.config.ConfigCreator;
+import de.rytrox.spicy.config.UTFConfig;
+import org.bukkit.plugin.java.JavaPlugin;
+
+import java.io.File;
+import java.io.InputStream;
+
+public class Main extends JavaPlugin {
+
+    @Override
+    public void onEnable() {
+        // Load a UTF file
+        UTFConfig fileConfig = new UTFConfig(new File(getDataFolder(), "config.json"));
+
+        // Loads a UTF string
+        UTFConfig stringConfig = new UTFConfig("key: 'value'");
+
+        // Loads a UTF from InputStreams
+        InputStream stream; // Let's assume that this is your InputStream that is initialized
+        UTFConfig streamConfig = new UTFConfig(stream);
+    }
+}
+```
+
+### 3.3.2 Saving a UTF-File
+JsonConfigs can be saved like any other Spigot Config by using the save Method
+
+Usage:
+
+```java
+import de.rytrox.spicy.config.ConfigCreator;
+import de.rytrox.spicy.config.UTFConfig;
+import org.bukkit.plugin.java.JavaPlugin;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Paths;
+import java.util.logging.Level;
+
+public class Main extends JavaPlugin {
+
+    private UTFConfig config;
+
+    @Override
+    public void onEnable() {
+        config = new JsonConfig(new File(getDataFolder(), "config.yml"));
+    }
+
+    @Override
+    public void saveConfig() {
+        try {
+            config.save(new File(getDataFolder(), "config.yml"));
+        } catch (IOException e) {
+            getLogger().log(Level.WARNING, "Cannot save config.yml in data folder", e);
+        }
+    }
+}
+```
+
+## 3.4 NBT Configurations
+If you are using the remapped version, you can use a configuration that binds NBT-Data into a valid configuration.
+This increases readability and modification of NBT-Data
+
+### 3.4.1 Creating a NBT-Configuration
+NBT Configurations can be loaded or created.
+
+Usage:
+```java
+import de.rytrox.spicy.config.ConfigCreator;
+import de.rytrox.spicy.config.NBTConfig;
+import de.rytrox.spicy.item.NBTItemStacks;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.plugin.java.JavaPlugin;
+
+import java.io.File;
+import java.io.InputStream;
+
+public class Main extends JavaPlugin {
+
+    @Override
+    public void onEnable() {
+        // creates an empty NBTConfig
+        NBTConfig empty = new NBTConfig();
+
+        // Loads an NBTConfig from an ItemStack
+        NBTConfig loaded = new NBTConfig(NBTItemStacks.getNBTTagCompound(new ItemStack()));
+    
+        // Loads an NBTConfig from an uncompressed file
+        NBTConfig uncompressed = NBTConfig.fromUncompressedFile(new File(getDataFolder(), "config.dat"));
+        
+        // Loads an NBTConfig from a compressed file
+        NBTConfig compressed = NBTConfig.fromCompressedFile(new File(getDataFolder(), "config-compressed.dat"));
+    }
+}
+```
+
+### 3.4.2 Saving a NBT-Configuration
+NBT-Configurations can be saved into a CompoundTag, a compressed or uncompressed file.
+
+Usage:
+
+```java
+import de.rytrox.spicy.config.ConfigCreator;
+import de.rytrox.spicy.config.NBTConfig;
+import de.rytrox.spicy.item.NBTItemStacks;
+import net.minecraft.nbt.CompoundTag;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.plugin.java.JavaPlugin;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+
+public class Example {
+
+    private NBTConfig nbtConfig = new NBTConfig();
+
+    public void saveToFileCompressed(File file) {
+        try {
+            nbtConfig.saveCompressed(file);
+        } catch (IOException exception) {
+            exception.printStackTrace();
+        }
+    }
+
+    public void saveToFileUncompressed(File file) {
+        try {
+            nbtConfig.saveUncompressed(file);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public CompoundTag saveToTagCompound() {
+        return nbtConfig.save();
+    }
+}
+```
