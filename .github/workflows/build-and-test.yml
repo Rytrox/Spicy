@@ -27,3 +27,5 @@ jobs:
           buildToolProvider: SpigotMC
       - name: Build & Test
         run: mvn clean package
+      - name: Release to Maven
+        run: mvn deploy
