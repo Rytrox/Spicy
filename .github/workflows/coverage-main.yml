@@ -47,3 +47,5 @@ jobs:
         with:
           name: jacoco-report
           path: target/site/jacoco/
+      - name: Release to Maven
+        run: mvn deploy
