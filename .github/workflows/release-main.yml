@@ -10,7 +10,7 @@ on:
 jobs:
   release:
     needs:
-      - 'Test & Build'
+      - coverage
     runs-on: ubuntu-latest
 
     steps:
