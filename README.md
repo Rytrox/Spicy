@@ -173,7 +173,7 @@ public class Foo {
      * @param row the resultset. You need to assume that the index is on the correct row. 
      *            Ignore the row index
      */
-    public Foo(ResultSet row) {
+    public Foo(ResultSet row) throws SQLException {
         this.id = row.getInt("id");
         this.name = row.getString("name");
     }
@@ -561,6 +561,160 @@ public class Example {
 
     public CompoundTag saveToTagCompound() {
         return nbtConfig.save();
+    }
+}
+```
+
+# 4 ItemStack Library
+Spicy provides a lot of useful methods for ItemStacks
+
+## 4.1 ItemStackBuilder
+The ItemStackBuilder simplified the creation and modification of ItemStacks.
+It uses a Builder-Pattern to create an ItemStack.
+
+### 4.1.1 Vanilla ItemStackBuilder
+When you are done, you can use the ItemStackBuilder#toItemStack Method to build
+
+```java
+import de.rytrox.spicy.item.ItemStackBuilder;
+import net.minecraft.world.level.material.Material;
+import org.bukkit.ChatColor;
+import org.bukkit.enchantments.Enchantment;
+import org.bukkit.inventory.ItemFlag;
+import org.bukkit.inventory.ItemStack;
+
+public class Foo {
+
+    public void createItemStack() {
+        ItemStack itemStack = new ItemStackBuilder(Material.AMETHYST) // Creates a Builder with Material Amethyst
+                .amount(2) // Set amount to 2
+                .displayName(ChatColor.translateAlternateColorCodes('&', "&5Amethyst")) // Set the Displayname of the ItemStack
+                .enchantment(Enchantment.ARROW_KNOCKBACK, 2) // Enchants the ItemStack
+                .flags(ItemFlag.HIDE_ENCHANTS, ItemFlag.HIDE_UNBREAKABLE) // Sets ItemFlag
+                .lore("Lore line 1", "Lore Line 2") // Sets the Lore
+                .modelData(3) // Sets the ItemModel Data
+                .toItemStack(); // Build the ItemStack
+    }
+}
+```
+
+### 4.1.2 NBT ItemStackBuilder
+If you want to write NBT-Data as well, you can use the NBTItemStackBuilder-Class
+
+```java
+import de.rytrox.spicy.item.NBTItemStackBuilder;
+import org.bukkit.Material;
+import org.bukkit.inventory.ItemStack;
+
+public class Foo {
+
+    public void createItemStack() {
+        ItemStack itemStack = new NBTItemStackBuilder(Material.AMETHYST_BLOCK)
+                .amount(2) // Set amount to 2
+                .displayName(ChatColor.translateAlternateColorCodes('&', "&5Amethyst")) // Set the Displayname of the ItemStack
+                .enchantment(Enchantment.ARROW_KNOCKBACK, 2) // Enchants the ItemStack
+                .flags(ItemFlag.HIDE_ENCHANTS, ItemFlag.HIDE_UNBREAKABLE) // Sets ItemFlag
+                .lore("Lore line 1", "Lore Line 2") // Sets the Lore
+                .modelData(3) // Sets the ItemModel Data
+                .withNBTData("key", "value") // set string "value" in key "key"
+                .withNBTData("key1", 1) // set value 1 in key "key1" 
+                .toItemStack(); // Build the ItemStack
+    }
+}
+```
+
+
+## 4.2 ItemStack Utilities
+Spicy provides util functions for ItemStacks
+
+### 4.2.1 Base64 Decoding and Encoding
+ItemStacks can be converted to a Base64 String, if you want to save it inside a Database or a file.
+
+```java
+import de.rytrox.spicy.item.ItemStacks;
+import org.bukkit.Material;
+import org.bukkit.inventory.ItemStack;
+
+public class Foo {
+
+    public void decodeAndEncodeBase64() {
+        ItemStack itemStack = new ItemStack(Material.DIAMOND_SWORD);
+
+        // Creates a Base64 String of the ItemStack
+        String base64Encoded = ItemStacks.encodeBase64(itemStack);
+        
+        ...
+        
+        // To decode an ItemStack
+        ItemStack base64Decoded = ItemStacks.decodeBase64(base64Encoded);
+    }
+}
+```
+
+### 4.2.2 JSON Decoding and Encoding
+Also, you can convert ItemStacks into JSON Strings instead
+
+```java
+import com.google.gson.JsonObject;
+import de.rytrox.spicy.item.ItemStacks;
+import org.bukkit.Material;
+import org.bukkit.inventory.ItemStack;
+
+public class Foo {
+
+    public void decodeAndEncodeJSON() {
+        ItemStack itemStack = new ItemStack(Material.DIAMOND_SWORD);
+
+        // Creates a Json String of the ItemStack
+        JsonObject json = ItemStacks.encodeJson(itemStack);
+        
+        ...
+
+        // To decode an ItemStack
+        ItemStack jsonDecoded = ItemStacks.decodeJson(json);
+    }
+}
+```
+
+## 4.3 Get Customized Name
+Minecraft provides a Default Name for ItemStacks and often developers thinks that ItemMeta#getDisplayName returns the default name.
+Spicy has a built-in method to determinate the custom name.
+
+First it checks if the ItemStack has a DisplayName and returns it. 
+Secondly it uses the Localized Name or converts the ItemType to a String name
+
+```java
+import de.rytrox.spicy.item.ItemStacks;
+import org.bukkit.Material;
+import org.bukkit.inventory.ItemStack;
+
+public class Foo {
+
+    public void customizedName() {
+        ItemStack itemStack = new ItemStack(Material.DIAMOND_SWORD);
+
+        String name = ItemStacks.getCustomizedName(itemStack);
+    }
+}
+```
+
+## 4.4 Bukkit-Copy of the ItemStack
+CraftBukkit has a Method to create a Copy of an ItemStack. 
+Sadly, you need to use Reflections to use it in multiple versions. 
+
+Spicy has a Wrapper-Method to access this method regardless of Reflections
+
+```java
+import de.rytrox.spicy.item.ItemStacks;
+import org.bukkit.Material;
+import org.bukkit.inventory.ItemStack;
+
+public class Foo {
+
+    public void bukkitCopy() {
+        ItemStack itemStack = new ItemStack(Material.DIAMOND_SWORD);
+
+        ItemStack copy = ItemStacks.asBukkitCopy(itemStack);
     }
 }
 ```
