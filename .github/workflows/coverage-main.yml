@@ -7,6 +7,9 @@ on:
 jobs:
   coverage:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
 
     steps:
       - uses: actions/checkout@v2
@@ -48,4 +51,6 @@ jobs:
           name: jacoco-report
           path: target/site/jacoco/
       - name: Release to Maven
-        run: mvn deploy
+        run: mvn --batch-mode deploy
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
