@@ -11,7 +11,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Maven-Settings
-        uses: s4u/maven-settings-action@2.6.0
+        uses: s4u/maven-settings-action@v2.6.0
         with:
           servers: '[{"id": "rytrox-nexus", "username": "${{ secrets.NEXUS_USERNAME }}", "password": "${{ secrets.NEXUS_PASSWORD }}"}]'
       - name: Set Up JDK 17
