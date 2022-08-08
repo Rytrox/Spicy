@@ -34,5 +34,5 @@ jobs:
         with:
           name: settings-xml
           path: /home/runner/.m2/settings.xml
-#      - name: Deploy
-#        run: mvn deploy
+      - name: Deploy
+        run: mvn deploy
