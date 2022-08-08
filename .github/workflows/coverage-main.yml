@@ -50,7 +50,3 @@ jobs:
         with:
           name: jacoco-report
           path: target/site/jacoco/
-      - name: Release to Maven
-        run: mvn deploy
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

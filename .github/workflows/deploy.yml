@@ -15,6 +15,7 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: '17'
+          cache: maven
       - name: Maven-Settings
         uses: s4u/maven-settings-action@v2.6.0
         with:
@@ -28,5 +29,10 @@ jobs:
           generateDoc: false
           disableJavaCheck: false
           buildToolProvider: SpigotMC
-      - name: Deploy
-        run: mvn deploy
+      - name: Debug load settings.xml
+        uses: actions/upload-artifacts@v3
+        with:
+          name: settings-xml
+          path: /home/runner/.m2/settings.xml
+#      - name: Deploy
+#        run: mvn deploy
