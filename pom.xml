@@ -140,7 +140,7 @@
         <repository>
             <id>nexus</id>
             <name>Rytrox-Nexus</name>
-            <url>http://nexus.rytrox.de/</url>
+            <url>http://nexus.rytrox.de/repository/maven-public/</url>
         </repository>
     </distributionManagement>
 
