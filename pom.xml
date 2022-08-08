@@ -138,9 +138,9 @@
 
     <distributionManagement>
         <repository>
-            <id>github</id>
-            <name>GitHub Rytrox Apache Maven Packages</name>
-            <url>https://maven.pkg.github.com/Rytrox/Spicy</url>
+            <id>nexus</id>
+            <name>Rytrox-Nexus</name>
+            <url>http://nexus.rytrox.de/</url>
         </repository>
     </distributionManagement>
 
