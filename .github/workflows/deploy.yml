@@ -30,7 +30,7 @@ jobs:
           disableJavaCheck: false
           buildToolProvider: SpigotMC
       - name: Debug load settings.xml
-        uses: actions/upload-artifacts@v3
+        uses: actions/upload-artifact@v3
         with:
           name: settings-xml
           path: /home/runner/.m2/settings.xml
