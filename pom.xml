@@ -126,6 +126,11 @@
                     </excludes>
                 </configuration>
             </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-deploy-plugin</artifactId>
+            </plugin>
         </plugins>
     </build>
 
@@ -137,9 +142,12 @@
     </repositories>
 
     <distributionManagement>
+        <snapshotRepository>
+            <id>nexus-snapshots</id>
+            <url>http://nexus.rytrox.de/repository/maven-snapshots/</url>
+        </snapshotRepository>
         <repository>
             <id>nexus</id>
-            <name>Rytrox-Nexus</name>
             <url>http://nexus.rytrox.de/repository/maven-releases/</url>
         </repository>
     </distributionManagement>
