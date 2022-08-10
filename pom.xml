@@ -144,11 +144,11 @@
     <distributionManagement>
         <snapshotRepository>
             <id>nexus-snapshots</id>
-            <url>http://nexus.rytrox.de/repository/maven-snapshots/</url>
+            <url>https://nexus.rytrox.de/repository/maven-snapshots/</url>
         </snapshotRepository>
         <repository>
             <id>nexus</id>
-            <url>http://nexus.rytrox.de/repository/maven-releases/</url>
+            <url>https://nexus.rytrox.de/repository/maven-releases/</url>
         </repository>
     </distributionManagement>
 
