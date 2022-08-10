@@ -7,6 +7,7 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.ConsoleHandler;
@@ -42,9 +43,11 @@ public class ColoredLoggerTest {
 
         ColoredLogger.enableColoredLogging('&', plugin.getLogger(), "&8[&6Spicy&8]");
         plugin.getLogger().log(Level.INFO, "&1Das &2ist &3ein &4kleiner &5Test");
+        plugin.getLogger().log(Level.INFO, "&1Das &2ist &3ein &5Test &7mit {0}", "&6Parameter");
 
         assertEquals("[Spicy] &1Das &2ist &3ein &4kleiner &5Test", logLogger.messages.remove(0));
         assertNotEquals("&1Das &2ist &3ein &4kleiner &5Test", logLogger.messages.remove(0));
+        assertEquals("[Spicy] &1Das &2ist &3ein &5Test &7mit &6Parameter", logLogger.messages.remove(0));
     }
 
     @AfterAll
@@ -61,7 +64,7 @@ public class ColoredLoggerTest {
         public void publish(LogRecord record) {
             super.publish(record);
 
-            messages.add(record.getMessage());
+            messages.add(MessageFormat.format(record.getMessage(), record.getParameters()));
         }
     }
 }

@@ -4,6 +4,7 @@ import org.bukkit.Bukkit;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -62,7 +63,7 @@ public final class ColoredLogger {
 		@Override
 		public void publish(LogRecord record) {
 			// replace prefix
-			String[] message = record.getMessage().split(" ");
+			String[] message = MessageFormat.format(record.getMessage(), record.getParameters()).split(" ");
 
 			if(prefix != null) {
 				if(!message[0].matches("\\[.*\\]")) {
