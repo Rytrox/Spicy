@@ -17,7 +17,7 @@ public final class MySQL implements SQL {
     public MySQL(String host, int port, String database, String username, String password) {
         MysqlDataSource properties = new MysqlDataSource();
 
-        properties.setUrl(String.format("jdbc:mysql://%s:%d/", host, port));
+        properties.setUrl(String.format("jdbc:mysql://%s:%d/%s?useSSL=false", host, port, database));
         properties.setDatabaseName(database);
         properties.setUser(username);
         properties.setPassword(password);
