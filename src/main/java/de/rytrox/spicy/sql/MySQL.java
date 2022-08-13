@@ -14,10 +14,14 @@ public final class MySQL implements SQL {
 
     private final MysqlDataSource source;
 
+    public MySQL(MysqlDataSource source) {
+        this.source = source;
+    }
+
     public MySQL(String host, int port, String database, String username, String password) {
         MysqlDataSource properties = new MysqlDataSource();
 
-        properties.setUrl(String.format("jdbc:mysql://%s:%d/%s?useSSL=false", host, port, database));
+        properties.setUrl(String.format("jdbc:mysql://%s:%d/%s", host, port, database));
         properties.setDatabaseName(database);
         properties.setUser(username);
         properties.setPassword(password);
