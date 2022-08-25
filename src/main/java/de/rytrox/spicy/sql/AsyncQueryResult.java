@@ -8,21 +8,22 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-public record AsyncQueryResult<T>(@NotNull CompletableFuture<List<T>> task) implements QueryResult<T> {
+public record AsyncQueryResult<T>(@NotNull CompletableFuture<SyncQueryResult<T>> task) implements QueryResult<T> {
 
     @Override
     public @NotNull <R> AsyncQueryResult<R> map(@NotNull Function<T, R> mappingFunction) {
-        CompletableFuture<List<R>> future = this.task
-                .thenApply((list) ->
-                    list.stream()
-                        .map(mappingFunction)
-                        .collect(Collectors.toList())
+        CompletableFuture<SyncQueryResult<R>> future = this.task
+                .thenApply((list) -> list.map(mappingFunction)
         );
 
         return new AsyncQueryResult<>(future);
     }
 
     public void subscribe(@NotNull Consumer<List<T>> result) {
-        task.thenAcceptAsync(result);
+        task.thenAcceptAsync((results) -> result.accept(results.get()));
+    }
+
+    public void subscribeToFirst(@NotNull Consumer<T> result) {
+        task.thenAcceptAsync((results) -> result.accept(results.get(0)));
     }
 }

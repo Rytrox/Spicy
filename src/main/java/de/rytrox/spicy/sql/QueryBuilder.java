@@ -1,5 +1,7 @@
 package de.rytrox.spicy.sql;
 
+import com.google.common.collect.Lists;
+import org.intellij.lang.annotations.Language;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -8,17 +10,18 @@ import java.lang.reflect.Constructor;
 import java.sql.*;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
 import java.util.concurrent.*;
 
-public record QueryBuilder(DataSource source, String query, Object... args) {
+public class QueryBuilder {
 
-    @NotNull
-    private PreparedStatement prepareStatement(@NotNull Connection connection, @NotNull String statement, Object... args) throws SQLException {
-        //Do not close this Statement here!!
-        PreparedStatement ps = connection.prepareStatement(statement);
-        if(args != null)
-            for(int i = 0; i < args.length; i++) ps.setString(i + 1, args[i].toString());
-        return ps;
+    private final DataSource source;
+    private final Queue<StatementWrapper> statements = new LinkedBlockingQueue<>();
+
+    public QueryBuilder(@NotNull DataSource source, @NotNull String query, Object... args) {
+        this.source = source;
+
+        this.statements.add(new StatementWrapper(query, args));
     }
 
     @NotNull
@@ -61,11 +64,9 @@ public record QueryBuilder(DataSource source, String query, Object... args) {
      */
     @NotNull
     public <T> AsyncQueryResult<T> query(Class<T> targetClass) {
-        CompletableFuture<List<T>> future = CompletableFuture.supplyAsync(() -> {
-            try(Connection connection = source.getConnection();
-                PreparedStatement statement = prepareStatement(connection, query, args)) {
-
-                return convertResultSetToEntities(targetClass, statement.executeQuery());
+        CompletableFuture<SyncQueryResult<T>> future = CompletableFuture.supplyAsync(() -> {
+            try {
+                return queryWithException(targetClass);
             } catch (SQLException exception) {
                 throw new CompletionException(exception);
             }
@@ -82,12 +83,22 @@ public record QueryBuilder(DataSource source, String query, Object... args) {
      */
     @Contract("_ -> new")
     public <T> @NotNull SyncQueryResult<T> querySync(Class<T> targetClass) {
+        try {
+            return queryWithException(targetClass);
+        } catch (SQLException exception) {
+            throw new IllegalStateException("Cannot execute SQL-Statement. Inner exception was: ", exception);
+        }
+    }
+
+    @Contract("_ -> new")
+    private <T> @NotNull SyncQueryResult<T> queryWithException(Class<T> targetClass) throws SQLException {
+        if(this.statements.size() > 1)
+            throw new IllegalStateException("Queries doesn't support Statement-Chaining");
+
         try(Connection connection = source.getConnection();
-            PreparedStatement statement = prepareStatement(connection, query, args)) {
+            PreparedStatement statement = this.statements.remove().build(connection)) {
 
             return new SyncQueryResult<>(convertResultSetToEntities(targetClass, statement.executeQuery()));
-        } catch (SQLException exception) {
-            throw new IllegalStateException("Cannot execute SQL-Statement. Inner exception was: " + exception, exception);
         }
     }
 
@@ -98,12 +109,10 @@ public record QueryBuilder(DataSource source, String query, Object... args) {
      * @return a CompletableFuture that returns the result if the statement succeed
      */
     @Contract(" -> new")
-    public @NotNull CompletableFuture<Boolean> execute() {
+    public @NotNull CompletableFuture<List<Boolean>> execute() {
         return CompletableFuture.supplyAsync(() -> {
-            try(Connection connection = source.getConnection();
-                PreparedStatement statement = prepareStatement(connection, query, args)) {
-
-                return statement.execute();
+            try {
+                return executeWithException();
             } catch (SQLException exception) {
                 throw new CompletionException(exception);
             }
@@ -116,13 +125,25 @@ public record QueryBuilder(DataSource source, String query, Object... args) {
      *
      * @return true if the statement was successfully executed, false otherwise
      */
-    public boolean executeSync() {
-        try(Connection connection = source.getConnection();
-            PreparedStatement statement = prepareStatement(connection, query, args)) {
-
-            return statement.execute();
+    public List<Boolean> executeSync() {
+        try {
+            return executeWithException();
         } catch (SQLException e) {
             throw new IllegalStateException("Could not execute SQL-Statement. Inner exception was: " + e);
+        }
+    }
+
+    private @NotNull List<Boolean> executeWithException() throws SQLException {
+        try(Connection connection = source.getConnection()) {
+            List<Boolean> results = Lists.newArrayListWithExpectedSize(this.statements.size());
+
+            for(StatementWrapper wrapper : this.statements) {
+                try(PreparedStatement statement = wrapper.build(connection)) {
+                    results.add(statement.execute());
+                }
+            }
+
+            return results;
         }
     }
 
@@ -132,7 +153,7 @@ public record QueryBuilder(DataSource source, String query, Object... args) {
      * This method runs asynchronously.
      */
     @Contract(" -> new")
-    public @NotNull CompletableFuture<Integer> executeUpdate() {
+    public @NotNull CompletableFuture<List<Integer>> executeUpdate() {
         return executeUpdate(false);
     }
 
@@ -140,26 +161,17 @@ public record QueryBuilder(DataSource source, String query, Object... args) {
      * Executes a default CRUD-Statement. <br>
      * This method runs asynchronously.
      */
-    public @NotNull CompletableFuture<Integer> executeUpdate(boolean returnAutoGeneratedValue) {
+    public @NotNull CompletableFuture<List<Integer>> executeUpdate(boolean returnAutoGeneratedValue) {
         return CompletableFuture.supplyAsync(() -> {
-            try(Connection connection = source.getConnection();
-                PreparedStatement statement = returnAutoGeneratedValue ?
-                        prepareStatement(connection, query, args, Statement.RETURN_GENERATED_KEYS) :
-                        prepareStatement(connection, query, args)) {
-
-                if(returnAutoGeneratedValue) {
-                    statement.executeUpdate();
-
-                    ResultSet resultSet = statement.getGeneratedKeys();
-                    return resultSet.getInt(1);
-                } else return statement.executeUpdate();
+            try {
+                return executeUpdateWithException(returnAutoGeneratedValue);
             } catch (SQLException exception) {
                 throw new CompletionException(exception);
             }
         });
     }
 
-    public int executeUpdateSync() {
+    public List<Integer> executeUpdateSync() {
         return executeUpdateSync(false);
     }
 
@@ -169,20 +181,36 @@ public record QueryBuilder(DataSource source, String query, Object... args) {
      *
      * @return the generated key of your table. Otherwise, ignore it
      */
-    public int executeUpdateSync(boolean returnAutoGeneratedValue) {
-        try(Connection connection = source.getConnection();
-            PreparedStatement statement = returnAutoGeneratedValue ?
-                    prepareStatement(connection, query, args, Statement.RETURN_GENERATED_KEYS) :
-                    prepareStatement(connection, query, args)) {
-
-            if(returnAutoGeneratedValue) {
-                statement.executeUpdate();
-
-                ResultSet resultSet = statement.getGeneratedKeys();
-                return resultSet.getInt(1);
-            } else return statement.executeUpdate();
+    public List<Integer> executeUpdateSync(boolean returnAutoGeneratedValue) {
+        try {
+            return executeUpdateWithException(returnAutoGeneratedValue);
         } catch (SQLException e) {
             throw new IllegalStateException("Could not execute SQL-Statement. Inner exception was: " + e);
         }
+    }
+
+    private @NotNull List<Integer> executeUpdateWithException(boolean returnAutoGeneratedValue) throws SQLException {
+        try(Connection connection = source.getConnection()) {
+            List<Integer> results = Lists.newArrayListWithExpectedSize(this.statements.size());
+
+            for(StatementWrapper wrapper : this.statements) {
+                try(PreparedStatement statement = wrapper.build(connection, PreparedStatement.RETURN_GENERATED_KEYS)) {
+                    if(returnAutoGeneratedValue) {
+                        statement.executeUpdate();
+
+                        ResultSet resultSet = statement.getGeneratedKeys();
+                        results.add(resultSet.getInt(1));
+                    } else results.add(statement.executeUpdate());
+                }
+            }
+
+            return results;
+        }
+    }
+
+    public QueryBuilder prepare(@NotNull @Language("SQL") String query, Object... args) {
+        this.statements.add(new StatementWrapper(query, args));
+
+        return this;
     }
 }

@@ -6,6 +6,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -19,24 +20,44 @@ import static org.junit.jupiter.api.Assertions.*;
 public class AsyncSyncQueryResultTest {
 
     @Mock
-    private CompletableFuture<List<Object>> mock;
+    private SyncQueryResult<Object> mock;
 
     private final CountDownLatch lock = new CountDownLatch(1);
 
     @Test
-    public void shouldCallSubscribeWithFutureData() {
-        AsyncQueryResult<Object> result = new AsyncQueryResult<>(mock);
-        Consumer subscription = Mockito.mock(Consumer.class);
+    public void shouldCallSubscribeWithFutureData() throws InterruptedException {
+        Mockito.doReturn(new ArrayList<>())
+                .when(mock).get();
+
+        AsyncQueryResult<Object> result = new AsyncQueryResult<>(CompletableFuture.completedFuture(mock));
+        Consumer subscription = (_val) -> {
+            assertEquals(mock.get(), _val);
+
+            lock.countDown();
+        };
 
         result.subscribe(subscription);
 
-        Mockito.verify(mock).thenAcceptAsync(subscription);
+        lock.await();
+    }
+
+    @Test
+    public void shouldSubscribeWithFirst() throws InterruptedException {
+        AsyncQueryResult<Integer> result = new AsyncQueryResult<>(CompletableFuture.completedFuture(new SyncQueryResult<>(List.of(0, 1))));
+
+        result.subscribeToFirst((zero) -> {
+            assertEquals(0, zero);
+
+            lock.countDown();
+        });
+
+        lock.await();
     }
 
     @Test
     public void shouldConvertWithMap() throws InterruptedException {
         AsyncQueryResult<Integer> result = new AsyncQueryResult<>(CompletableFuture.supplyAsync(() ->
-                Arrays.asList(0, 1, 2, 3, 4, 5))
+                new SyncQueryResult<>(Arrays.asList(0, 1, 2, 3, 4, 5)))
         );
 
         Function<Integer, String> convertFunction = String::valueOf;
