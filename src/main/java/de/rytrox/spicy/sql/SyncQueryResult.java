@@ -31,4 +31,9 @@ public record SyncQueryResult<T>(List<T> entities) implements QueryResult<T> {
     public List<T> get() {
         return entities;
     }
+
+    @NotNull
+    public T get(int index) {
+        return entities.get(index);
+    }
 }

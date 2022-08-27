@@ -3,12 +3,15 @@ package de.rytrox.spicy.sql;
 import org.intellij.lang.annotations.Language;
 import org.jetbrains.annotations.NotNull;
 
+import javax.sql.DataSource;
+
 /**
  * Interface for SQL-Connector
  *
  */
-@FunctionalInterface
-public interface SQL {
+public abstract class SQL {
+
+    protected DataSource source;
 
     /**
      * Prepares the MySQL-Connection for a new Statement. <br>
@@ -33,5 +36,7 @@ public interface SQL {
      * @return a builder which will be used for connections later
      */
     @NotNull
-    QueryBuilder prepare(@NotNull @Language("SQL") String statement, @NotNull Object... args);
+    public QueryBuilder prepare(@NotNull @Language("SQL") String statement, @NotNull Object... args) {
+        return new QueryBuilder(this.source, statement, args);
+    }
 }

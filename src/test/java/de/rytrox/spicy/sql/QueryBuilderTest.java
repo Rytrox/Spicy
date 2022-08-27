@@ -61,11 +61,11 @@ public class QueryBuilderTest {
                     Developer timeout = developers.get(0);
                     Developer sether = developers.get(1);
 
-                    assertEquals(701, sether.getId());
-                    assertEquals("Sether", sether.getName());
-
                     assertEquals(408, timeout.getId());
                     assertEquals("Timeout", timeout.getName());
+
+                    assertEquals(701, sether.getId());
+                    assertEquals("Sether", sether.getName());
 
                     resultPassed.set(true);
                     lock.countDown();
@@ -156,13 +156,14 @@ public class QueryBuilderTest {
     public void shouldUpdateAsyncSQLUpdate() throws InterruptedException {
         AtomicBoolean result = new AtomicBoolean(false);
 
-        datasource.prepare("UPDATE Developers SET name = 'Sether701' WHERE id = 701")
+        datasource.prepare("INSERT INTO Developers(id, name) VALUES (?, ?)", 105, "Testnutzer")
+                .prepare("UPDATE Developers SET name = 'Sether701' WHERE id = ?", 105)
                 .executeUpdate()
                 .thenAccept((res) -> {
-                    datasource.prepare("UPDATE Developers SET name = 'Sether' WHERE id = 701")
+                    datasource.prepare("DELETE FROM Developers WHERE id = 105")
                             .executeUpdateSync();
 
-                    assertEquals(1, res.intValue());
+                    assertEquals(1, res.get(1).intValue());
                     result.set(true);
 
                     lock.countDown();
@@ -174,10 +175,24 @@ public class QueryBuilderTest {
 
     @Test
     public void shouldExecuteSQLUpdate() {
-        assertEquals(1, datasource.prepare("UPDATE Developers SET name = 'Sether701' WHERE id = 701")
+        assertEquals(List.of(1), datasource.prepare("UPDATE Developers SET name = 'Sether701' WHERE id = 701")
                 .executeUpdateSync());
 
         datasource.prepare("UPDATE Developers SET name = 'Sether' WHERE id = 701")
+                .executeUpdateSync();
+    }
+
+    @Test
+    public void shouldChainSQLStatements() {
+        datasource.prepare("INSERT INTO Developers(id, name) VALUES (?, ?)", 101, "Testnutzer1")
+                .prepare("INSERT INTO Developers(id, name) VALUES (?, ?)", 102, "Testnutzer2")
+                .executeUpdateSync();
+
+        assertEquals(List.of(101, 102), datasource.prepare("SELECT id FROM Developers WHERE name LIKE ?", "Testnutzer%")
+                .querySync(Integer.class)
+                .get());
+
+        datasource.prepare("DELETE FROM Developers WHERE name LIKE ?", "Testnutzer%")
                 .executeUpdateSync();
     }
 }

@@ -85,6 +85,9 @@ private SQLite fileDatabase = new SQLite(Paths.get("path", "to", "your", "file.d
 ```
 You can also implement your own Driver based on your database.
 
+Field `source` is a protected `DataSource` member of SQL.
+It is used to create connections to your database
+
 Here is an example for a PostgreSQL Driver:
 
 ```java
@@ -97,7 +100,7 @@ import java.sql.SQLException;
 import org.postgresql.Driver;
 import org.postgresql.jdbc3.Jdbc3SimpleDataSource;
 
-public class PostgreSQL implements SQL {
+public class PostgreSQL extends SQL {
 
     static {
         try {
@@ -107,9 +110,7 @@ public class PostgreSQL implements SQL {
             e.printStackTrace();
         }
     }
-
-    private final DataSource source;
-
+    
     public PostgreSQL(String host, int port, String database, String username, String password) {
         // create your DataSource Implementation 
         source = new Jdbc3SimpleDataSource();
@@ -118,11 +119,6 @@ public class PostgreSQL implements SQL {
         source.setPortNumber(port);
         source.setUser(username);
         source.setPassword(password);
-    }
-
-    @Override
-    public @NotNull QueryBuilder prepare(@NotNull @Language("PostgreSQL") String statement, Object... args) {
-        return new QueryBuilder(source, statement, args);
     }
 }
 ```
@@ -265,6 +261,24 @@ datasource.prepare("INSERT INTO Foo(id, name) VALUES (404, 'Not Found')")
                 });
         });
 ```
+
+## 1.3 Chaining multiple non-query statements
+Sometimes, when you want to execute multiple statements in a row, 
+you can chain the `prepare` method and executes multiple statements.
+
+Those statements will be executed one after another in the order you chain them.
+
+Example: <br>
+Let's assume that our table is `Foo(id INTEGER NOT NULL, name VARCHAR(100))`. <br>
+To chain statements we simply need to do:
+```java
+datasource.prepare("INSERT INTO Foo(id, name) VALUES (?, ?)", 101, "Bar") // Insert Bar with id 101
+        .prepare("UPDATE FOO SET name = ? WHERE id = ?", "Updated", 101) // Change name of Bar to "Updated"
+        .executeUpdate(); // execute in full async mode
+```
+
+<b> ATTENTION: </b> <br>
+You cannot chain Query-Statements (SELECT), since SELECT works different from CREATE, UPDATE and DELETE
 
 # 2. Colored Logging
 With the ColoredLogger-Module you can use Minecraft-ColorCodes into your Plugin-Logger.
