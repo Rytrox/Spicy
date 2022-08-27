@@ -12,6 +12,14 @@ Currently, Spicy uses Java 17 and Spigot 1.18.2, so make sure to install that fi
 
 After the installation you can use it like any other Maven-Repository:
 ```xml
+<repositories>
+    ...
+    <repository>
+        <id>rytrox</id>
+        <url>https://nexus.rytrox.de/repository/maven-public/</url>
+    </repository>
+</repositories>
+
 <dependencies>
     ...
     <dependency>
