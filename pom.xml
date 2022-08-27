@@ -85,7 +85,6 @@
                 <configuration>
                     <artifactSet>
                         <excludes>
-                            <exclude>org.jetbrains:annotations</exclude>
                             <exclude>com.google.protobuf:protobuf-java</exclude>
                         </excludes>
                     </artifactSet>
@@ -260,7 +259,7 @@
             <groupId>org.jetbrains</groupId>
             <artifactId>annotations</artifactId>
             <version>${annotations.version}</version>
-            <scope>compile</scope>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
 </project>
