@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 public record AsyncQueryResult<T>(@NotNull CompletableFuture<SyncQueryResult<T>> task) implements QueryResult<T> {
 
@@ -25,5 +24,10 @@ public record AsyncQueryResult<T>(@NotNull CompletableFuture<SyncQueryResult<T>>
 
     public void subscribeToFirst(@NotNull Consumer<T> result) {
         task.thenAcceptAsync((results) -> result.accept(results.get(0)));
+    }
+
+    @NotNull
+    public CompletableFuture<List<T>> get() {
+        return this.task.thenApply(SyncQueryResult::get);
     }
 }
