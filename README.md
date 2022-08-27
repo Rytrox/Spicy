@@ -5,12 +5,9 @@
 Spicy is an Utils-Library for Spigot-Developer to improve their Spigot-Plugins.
 
 # Installation
-To install and use Spicy in Maven, you simply have to download this repository and install it on your local 
-Maven-Repository with `mvn clean install`.
+To install and use Spicy in Maven, you simply need to include our Nexus-Repository and add the Library.
 
 Currently, Spicy uses Java 17 and Spigot 1.18.2, so make sure to install that first.
-
-After the installation you can use it like any other Maven-Repository:
 ```xml
 <repositories>
     ...
@@ -77,6 +74,12 @@ If you are using NMS-Remapped you can use Spicy's remapping-features as well by 
 </plugins>
 ```
 
+<b>ATTENTION</b> <br>
+If you want to use IntelliSense with Language Injection you need to clone this repository and include it in your `Project Structure`
+You need to import this project as a Maven-Project.
+
+If you want JetBrains to support this feature, <a href="https://youtrack.jetbrains.com/issue/IDEA-205659/Please-support-language-injection-for-external-libraries">click here!</a>
+
 # Features
 # 1. SQL ORM-like Library
 Spicy includes an SQL-Module that allows to map tables and rows into Java-Object.
@@ -121,12 +124,12 @@ public class PostgreSQL extends SQL {
     
     public PostgreSQL(String host, int port, String database, String username, String password) {
         // create your DataSource Implementation 
-        source = new Jdbc3SimpleDataSource();
-        source.setServerName(host);
-        source.setDatabaseName(database);
-        source.setPortNumber(port);
-        source.setUser(username);
-        source.setPassword(password);
+        this.source = new Jdbc3SimpleDataSource();
+        this.source.setServerName(host);
+        this.source.setDatabaseName(database);
+        this.source.setPortNumber(port);
+        this.source.setUser(username);
+        this.source.setPassword(password);
     }
 }
 ```
