@@ -76,4 +76,28 @@ public class AsyncSyncQueryResultTest {
 
         lock.await();
     }
+
+    @Test
+    void shouldReturnFuture() throws InterruptedException {
+        AsyncQueryResult<Integer> result = new AsyncQueryResult<>(CompletableFuture.supplyAsync(() ->
+                new SyncQueryResult<>(Arrays.asList(0, 1, 2, 3, 4, 5)))
+        );
+
+        CompletableFuture<List<Integer>> future = result.get();
+
+        assertNotNull(future);
+
+        future.whenComplete((res, throwable) -> {
+            assertEquals(0, res.get(0));
+            assertEquals(1, res.get(1));
+            assertEquals(2, res.get(2));
+            assertEquals(3, res.get(3));
+            assertEquals(4, res.get(4));
+            assertEquals(5, res.get(5));
+
+            lock.countDown();
+        });
+
+        lock.await();
+    }
 }
