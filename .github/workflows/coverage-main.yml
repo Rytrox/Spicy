@@ -44,7 +44,7 @@ jobs:
         with:
           author_name: Timeout-Timo
           author_email: taubmann870@gmail.com
-          default_author: user_name
+          default_author: user_info
           message: 'commit badge'
           add: '*.svg'
       - name: Upload JaCoCo Coverage
