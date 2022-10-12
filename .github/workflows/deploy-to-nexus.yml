@@ -42,7 +42,7 @@ jobs:
           disableJavaCheck: true
           buildToolProvider: SpigotMC
       - name: Setup Spigot (remapped)
-        uses: SpraxDev/Action-SpigotMC@v4.0.0
+        uses: SpraxDev/Action-SpigotMC@v4.1.0
         with:
           versions: 1.19.2, 1.18.2
           remapped: true
