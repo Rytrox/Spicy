@@ -20,6 +20,12 @@
         <mockito.version>4.8.0</mockito.version>
     </properties>
 
+    <modules>
+        <module>core</module>
+        <module>1.18.2</module>
+        <module>1.8</module>
+    </modules>
+
     <repositories>
         <repository>
             <id>spigotmc-repo</id>
@@ -29,13 +35,12 @@
             <id>sonatype</id>
             <url>https://oss.sonatype.org/content/groups/public/</url>
         </repository>
+        <repository>
+            <id>papermc</id>
+            <url>https://repo.papermc.io/repository/maven-public/</url>
+        </repository>
     </repositories>
 
-    <modules>
-        <module>core</module>
-        <module>1.18.2</module>
-        <module>1.8</module>
-    </modules>
 
     <build>
         <pluginManagement>
