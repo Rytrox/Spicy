@@ -123,21 +123,21 @@ public class NBTConfig extends MemoryConfiguration {
         map.forEach((key, value) -> {
             if(key instanceof String && value != null) {
                 if(value instanceof Byte) {
-                    compound.setByte((String) key, (byte) value);
+                    compound.setByte((String) key, (Byte) value);
                 } else if(value instanceof Short) {
-                    compound.setShort((String) key, (short) value);
-                } else if(value instanceof Integer || value instanceof Character) {
-                    compound.setInt((String) key, (int) value);
+                    compound.setShort((String) key, (Short) value);
+                } else if(value instanceof Integer) {
+                    compound.setInt((String) key, (Integer) value);
                 } else if(value instanceof Long) {
-                    compound.setLong((String) key, (long) value);
+                    compound.setLong((String) key, (Long) value);
                 } else if(value instanceof Float) {
-                    compound.setFloat((String) key, (float) value);
+                    compound.setFloat((String) key, (Float) value);
                 } else if(value instanceof Double) {
-                    compound.setDouble((String) key, (double) value);
+                    compound.setDouble((String) key, (Double) value);
                 } else if(value instanceof String) {
                     compound.setString((String) key, (String) value);
                 } else if(value instanceof Boolean) {
-                    compound.setBoolean((String) key, (boolean) value);
+                    compound.setBoolean((String) key, (Boolean) value);
                 } else if(value instanceof Map) {
                     compound.set((String) key, convertMapToCompound((Map<?, ?>) value));
                 } else if(value instanceof List) {
@@ -161,21 +161,21 @@ public class NBTConfig extends MemoryConfiguration {
 
         list.forEach(value -> {
             if(value instanceof Byte) {
-                nbtList.add(new NBTTagByte((byte) value));
+                nbtList.add(new NBTTagByte((Byte) value));
             } else if(value instanceof Short) {
-                nbtList.add(new NBTTagShort((short) value));
-            } else if(value instanceof Integer || value instanceof Character) {
-                nbtList.add(new NBTTagInt((int) value));
+                nbtList.add(new NBTTagShort((Short) value));
+            } else if(value instanceof Integer) {
+                nbtList.add(new NBTTagInt((Integer) value));
             } else if(value instanceof Long) {
-                nbtList.add(new NBTTagLong((long) value));
+                nbtList.add(new NBTTagLong((Long) value));
             } else if(value instanceof Float) {
-                nbtList.add(new NBTTagFloat((float) value));
+                nbtList.add(new NBTTagFloat((Float) value));
             } else if(value instanceof Double) {
-                nbtList.add(new NBTTagDouble((double) value));
+                nbtList.add(new NBTTagDouble((Double) value));
             } else if(value instanceof String) {
                 nbtList.add(new NBTTagString((String) value));
             } else if(value instanceof Boolean) {
-                nbtList.add(new NBTTagByte((byte) (((boolean) value) ? 1 : 0)));
+                nbtList.add(new NBTTagByte((byte) ((Boolean) value).compareTo(false)));
             } else if(value instanceof Map) {
                 nbtList.add(convertMapToCompound((Map<?, ?>) value));
             } else if(value instanceof List) {
