@@ -3,40 +3,60 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
+
     <groupId>de.rytrox</groupId>
-    <artifactId>spicy</artifactId>
-    <version>1.0_1182</version>
+    <artifactId>spicy-parent</artifactId>
+    <version>1.0.1</version>
+    <packaging>pom</packaging>
+
+    <name>Spicy</name>
+
+    <description>Make Spigot Development easy. Provides useful Libraries for every Spigot-Developer</description>
+    <url>https://rytrox.de</url>
 
     <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <powermock.version>2.0.9</powermock.version>
-        <java.version>17</java.version>
-        <mockito.version>4.6.1</mockito.version>
+        <maven.deploy.skip>true</maven.deploy.skip>
         <annotations.version>23.0.0</annotations.version>
-        <mockserver.version>5.13.2</mockserver.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <mockito.version>4.8.0</mockito.version>
     </properties>
 
-    <build>
-        <sourceDirectory>src/main/java</sourceDirectory>
-        <resources>
-            <resource>
-                <directory>src/main/java</directory>
-                <excludes>
-                    <exclude>**/*.java</exclude>
-                </excludes>
-            </resource>
-        </resources>
+    <modules>
+        <module>core</module>
+        <module>1.18.2</module>
+        <module>1.8</module>
+    </modules>
 
+    <repositories>
+        <repository>
+            <id>spigotmc-repo</id>
+            <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
+        </repository>
+        <repository>
+            <id>sonatype</id>
+            <url>https://oss.sonatype.org/content/groups/public/</url>
+        </repository>
+        <repository>
+            <id>papermc</id>
+            <url>https://repo.papermc.io/repository/maven-public/</url>
+        </repository>
+    </repositories>
+
+
+    <distributionManagement>
+        <snapshotRepository>
+            <id>nexus-snapshots</id>
+            <url>https://nexus.rytrox.de/repository/maven-snapshots/</url>
+        </snapshotRepository>
+        <repository>
+            <id>nexus</id>
+            <url>https://nexus.rytrox.de/repository/maven-releases/</url>
+        </repository>
+    </distributionManagement>
+
+    <build>
         <pluginManagement>
             <plugins>
-                <plugin>
-                    <artifactId>maven-surefire-plugin</artifactId>
-                    <configuration>
-                        <!--suppress UnresolvedMavenProperty -->
-                        <argLine>${argLine} --enable-preview</argLine>
-                    </configuration>
-                    <version>3.0.0-M5</version>
-                </plugin>
                 <plugin>
                     <groupId>org.jacoco</groupId>
                     <artifactId>jacoco-maven-plugin</artifactId>
@@ -61,15 +81,14 @@
 
         <plugins>
             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.8.1</version>
                 <configuration>
                     <source>${java.version}</source>
                     <target>${java.version}</target>
-                    <compilerArgs>--enable-preview</compilerArgs>
                 </configuration>
             </plugin>
-
-            <!-- Um Dependencies in Spicy mit einzubinden -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
@@ -88,11 +107,10 @@
                             <exclude>com.google.protobuf:protobuf-java</exclude>
                         </excludes>
                     </artifactSet>
-                    <finalName>${project.artifactId}</finalName>
+                    <finalName>${project.name}</finalName>
                 </configuration>
             </plugin>
 
-            <!-- Not Null Instrumenter für Byte-Code Validierung -->
             <plugin>
                 <groupId>se.eris</groupId>
                 <artifactId>notnull-instrumenter-maven-plugin</artifactId>
@@ -131,57 +149,26 @@
                 <artifactId>maven-deploy-plugin</artifactId>
             </plugin>
         </plugins>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+            </resource>
+        </resources>
     </build>
-
-    <repositories>
-        <repository>
-            <id>papermc</id>
-            <url>https://repo.papermc.io/repository/maven-public/</url>
-        </repository>
-    </repositories>
-
-    <distributionManagement>
-        <snapshotRepository>
-            <id>nexus-snapshots</id>
-            <url>https://nexus.rytrox.de/repository/maven-snapshots/</url>
-        </snapshotRepository>
-        <repository>
-            <id>nexus</id>
-            <url>https://nexus.rytrox.de/repository/maven-releases/</url>
-        </repository>
-    </distributionManagement>
 
     <dependencies>
         <dependency>
-            <groupId>org.spigotmc</groupId>
-            <artifactId>spigot</artifactId>
-            <version>1.18.2-R0.1-SNAPSHOT</version>
-            <classifier>remapped-mojang</classifier>
+            <groupId>org.jetbrains</groupId>
+            <artifactId>annotations</artifactId>
+            <version>${annotations.version}</version>
             <scope>provided</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>net.jafama</groupId>
-            <artifactId>jafama</artifactId>
-            <version>2.3.2</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpmime</artifactId>
-            <version>4.5.13</version>
         </dependency>
 
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-engine</artifactId>
-            <version>5.8.2</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.github.seeseemelk</groupId>
-            <artifactId>MockBukkit-v1.18</artifactId>
-            <version>2.27.0</version>
+            <version>5.9.0</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -207,59 +194,22 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.mockito</groupId>
-            <artifactId>mockito-junit-jupiter</artifactId>
-            <version>${mockito.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.mock-server</groupId>
-            <artifactId>mockserver-netty</artifactId>
-            <version>${mockserver.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>net.bytebuddy</groupId>
             <artifactId>byte-buddy</artifactId>
-            <version>1.12.10</version>
+            <version>1.12.16</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>net.bytebuddy</groupId>
             <artifactId>byte-buddy-agent</artifactId>
-            <version>1.12.10</version>
+            <version>1.12.16</version>
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.mock-server</groupId>
-            <artifactId>mockserver-client-java</artifactId>
-            <version>${mockserver.version}</version>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-junit-jupiter</artifactId>
+            <version>${mockito.version}</version>
             <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.bouncycastle</groupId>
-            <artifactId>bcprov-jdk15on</artifactId>
-            <version>1.70</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.bouncycastle</groupId>
-            <artifactId>bcpkix-jdk15on</artifactId>
-            <version>1.70</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.mock-server</groupId>
-            <artifactId>mockserver-junit-rule</artifactId>
-            <version>${mockserver.version}</version>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.jetbrains</groupId>
-            <artifactId>annotations</artifactId>
-            <version>${annotations.version}</version>
-            <scope>provided</scope>
         </dependency>
     </dependencies>
 </project>
