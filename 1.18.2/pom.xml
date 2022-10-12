@@ -7,7 +7,7 @@
     <parent>
         <groupId>de.rytrox</groupId>
         <artifactId>spicy-parent</artifactId>
-        <version>1.0.1-SNAPSHOT</version>
+        <version>1.0.1</version>
     </parent>
 
     <artifactId>spicy</artifactId>
@@ -16,6 +16,7 @@
     <name>${project.parent.name} 1.18.2</name>
 
     <properties>
+        <maven.deploy.skip>false</maven.deploy.skip>
         <java.version>17</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <mockserver.version>5.14.0</mockserver.version>

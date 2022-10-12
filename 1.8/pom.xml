@@ -7,13 +7,14 @@
     <parent>
         <groupId>de.rytrox</groupId>
         <artifactId>spicy-parent</artifactId>
-        <version>1.0.1-SNAPSHOT</version>
+        <version>1.0.1</version>
     </parent>
 
     <artifactId>spicy</artifactId>
     <version>${project.parent.version}-180</version>
 
     <properties>
+        <maven.deploy.skip>false</maven.deploy.skip>
         <java.version>1.8</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>

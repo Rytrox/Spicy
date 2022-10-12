@@ -1,13 +1,10 @@
-![Coverage](.github/badges/jacoco.svg)
-![Branches](.github/badges/branches.svg)
-
 # Spicy – Improve Spigot-Development
 Spicy is an Utils-Library for Spigot-Developer to improve their Spigot-Plugins.
 
 # Installation
 To install and use Spicy in Maven, you simply need to include our Nexus-Repository and add the Library.
 
-Currently, Spicy uses Java 17 and Spigot 1.18.2, so make sure to install that first.
+Currently, Spicy uses Java 17 and Spigot 1.18.2 or Java 8 and Spigot 1.8.8, so make sure to install that first.
 ```xml
 <repositories>
     ...
@@ -22,12 +19,12 @@ Currently, Spicy uses Java 17 and Spigot 1.18.2, so make sure to install that fi
     <dependency>
         <groupId>de.rytrox</groupId>
         <artifactId>spicy</artifactId>
-        <version>1.0_1182</version>
+        <version>1.0.1_1182</version> <!-- or 1.0.1_180 for 1.8 Build-->
     </dependency>
 </dependencies>
 ```
 
-If you are using NMS-Remapped you can use Spicy's remapping-features as well by changing your SpecialSource Configuration like this:
+If you are using NMS-Remapped on 1.18.2 you can use Spicy's remapping-features as well by changing your SpecialSource Configuration like this:
 ```xml
 <plugins>
     ...

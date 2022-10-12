@@ -48,4 +48,4 @@ jobs:
           name: settings-xml
           path: /home/runner/.m2/settings.xml
       - name: Deploy
-        run: mvn deploy
+        run: mvn -pl 1.18.2 -am deploy

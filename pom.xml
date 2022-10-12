@@ -6,7 +6,7 @@
 
     <groupId>de.rytrox</groupId>
     <artifactId>spicy-parent</artifactId>
-    <version>1.0.1-SNAPSHOT</version>
+    <version>1.0.1</version>
     <packaging>pom</packaging>
 
     <name>Spicy</name>
@@ -15,6 +15,7 @@
     <url>https://rytrox.de</url>
 
     <properties>
+        <maven.deploy.skip>true</maven.deploy.skip>
         <annotations.version>23.0.0</annotations.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <mockito.version>4.8.0</mockito.version>
@@ -41,6 +42,17 @@
         </repository>
     </repositories>
 
+
+    <distributionManagement>
+        <snapshotRepository>
+            <id>nexus-snapshots</id>
+            <url>https://nexus.rytrox.de/repository/maven-snapshots/</url>
+        </snapshotRepository>
+        <repository>
+            <id>nexus</id>
+            <url>https://nexus.rytrox.de/repository/maven-releases/</url>
+        </repository>
+    </distributionManagement>
 
     <build>
         <pluginManagement>
@@ -130,6 +142,11 @@
                         <exclude>README.md</exclude>
                     </excludes>
                 </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-deploy-plugin</artifactId>
             </plugin>
         </plugins>
         <resources>
