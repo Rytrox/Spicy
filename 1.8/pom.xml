@@ -28,8 +28,8 @@
         </dependency>
 
         <dependency>
-            <groupId>${project.parent.groupId}</groupId>
-            <artifactId>core</artifactId>
+            <groupId>de.rytrox</groupId>
+            <artifactId>spicy</artifactId>
             <version>${project.parent.version}</version>
         </dependency>
         <dependency>
