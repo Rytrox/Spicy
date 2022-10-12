@@ -19,7 +19,7 @@ jobs:
       - name: Setup Spigot
         uses: SpraxDev/Action-SpigotMC@v4.0.0
         with:
-          versions: 1.18.2
+          versions: 1.19.2, 1.18.2
           remapped: true
           generateSrc: false
           generateDoc: false

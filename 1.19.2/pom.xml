@@ -167,5 +167,11 @@
             <version>1.70</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>de.rytrox</groupId>
+            <artifactId>spicy</artifactId>
+            <version>1.0.2-SNAPSHOT-1182</version>
+            <scope>compile</scope>
+        </dependency>
     </dependencies>
 </project>
