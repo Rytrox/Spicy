@@ -1,0 +1,55 @@
+{
+  "byte": 2,
+  "short": 46,
+  "integer": 13243463,
+  "long": 343423494964959360,
+  "boolean": false,
+  "float": 123.4643,
+  "double": 123434.466544356465432344,
+  "string": "Hello World",
+  "lists": {
+    "booleans": [
+      true,
+      false
+    ],
+    "ints": [
+      12,
+      -24,
+      32435
+    ],
+    "floats": [
+      3543.3543,
+      456.535643,
+      3.43345,
+      3443.533
+    ],
+    "nested": [
+      [
+        23,
+        3432
+      ],
+      [
+        34,
+        43453
+      ]
+    ]
+  },
+  "developerList": [
+    {
+      "id": 408,
+      "name": "Timeout",
+      "assistant": {
+        "id": 409,
+        "name": "Asedem"
+      }
+    },
+    {
+      "id": 701,
+      "name": "Sether",
+      "assistant": {
+        "id": 702,
+        "name": "kaigoe"
+      }
+    }
+  ]
+}

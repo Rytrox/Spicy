@@ -1,13 +1,4 @@
 
 .idea/
-out/
+
 target/
-
-Libs.iml
-
-LibsRebuild.iml
-/logs
-
-src/test/resources/mysql.yml
-
-*.iml
