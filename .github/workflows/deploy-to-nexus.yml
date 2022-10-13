@@ -34,7 +34,7 @@ jobs:
             ]
           githubServer: false
       - name: Setup Spigot (normal)
-        uses: SpraxDev(Action-SpigotMC@v4.1.0
+        uses: SpraxDev/Action-SpigotMC@v4.1.0
         with:
           versions: 1.8.8
           generateSrc: false
