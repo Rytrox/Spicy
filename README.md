@@ -4,7 +4,7 @@ Spicy is an Utils-Library for Spigot-Developer to improve their Spigot-Plugins.
 # Installation
 To install and use Spicy in Maven, you simply need to include our Nexus-Repository and add the Library.
 
-Currently, Spicy uses Java 17 and Spigot 1.18.2 or Java 8 and Spigot 1.8.8, so make sure to install that first.
+Currently, Spicy uses Java 17 and Spigot 1.18.2 or Spigot 1.19.2 or Java 8 and Spigot 1.8.8, so make sure to install that first.
 ```xml
 <repositories>
     ...
@@ -19,7 +19,7 @@ Currently, Spicy uses Java 17 and Spigot 1.18.2 or Java 8 and Spigot 1.8.8, so m
     <dependency>
         <groupId>de.rytrox</groupId>
         <artifactId>spicy</artifactId>
-        <version>1.0.1_1182</version> <!-- or 1.0.1_180 for 1.8 Build-->
+        <version>1.0.1-1192</version> <!-- or 1.0.1_180 for 1.8 Build-->
     </dependency>
 </dependencies>
 ```
