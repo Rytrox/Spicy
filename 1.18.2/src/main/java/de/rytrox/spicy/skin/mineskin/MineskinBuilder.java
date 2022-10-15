@@ -5,6 +5,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
 
 /**
@@ -28,7 +29,7 @@ public class MineskinBuilder {
      * @param uuid the uuid of the mineskin
      * @return a Future containing the mineskin
      */
-    public static @NotNull Future<Mineskin> loadMineskin(@NotNull UUID uuid) {
+    public static @NotNull CompletableFuture<Mineskin> loadMineskin(@NotNull UUID uuid) {
         return MineskinHandler.getMineskin(uuid);
     }
 
@@ -83,7 +84,7 @@ public class MineskinBuilder {
      * @param url the url of the skin in the internet
      * @return A Future containing the Mineskin
      */
-    public Future<Mineskin> generate(@NotNull String url) {
+    public CompletableFuture<Mineskin> generate(@NotNull String url) {
         return new MineskinHandler().generate(options, url);
     }
 
@@ -94,7 +95,7 @@ public class MineskinBuilder {
      * @param file the png file of the Skin
      * @return A Future containing the Mineskin
      */
-    public Future<Mineskin> generate(@NotNull File file) {
+    public CompletableFuture<Mineskin> generate(@NotNull File file) {
         return new MineskinHandler().generate(options, file);
     }
 
@@ -105,7 +106,19 @@ public class MineskinBuilder {
      * @param uuid the uuid of the player you want to grab the skin from
      * @return A future containing the Mineskin
      */
-    public Future<Mineskin> generate(@NotNull UUID uuid) {
+    public CompletableFuture<Mineskin> generate(@NotNull UUID uuid) {
         return new MineskinHandler().generate(options, uuid);
+    }
+
+    /**
+     * Creates a new Mineskin. <br>
+     * This method returns a Future in a new Task, you need to wait or react to it with chainers
+     *
+     * @param username the username of the player you want to grab the skin from
+     * @return A future containing the Mineskin
+     */
+    @NotNull
+    public CompletableFuture<Mineskin> generateByUsername(@NotNull String username) {
+        return new MineskinHandler().generateByUsername(options, username);
     }
 }
