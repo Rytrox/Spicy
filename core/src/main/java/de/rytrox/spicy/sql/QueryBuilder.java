@@ -2,13 +2,11 @@ package de.rytrox.spicy.sql;
 
 import com.google.common.collect.Lists;
 import org.apache.commons.lang3.reflect.ConstructorUtils;
-import org.apache.commons.lang3.reflect.FieldUtils;
 import org.intellij.lang.annotations.Language;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import javax.sql.DataSource;
-import java.lang.reflect.Constructor;
 import java.sql.*;
 import java.util.LinkedList;
 import java.util.List;
@@ -41,20 +39,24 @@ public class QueryBuilder {
         } catch (NoSuchMethodException e) {
             // try to convert it manually if it's just one column
             if(resultSet.getMetaData().getColumnCount() == 1) {
-                while(resultSet.next()) {
+                do { // do while, because pointer was already moved in try-block
                     try {
                         entities.add(resultSet.getObject(1, targetClass));
                     } catch(SQLFeatureNotSupportedException exception) {
                         // SQLite is a pain...
                         entities.add((T) resultSet.getObject(1));
                     }
-                }
-            } else logger.log(Level.SEVERE,
-                    String.format(
-                        "Cannot convert ResultSet into Class %s. Be sure the constructor %s(ResultSet) exist and has public accessor.",
-                        targetClass.getName(),
-                        targetClass.getName()
-                    ), e);
+                } while(resultSet.next());
+            } else {
+                logger.log(Level.SEVERE,
+                        String.format(
+                                "Cannot convert ResultSet into Class %s. Be sure the constructor %s(ResultSet) exist and has public accessor.",
+                                targetClass.getName(),
+                                targetClass.getName()
+                        ), e);
+
+                throw new SQLException(e);
+            }
         } catch (ReflectiveOperationException e) {
             logger.log(Level.SEVERE,
                     String.format(
@@ -62,6 +64,8 @@ public class QueryBuilder {
                             targetClass.getName(),
                             targetClass.getName()
                     ), e);
+
+            throw new SQLException(e);
         }
 
         return entities;
