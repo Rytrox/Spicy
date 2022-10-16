@@ -28,7 +28,7 @@ class StatementWrapper {
         //Do not close this Statement here!!
         PreparedStatement ps = connection.prepareStatement(query);
         if(args != null)
-            for(int i = 0; i < args.length; i++) ps.setString(i + 1, args[i].toString());
+            for(int i = 0; i < args.length; i++) ps.setObject(i + 1, args[i]);
         return ps;
     }
 

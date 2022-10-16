@@ -18,9 +18,7 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.ssl.SSLContexts;
 import org.apache.http.util.EntityUtils;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
-import javax.net.ssl.SSLContext;
 import java.io.File;
 import java.io.IOException;
 
@@ -28,8 +26,6 @@ import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
 import java.util.concurrent.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 class MineskinHandler {
 
