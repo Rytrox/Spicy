@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 
 import java.nio.file.Paths;
 
+import java.sql.SQLException;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -28,7 +29,7 @@ public class QueryBuilderTest {
 
     @Test
     public void shouldNotConvertIntoNonEntity() {
-        assertThrows(RuntimeException.class, () -> datasource.prepare("SELECT * FROM Developers")
+        assertThrows(IllegalStateException.class, () -> datasource.prepare("SELECT * FROM Developers")
                 .querySync(DeveloperWithoutMatchingConstructor.class)
                 .get());
 
@@ -97,8 +98,8 @@ public class QueryBuilderTest {
                 .querySync(Integer.class)
                 .get();
 
-        assertTrue(ids.contains(701));
         assertTrue(ids.contains(408));
+        assertTrue(ids.contains(701));
     }
 
     @Test
@@ -184,13 +185,11 @@ public class QueryBuilderTest {
 
     @Test
     public void shouldChainSQLStatements() {
-        datasource.prepare("INSERT INTO Developers(id, name) VALUES (?, ?)", 101, "Testnutzer1")
+        List<Integer> developer = datasource.prepare("INSERT INTO Developers(id, name) VALUES (?, ?)", 101, "Testnutzer1")
                 .prepare("INSERT INTO Developers(id, name) VALUES (?, ?)", 102, "Testnutzer2")
-                .executeUpdateSync();
+                .executeUpdateSync(true);
 
-        assertEquals(List.of(101, 102), datasource.prepare("SELECT id FROM Developers WHERE name LIKE ?", "Testnutzer%")
-                .querySync(Integer.class)
-                .get());
+        assertEquals(List.of(101, 102), developer);
 
         datasource.prepare("DELETE FROM Developers WHERE name LIKE ?", "Testnutzer%")
                 .executeUpdateSync();

@@ -5,7 +5,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.util.UUID;
-import java.util.concurrent.Future;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * Builder-Class that creates new Skins in Mineskin. <br>
@@ -28,7 +28,8 @@ public class MineskinBuilder {
      * @param uuid the uuid of the mineskin
      * @return a Future containing the mineskin
      */
-    public static @NotNull Future<Mineskin> loadMineskin(@NotNull UUID uuid) {
+    @NotNull
+    public static CompletableFuture<Mineskin> loadMineskin(@NotNull UUID uuid) {
         return MineskinHandler.getMineskin(uuid);
     }
 
@@ -39,6 +40,7 @@ public class MineskinBuilder {
      * @param variant the variant you want to have. Standard value: Steve
      * @return the builder to continue
      */
+    @NotNull
     public MineskinBuilder variant(@NotNull GenerateOptions.Variant variant) {
         this.options.setVariant(variant);
 
@@ -56,6 +58,7 @@ public class MineskinBuilder {
      * @param visibility the visibility you want to use. Standard value: private
      * @return the builder to continue
      */
+    @NotNull
     public MineskinBuilder visibility(@NotNull GenerateOptions.Visibility visibility) {
         this.options.setVisibility(visibility);
 
@@ -69,6 +72,7 @@ public class MineskinBuilder {
      * @param name the name you want to use. Standard value: ''
      * @return the builder to continue
      */
+    @NotNull
     public MineskinBuilder name(@NotNull String name) {
         Validate.isTrue(name.length() <= 20, "Name cannot be longer than 20 characters");
         this.options.setName(name);
@@ -83,7 +87,8 @@ public class MineskinBuilder {
      * @param url the url of the skin in the internet
      * @return A Future containing the Mineskin
      */
-    public Future<Mineskin> generate(@NotNull String url) {
+    @NotNull
+    public CompletableFuture<Mineskin> generate(@NotNull String url) {
         return new MineskinHandler().generate(options, url);
     }
 
@@ -94,7 +99,8 @@ public class MineskinBuilder {
      * @param file the png file of the Skin
      * @return A Future containing the Mineskin
      */
-    public Future<Mineskin> generate(@NotNull File file) {
+    @NotNull
+    public CompletableFuture<Mineskin> generate(@NotNull File file) {
         return new MineskinHandler().generate(options, file);
     }
 
@@ -105,7 +111,20 @@ public class MineskinBuilder {
      * @param uuid the uuid of the player you want to grab the skin from
      * @return A future containing the Mineskin
      */
-    public Future<Mineskin> generate(@NotNull UUID uuid) {
+    @NotNull
+    public CompletableFuture<Mineskin> generate(@NotNull UUID uuid) {
         return new MineskinHandler().generate(options, uuid);
+    }
+
+    /**
+     * Creates a new Mineskin. <br>
+     * This method returns a Future in a new Task, you need to wait or react to it with chainers
+     *
+     * @param username the username of the player you want to grab the skin from
+     * @return A future containing the Mineskin
+     */
+    @NotNull
+    public CompletableFuture<Mineskin> generateByUsername(@NotNull String username) {
+        return new MineskinHandler().generateByUsername(options, username);
     }
 }

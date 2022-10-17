@@ -25,6 +25,7 @@ public class MineskinHandlerTest {
         MineskinHandler.GENERATE_URL = "http://localhost:1080/generate/url";
         MineskinHandler.GENERATE_FILE = "http://localhost:1080/generate/upload";
         MineskinHandler.GENERATE_UUID = "http://localhost:1080/generate/user";
+        MineskinHandler.MOJANG_UUID = "http://localhost:1080/users/profiles/minecraft/";
 
         ClientAndServer server = startClientAndServer(1080);
         server.when(
@@ -75,6 +76,21 @@ public class MineskinHandlerTest {
                         .withDelay(TimeUnit.MILLISECONDS, 20)
                         .withStatusCode(200)
                         .withBody(FileUtils.readFileToString(Paths.get("src", "test", "resources", "mineskin", "skin.json").toFile(), StandardCharsets.UTF_8))
+        );
+
+        server.when(
+                request()
+                        .withMethod("GET")
+                        .withPath("/users/profiles/minecraft/DerTimeout")
+        ).respond(
+                response()
+                        .withDelay(TimeUnit.MILLISECONDS, 20)
+                        .withStatusCode(200)
+                        .withBody(JsonBody.json(
+                                """
+                                { "id": "94dd234a23204f179f40a1cc80afab2d", "name": "DerTimeout" }
+                                """
+                        ))
         );
     }
 
@@ -135,5 +151,20 @@ public class MineskinHandlerTest {
                 .get(5, TimeUnit.SECONDS);
 
         assertEquals(skin, cached);
+    }
+
+    @Test
+    public void shouldGenerateSkinByUsername() throws ExecutionException, InterruptedException, TimeoutException {
+        MineskinHandler handler = new MineskinHandler();
+
+        Mineskin mineskin = handler.generateByUsername(new GenerateOptions(), "DerTimeout")
+                .get(5, TimeUnit.SECONDS);
+
+        assertNotNull(mineskin);
+
+        Mineskin cached = MineskinHandler.getMineskin(UUID.fromString("f0765f67-ef4a-4a34-a3a1-a048e8ecd822"))
+                .get(5, TimeUnit.SECONDS);
+
+        assertEquals(mineskin, cached);
     }
 }
