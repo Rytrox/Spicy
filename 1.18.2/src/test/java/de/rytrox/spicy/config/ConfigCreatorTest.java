@@ -36,6 +36,18 @@ public class ConfigCreatorTest {
 
     @Test
     public void shouldLoadYamlConfiguration() throws IOException {
+        File file = creator.copyDefaultFile(Paths.get("config.yml"));
+
+        assertTrue(file.exists());
+        assertTrue(file.length() > 0);
+        assertEquals(temporaryFolder.resolve("config.yml").toString(), file.getPath());
+
+        assertEquals(getMD5Hash(Paths.get("src", "test", "resources", "config.yml")), getMD5Hash(Paths.get(file.getPath())));
+        assertEquals(getSHA256Hash(Paths.get("src", "test", "resources", "config.yml")), getSHA256Hash(Paths.get(file.getPath())));
+    }
+
+    @Test
+    public void shouldLoadYamlConfigurationWithCustomPath() throws IOException {
         File file = creator.copyDefaultFile(Paths.get("config.yml"), Files.createTempFile("temp", "suff").toAbsolutePath());
 
         assertTrue(file.exists());
