@@ -43,7 +43,7 @@ public class ConfigCreator {
 	 */
 	@NotNull
 	public File copyDefaultFile(@NotNull Path fromPath) throws IOException {
-		return copyDefaultFile(fromPath, Paths.get(""));
+		return copyDefaultFile(fromPath, fromPath);
 	}
 
 	/**
