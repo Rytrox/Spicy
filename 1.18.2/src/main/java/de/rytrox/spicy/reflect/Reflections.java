@@ -6,8 +6,10 @@ import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.apache.commons.lang.ClassUtils;
 import org.apache.commons.lang.Validate;
 import org.apache.commons.lang.reflect.FieldUtils;
+import org.bukkit.Bukkit;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -92,5 +94,39 @@ public class Reflections {
                 .filter(underclass -> underclass.getName().equalsIgnoreCase(overclass.getName() + "$" + classname))
                 .findAny()
                 .orElse(null);
+    }
+
+    /**
+     * This method returns a CraftBukkit-Class
+     * @param clazz the Craftbukkit-Class
+     * @return the CraftBukkit-Class. Null if the class cannot be found
+     */
+    public static Class<?> getCraftBukkitClass(String clazz) {
+        return loadClass("org.bukkit.craftbukkit.%s.%s", clazz);
+    }
+
+    /**
+     * This method returns the array type of a certain CraftBukkit-Class
+     * For example: it will returns CraftPlayer[].class instead of CraftPlayer.class
+     *
+     * For single types please use {@link Reflections#getCraftBukkitClass(String)}
+     *
+     * @param clazz the path of the class after the version package. Split them with an '.'
+     * @return the array type of the CraftBukkit-Class. Null if the class cannot be found
+     */
+    public static Class<?> getCraftBukkitArrayTypeClass(String clazz) {
+        return loadClass("[Lorg.bukkit.craftbukkit.%s.%s;", clazz);
+    }
+
+    private static @Nullable Class<?> loadClass(String subpackage, String clazz) {
+        String version = Bukkit.getServer().getClass().getPackage().getName().split("\\.")[3];
+
+        String name = String.format(subpackage, version, clazz);
+        try {
+            return ClassUtils.getClass(name);
+        } catch (ClassNotFoundException e) {
+            Logger.getGlobal().log(Level.WARNING, e, () ->"Could not find Class " + name);
+        }
+        return null;
     }
 }

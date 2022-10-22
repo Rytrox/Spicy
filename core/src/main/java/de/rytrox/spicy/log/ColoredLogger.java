@@ -1,6 +1,5 @@
 package de.rytrox.spicy.log;
 
-import org.bukkit.Bukkit;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -23,14 +22,6 @@ public final class ColoredLogger {
 
 	private ColoredLogger() {
 		/* EMPTY. IT IS NOT NECESSARY */
-	}
-
-	/**
-	 * Enable colored logging for all plugins. Modifies Bukkit's internal logger to match color codes
-	 * @param colorFormatter the color formatter character
-	 */
-	public static void enableColoredLogging(char colorFormatter) {
-		enableColoredLogging(colorFormatter, Bukkit.getLogger(), null);
 	}
 
 	public static void enableColoredLogging(char colorFormatter,
