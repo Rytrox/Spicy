@@ -1,7 +1,7 @@
 package de.rytrox.spicy.nbt;
 
 import de.rytrox.spicy.reflect.Reflections;
-import net.minecraft.server.v1_8_R3.NBTCompressedStreamTools;
+
 import org.apache.commons.lang3.reflect.ConstructorUtils;
 import org.apache.commons.lang3.reflect.MethodUtils;
 import org.bukkit.Bukkit;
@@ -10,7 +10,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Files;
 import java.util.*;
 import java.util.logging.Level;
