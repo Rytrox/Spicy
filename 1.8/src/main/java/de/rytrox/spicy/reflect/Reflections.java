@@ -118,6 +118,15 @@ public class Reflections {
         return loadClass("[Lorg.bukkit.craftbukkit.%s.%s;", clazz);
     }
 
+    /**
+     * This method return an NMS-Class, which has a certain name
+     * @param nmsClass the name of the NMS-Class
+     * @return the CLass itself. Null if the class cannot be found.
+     */
+    public static Class<?> getNMSClass(String nmsClass) {
+        return loadClass("net.minecraft.server.%s.%s", nmsClass);
+    }
+
     private static @Nullable Class<?> loadClass(String subpackage, String clazz) {
         String version = Bukkit.getServer().getClass().getPackage().getName().split("\\.")[3];
 

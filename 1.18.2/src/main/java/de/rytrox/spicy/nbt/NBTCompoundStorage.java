@@ -28,6 +28,7 @@ public class NBTCompoundStorage implements NBTStorage<String> {
                 case ByteArrayTag byteArray -> elements.put(key, byteArray.getAsByteArray());
                 case IntArrayTag intArray -> elements.put(key, intArray.getAsIntArray());
                 case LongArrayTag longArrayTag -> elements.put(key, longArrayTag.getAsLongArray());
+                case StringTag stringTag -> elements.put(key, stringTag.getAsString());
                 case ListTag list -> elements.put(key, fromListTag(list));
                 case null, EndTag ignored -> {} // ignore null. It isn't necessary
                 default -> throw new IllegalStateException("Unexpected value: " + value);
@@ -66,7 +67,7 @@ public class NBTCompoundStorage implements NBTStorage<String> {
     }
 
     @NotNull
-    public static List<?> fromListTag(@NotNull ListTag listTag) {
+    private static List<?> fromListTag(@NotNull ListTag listTag) {
         List<Object> list = new LinkedList<>();
 
         listTag.forEach((tag) -> {
@@ -81,6 +82,7 @@ public class NBTCompoundStorage implements NBTStorage<String> {
                 case ByteArrayTag byteArray -> list.add(byteArray.getAsByteArray());
                 case IntArrayTag intArray -> list.add(intArray.getAsIntArray());
                 case LongArrayTag longArrayTag -> list.add(longArrayTag.getAsLongArray());
+                case StringTag stringTag -> list.add(stringTag.getAsString());
                 case ListTag innerList -> list.add(fromListTag(innerList));
                 case null, EndTag ignored -> {} // ignore null. It isn't necessary
                 default -> throw new IllegalStateException("Unexpected value: " + tag);
@@ -135,9 +137,9 @@ public class NBTCompoundStorage implements NBTStorage<String> {
     @Override
     public @Nullable <T> List<T> getList(@NotNull String key, @NotNull Class<T> type, @Nullable List<T> def) {
         List<T> list = findSafe(key, List.class)
+                .orElse(def)
                 .stream()
-                .filter((element) -> type.isAssignableFrom(element.getClass()))
-                .map((element) -> (T) element)
+                .filter((element) -> element.getClass().isAssignableFrom(type))
                 .toList();
 
         return list.isEmpty() ? def : list;
