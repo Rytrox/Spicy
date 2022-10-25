@@ -19,7 +19,7 @@ Currently, Spicy uses Java 17 and Spigot 1.18.2 or Spigot 1.19.2 or Java 8 and S
     <dependency>
         <groupId>de.rytrox</groupId>
         <artifactId>spicy</artifactId>
-        <version>1.0.1-1192</version> <!-- or 1.0.1_180 for 1.8 Build-->
+        <version>1.0.3-1192</version> <!-- or 1.0.1_180 for 1.8 Build-->
     </dependency>
 </dependencies>
 ```
@@ -47,7 +47,7 @@ If you are using NMS-Remapped on 1.18.2 you can use Spicy's remapping-features a
                             org.spigotmc:spigot:1.18.2-R0.1-SNAPSHOT:jar:remapped-mojang
                         </remappedDependency>
                         <remappedDependency>
-                            de.rytrox:spicy:1.0_1182:jar
+                            de.rytrox:spicy:1.0.3_1182:jar
                         </remappedDependency>
                     </remappedDependencies>
                     <remappedArtifactAttached>true</remappedArtifactAttached>
@@ -507,17 +507,17 @@ public class Main extends JavaPlugin {
 }
 ```
 
-## 3.4 NBT Configurations
-If you are using the remapped version, you can use a configuration that binds NBT-Data into a valid configuration.
+# 4 NBT Storage
+If you are using the remapped version, you can read and modify NBT-Data
 This increases readability and modification of NBT-Data
 
-### 3.4.1 Creating a NBT-Configuration
-NBT Configurations can be loaded or created.
+### 4.1 Creating a NBTStorage
+NBT Data can be loaded or created.
 
 Usage:
 ```java
 import de.rytrox.spicy.config.ConfigCreator;
-import de.rytrox.spicy.config.NBTConfig;
+import de.rytrox.spicy.nbt.NBTStorage;
 import de.rytrox.spicy.reflect.NBTItemStacks;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -529,29 +529,29 @@ public class Main extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        // creates an empty NBTConfig
-        NBTConfig empty = new NBTConfig();
+        // creates an empty NBTStorage
+        NBTStorage empty = new NBTStorage();
 
         // Loads an NBTConfig from an ItemStack
-        NBTConfig loaded = new NBTConfig(NBTItemStacks.getNBTTagCompound(new ItemStack()));
+        NBTStorage loaded = new NBTStorage(NBTItemStacks.getNBTTagCompound(new ItemStack()));
     
         // Loads an NBTConfig from an uncompressed file
-        NBTConfig uncompressed = NBTConfig.fromUncompressedFile(new File(getDataFolder(), "config.dat"));
+        NBTStorage uncompressed = NBTStorage.fromUncompressedFile(new File(getDataFolder(), "uncompressed.dat"));
         
         // Loads an NBTConfig from a compressed file
-        NBTConfig compressed = NBTConfig.fromCompressedFile(new File(getDataFolder(), "config-compressed.dat"));
+        NBTStorage compressed = NBTStorage.fromCompressedFile(new File(getDataFolder(), "compressed.dat"));
     }
 }
 ```
 
-### 3.4.2 Saving a NBT-Configuration
+### 4.2 Saving a NBT-Configuration
 NBT-Configurations can be saved into a CompoundTag, a compressed or uncompressed file.
 
 Usage:
 
 ```java
 import de.rytrox.spicy.config.ConfigCreator;
-import de.rytrox.spicy.config.NBTConfig;
+import de.rytrox.spicy.nbt.NBTStorage;
 import de.rytrox.spicy.reflect.NBTItemStacks;
 import net.minecraft.nbt.CompoundTag;
 import org.bukkit.inventory.ItemStack;
@@ -563,7 +563,7 @@ import java.io.InputStream;
 
 public class Example {
 
-    private NBTConfig nbtConfig = new NBTConfig();
+    private NBTStorage nbtConfig = new NBTStorage();
 
     public void saveToFileCompressed(File file) {
         try {
@@ -587,14 +587,14 @@ public class Example {
 }
 ```
 
-# 4 ItemStack Library
+# 5 ItemStack Library
 Spicy provides a lot of useful methods for ItemStacks
 
-## 4.1 ItemStackBuilder
+## 5.1 ItemStackBuilder
 The ItemStackBuilder simplified the creation and modification of ItemStacks.
 It uses a Builder-Pattern to create an ItemStack.
 
-### 4.1.1 Vanilla ItemStackBuilder
+### 5.1.1 Vanilla ItemStackBuilder
 When you are done, you can use the ItemStackBuilder#toItemStack Method to build
 
 ```java
@@ -620,7 +620,7 @@ public class Foo {
 }
 ```
 
-### 4.1.2 NBT ItemStackBuilder
+### 5.1.2 NBT ItemStackBuilder
 If you want to write NBT-Data as well, you can use the NBTItemStackBuilder-Class
 
 ```java
@@ -646,10 +646,10 @@ public class Foo {
 ```
 
 
-## 4.2 ItemStack Utilities
+## 5.2 ItemStack Utilities
 Spicy provides util functions for ItemStacks
 
-### 4.2.1 Base64 Decoding and Encoding
+### 5.2.1 Base64 Decoding and Encoding
 ItemStacks can be converted to a Base64 String, if you want to save it inside a Database or a file.
 
 ```java
@@ -673,7 +673,7 @@ public class Foo {
 }
 ```
 
-### 4.2.2 JSON Decoding and Encoding
+### 5.2.2 JSON Decoding and Encoding
 Also, you can convert ItemStacks into JSON Strings instead
 
 ```java
@@ -698,7 +698,7 @@ public class Foo {
 }
 ```
 
-## 4.3 Get Customized Name
+## 5.3 Get Customized Name
 Minecraft provides a Default Name for ItemStacks and often developers thinks that ItemMeta#getDisplayName returns the default name.
 Spicy has a built-in method to determinate the custom name.
 
@@ -720,7 +720,7 @@ public class Foo {
 }
 ```
 
-## 4.4 Bukkit-Copy of the ItemStack
+## 5.4 Bukkit-Copy of the ItemStack
 CraftBukkit has a Method to create a Copy of an ItemStack. 
 Sadly, you need to use Reflections to use it in multiple versions. 
 
