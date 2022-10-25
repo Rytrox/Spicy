@@ -149,7 +149,7 @@ public final class ItemStacks {
      * @param item the item you want to copy
      * @return the nms itemstack as object type
      */
-    @Nullable
+    @NotNull
     public static net.minecraft.world.item.ItemStack asNMSCopy(ItemStack item) {
         try {
             return (net.minecraft.world.item.ItemStack) MethodUtils.invokeStaticMethod(
@@ -166,7 +166,7 @@ public final class ItemStacks {
             Bukkit.getLogger().log(Level.WARNING, "Unable to Find Method CraftItemStack#asNMSCopy", e);
         }
 
-        return null;
+        throw new IllegalStateException("Unable to execute CraftBukkit-Method asNMSCopy. Please open an issue at https://github.com/Rytrox/Spicy/issues. This is a bug");
     }
 
     @NotNull
