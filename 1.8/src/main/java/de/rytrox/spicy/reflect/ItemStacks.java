@@ -1,4 +1,4 @@
-package de.rytrox.spicy.item;
+package de.rytrox.spicy.reflect;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -9,8 +9,8 @@ import java.util.Map;
 import java.util.logging.Level;
 
 import de.rytrox.spicy.reflect.Reflections;
-
 import org.apache.commons.lang.WordUtils;
+import org.apache.commons.lang3.reflect.MethodUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -77,7 +77,7 @@ public final class ItemStacks {
      */
     @NotNull
     public static JsonObject encodeJson(@NotNull ItemStack item) {
-        return JsonParser.parseString(GSON.toJson(item.serialize())).getAsJsonObject();
+        return new JsonParser().parse(GSON.toJson(item.serialize())).getAsJsonObject();
     }
 
     /**
@@ -93,12 +93,8 @@ public final class ItemStacks {
     @NotNull
     public static String getCustomizedName(@NotNull ItemStack itemStack) {
         // return displayname if item has one
-        if(itemStack.getItemMeta() != null) {
-            if(itemStack.getItemMeta().hasDisplayName()) {
-                return itemStack.getItemMeta().getDisplayName();
-            } else if(itemStack.getItemMeta().hasLocalizedName()) {
-                return itemStack.getItemMeta().getLocalizedName();
-            }
+        if(itemStack.getItemMeta() != null && itemStack.getItemMeta().hasDisplayName()) {
+            return itemStack.getItemMeta().getDisplayName();
         }
 
         // only continue if the item could be found
@@ -107,12 +103,12 @@ public final class ItemStacks {
     }
 
     @Nullable
-    public static ItemStack asBukkitCopy(@NotNull net.minecraft.world.item.ItemStack nmsItem) {
+    public static ItemStack asBukkitCopy(@NotNull net.minecraft.server.v1_8_R3.ItemStack nmsItem) {
         try {
             Class<?> craftitemstackClass = Reflections.getCraftBukkitClass("inventory.CraftItemStack");
 
             return (ItemStack) craftitemstackClass
-                    .getMethod("asBukkitCopy", net.minecraft.world.item.ItemStack.class)
+                    .getMethod("asBukkitCopy", net.minecraft.server.v1_8_R3.ItemStack.class)
                     .invoke(craftitemstackClass, nmsItem);
         } catch (IllegalAccessException e) {
             Bukkit.getLogger().log(Level.SEVERE, "Unable to create Bukkit-Copy of an itemstack: ", e);

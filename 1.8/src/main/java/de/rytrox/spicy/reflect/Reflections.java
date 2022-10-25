@@ -20,7 +20,7 @@ public class Reflections {
     /**
      * Searches through a bundle of field until it founds the correct field
      * @param clazz the class you want to search
-     * @param names a bundle of names. NMS-Fieldnames may changes in different versions
+     * @param names a bundle of names. NMS-Fieldnames may change in different versions
      * @return the searched field or null if the field cannot be found.
      */
     @Nullable
@@ -46,7 +46,7 @@ public class Reflections {
         // Validate
         Validate.notEmpty(names, "Names cannot be empty");
 
-        // recursive search if field could not be found. Otherwise return field
+        // recursive search if field could not be found. Otherwise, return field
         return Arrays.stream(names)
                 .map(name -> FieldUtils.getField(clazz, name, true))
                 .filter(Objects::nonNull)
@@ -106,7 +106,7 @@ public class Reflections {
     }
 
     /**
-     * This method returns the array type of a certain CraftBukkit-Class
+     * This method returns the array type of certain CraftBukkit-Class
      * For example: it will returns CraftPlayer[].class instead of CraftPlayer.class
      *
      * For single types please use {@link Reflections#getCraftBukkitClass(String)}

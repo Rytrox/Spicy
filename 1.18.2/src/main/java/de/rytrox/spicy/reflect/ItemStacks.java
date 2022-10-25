@@ -1,4 +1,4 @@
-package de.rytrox.spicy.item;
+package de.rytrox.spicy.reflect;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -6,10 +6,14 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Base64;
 import java.util.Map;
+import java.util.Optional;
 import java.util.logging.Level;
 
 import de.rytrox.spicy.reflect.Reflections;
+
+import net.minecraft.nbt.CompoundTag;
 import org.apache.commons.lang.WordUtils;
+import org.apache.commons.lang3.reflect.MethodUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -76,7 +80,7 @@ public final class ItemStacks {
      */
     @NotNull
     public static JsonObject encodeJson(@NotNull ItemStack item) {
-        return new JsonParser().parse(GSON.toJson(item.serialize())).getAsJsonObject();
+        return JsonParser.parseString(GSON.toJson(item.serialize())).getAsJsonObject();
     }
 
     /**
@@ -92,8 +96,12 @@ public final class ItemStacks {
     @NotNull
     public static String getCustomizedName(@NotNull ItemStack itemStack) {
         // return displayname if item has one
-        if(itemStack.getItemMeta() != null && itemStack.getItemMeta().hasDisplayName()) {
-            return itemStack.getItemMeta().getDisplayName();
+        if(itemStack.getItemMeta() != null) {
+            if(itemStack.getItemMeta().hasDisplayName()) {
+                return itemStack.getItemMeta().getDisplayName();
+            } else if(itemStack.getItemMeta().hasLocalizedName()) {
+                return itemStack.getItemMeta().getLocalizedName();
+            }
         }
 
         // only continue if the item could be found
@@ -102,12 +110,12 @@ public final class ItemStacks {
     }
 
     @Nullable
-    public static ItemStack asBukkitCopy(@NotNull net.minecraft.server.v1_8_R3.ItemStack nmsItem) {
+    public static ItemStack asBukkitCopy(@NotNull net.minecraft.world.item.ItemStack nmsItem) {
         try {
             Class<?> craftitemstackClass = Reflections.getCraftBukkitClass("inventory.CraftItemStack");
 
             return (ItemStack) craftitemstackClass
-                    .getMethod("asBukkitCopy", net.minecraft.server.v1_8_R3.ItemStack.class)
+                    .getMethod("asBukkitCopy", net.minecraft.world.item.ItemStack.class)
                     .invoke(craftitemstackClass, nmsItem);
         } catch (IllegalAccessException e) {
             Bukkit.getLogger().log(Level.SEVERE, "Unable to create Bukkit-Copy of an itemstack: ", e);
@@ -135,4 +143,37 @@ public final class ItemStacks {
         throw new IllegalStateException();
     }
 
+
+    /**
+     * Returns an NMS-Copy of the itemstack as object
+     * @param item the item you want to copy
+     * @return the nms itemstack as object type
+     */
+    @Nullable
+    public static net.minecraft.world.item.ItemStack asNMSCopy(ItemStack item) {
+        try {
+            return (net.minecraft.world.item.ItemStack) MethodUtils.invokeStaticMethod(
+                    Reflections.getCraftBukkitClass("inventory.CraftItemStack"), "asNMSCopy", item);
+        } catch (IllegalAccessException e) {
+            Bukkit.getLogger().log(Level.SEVERE, "Unable to create NMS-Copy of an itemstack: ", e);
+        } catch (IllegalArgumentException e) {
+            Bukkit.getLogger().log(Level.SEVERE, "Invalid argument format: ", e);
+        } catch (InvocationTargetException e) {
+            Bukkit.getLogger().log(Level.WARNING, "Invocated target: ", e);
+        } catch (SecurityException e) {
+            Bukkit.getLogger().log(Level.SEVERE, "Security error while accessing with reflections: ", e);
+        } catch (NoSuchMethodException e) {
+            Bukkit.getLogger().log(Level.WARNING, "Unable to Find Method CraftItemStack#asNMSCopy", e);
+        }
+
+        return null;
+    }
+
+    @NotNull
+    public static CompoundTag getNBTTagCompound(@NotNull ItemStack item) {
+        // return null if itemstack is null otherwise return nbt-tag compound
+        return Optional.ofNullable(asNMSCopy(item))
+                .map(net.minecraft.world.item.ItemStack::getOrCreateTag)
+                .orElse(new CompoundTag());
+    }
 }

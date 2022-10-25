@@ -518,7 +518,7 @@ Usage:
 ```java
 import de.rytrox.spicy.config.ConfigCreator;
 import de.rytrox.spicy.config.NBTConfig;
-import de.rytrox.spicy.item.NBTItemStacks;
+import de.rytrox.spicy.reflect.NBTItemStacks;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -552,7 +552,7 @@ Usage:
 ```java
 import de.rytrox.spicy.config.ConfigCreator;
 import de.rytrox.spicy.config.NBTConfig;
-import de.rytrox.spicy.item.NBTItemStacks;
+import de.rytrox.spicy.reflect.NBTItemStacks;
 import net.minecraft.nbt.CompoundTag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -653,7 +653,7 @@ Spicy provides util functions for ItemStacks
 ItemStacks can be converted to a Base64 String, if you want to save it inside a Database or a file.
 
 ```java
-import de.rytrox.spicy.item.ItemStacks;
+import de.rytrox.spicy.reflect.ItemStacks;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
@@ -678,7 +678,7 @@ Also, you can convert ItemStacks into JSON Strings instead
 
 ```java
 import com.google.gson.JsonObject;
-import de.rytrox.spicy.item.ItemStacks;
+import de.rytrox.spicy.reflect.ItemStacks;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
@@ -706,7 +706,7 @@ First it checks if the ItemStack has a DisplayName and returns it.
 Secondly it uses the Localized Name or converts the ItemType to a String name
 
 ```java
-import de.rytrox.spicy.item.ItemStacks;
+import de.rytrox.spicy.reflect.ItemStacks;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
@@ -727,7 +727,7 @@ Sadly, you need to use Reflections to use it in multiple versions.
 Spicy has a Wrapper-Method to access this method regardless of Reflections
 
 ```java
-import de.rytrox.spicy.item.ItemStacks;
+import de.rytrox.spicy.reflect.ItemStacks;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 

@@ -1,9 +1,10 @@
-package de.rytrox.spicy.item;
+package de.rytrox.spicy.reflect;
 
 import be.seeseemelk.mockbukkit.MockBukkit;
 
 import com.google.gson.JsonObject;
 
+import de.rytrox.spicy.reflect.ItemStacks;
 import de.rytrox.spicy.reflect.Reflections;
 import org.apache.commons.lang.WordUtils;
 import org.bukkit.Material;

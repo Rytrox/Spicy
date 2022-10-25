@@ -1,7 +1,6 @@
-package de.rytrox.spicy.item;
+package de.rytrox.spicy.reflect;
 
 import be.seeseemelk.mockbukkit.MockBukkit;
-import de.rytrox.spicy.reflect.Reflections;
 import org.apache.commons.lang3.reflect.MethodUtils;
 import org.bukkit.Material;
 import org.bukkit.craftbukkit.v1_18_R2.inventory.CraftItemStack;
@@ -43,7 +42,7 @@ public class NBTItemStacksTest {
             methodUtils.when(() -> MethodUtils.invokeStaticMethod(Mockito.any(Class.class), Mockito.eq("asNMSCopy"), Mockito.eq(itemStack)))
                     .thenThrow(IllegalAccessException.class);
 
-            net.minecraft.world.item.ItemStack copy = NBTItemStacks.asNMSCopy(itemStack);
+            net.minecraft.world.item.ItemStack copy = ItemStacks.asNMSCopy(itemStack);
             assertNull(copy);
         }
     }
@@ -58,7 +57,7 @@ public class NBTItemStacksTest {
             methodUtils.when(() -> MethodUtils.invokeStaticMethod(Mockito.any(Class.class), Mockito.eq("asNMSCopy"), Mockito.eq(itemStack)))
                     .thenThrow(IllegalArgumentException.class);
 
-            net.minecraft.world.item.ItemStack copy = NBTItemStacks.asNMSCopy(itemStack);
+            net.minecraft.world.item.ItemStack copy = ItemStacks.asNMSCopy(itemStack);
             assertNull(copy);
         }
     }
@@ -73,7 +72,7 @@ public class NBTItemStacksTest {
             methodUtils.when(() -> MethodUtils.invokeStaticMethod(Mockito.any(Class.class), Mockito.eq("asNMSCopy"), Mockito.eq(itemStack)))
                     .thenThrow(InvocationTargetException.class);
 
-            net.minecraft.world.item.ItemStack copy = NBTItemStacks.asNMSCopy(itemStack);
+            net.minecraft.world.item.ItemStack copy = ItemStacks.asNMSCopy(itemStack);
             assertNull(copy);
         }
     }
@@ -88,7 +87,7 @@ public class NBTItemStacksTest {
             methodUtils.when(() -> MethodUtils.invokeStaticMethod(Mockito.any(Class.class), Mockito.eq("asNMSCopy"), Mockito.eq(itemStack)))
                     .thenThrow(SecurityException.class);
 
-            net.minecraft.world.item.ItemStack copy = NBTItemStacks.asNMSCopy(itemStack);
+            net.minecraft.world.item.ItemStack copy = ItemStacks.asNMSCopy(itemStack);
             assertNull(copy);
         }
     }
@@ -103,7 +102,7 @@ public class NBTItemStacksTest {
             methodUtils.when(() -> MethodUtils.invokeStaticMethod(Mockito.any(Class.class), Mockito.eq("asNMSCopy"), Mockito.eq(itemStack)))
                     .thenThrow(NoSuchMethodException.class);
 
-            net.minecraft.world.item.ItemStack copy = NBTItemStacks.asNMSCopy(itemStack);
+            net.minecraft.world.item.ItemStack copy = ItemStacks.asNMSCopy(itemStack);
             assertNull(copy);
         }
     }
