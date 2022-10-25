@@ -2,16 +2,16 @@ package de.rytrox.spicy.reflect;
 
 import com.mojang.authlib.GameProfile;
 
-import net.minecraft.server.v1_8_R3.EntityPlayer;
-import net.minecraft.server.v1_8_R3.Packet;
-import net.minecraft.server.v1_8_R3.PlayerConnection;
-
+import org.apache.commons.lang3.Validate;
+import org.apache.commons.lang3.reflect.FieldUtils;
 import org.apache.commons.lang3.reflect.MethodUtils;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class Players {
+
+    private static final Class<?> packetClass = Reflections.getNMSClass("Packet");
 
     private Players() {
         /* UTIL-CLASSES DON'T NEED A CONSTRUCTOR */
@@ -24,7 +24,7 @@ public class Players {
      */
     @Nullable
     public static GameProfile getGameProfile(@NotNull Player player) throws ReflectiveOperationException {
-        return getEntityPlayer(player).getProfile();
+        return (GameProfile) MethodUtils.invokeMethod(getEntityPlayer(player), "getProfile");
     }
 
     /**
@@ -34,8 +34,8 @@ public class Players {
      * @throws ReflectiveOperationException if there was an error
      */
     @NotNull
-    public static EntityPlayer getEntityPlayer(@NotNull Player player) throws ReflectiveOperationException {
-        return (EntityPlayer) MethodUtils.invokeExactMethod(player, "getHandle");
+    public static Object getEntityPlayer(@NotNull Player player) throws ReflectiveOperationException {
+        return MethodUtils.invokeExactMethod(player, "getHandle");
     }
 
     /**
@@ -45,8 +45,8 @@ public class Players {
      * @throws ReflectiveOperationException if there was an error
      */
     @NotNull
-    public static PlayerConnection getPlayerConnection(@NotNull Player player) throws ReflectiveOperationException {
-        return getEntityPlayer(player).playerConnection;
+    public static Object getPlayerConnection(@NotNull Player player) throws ReflectiveOperationException {
+        return FieldUtils.readField(getEntityPlayer(player), "playerConnection");
     }
 
     /**
@@ -55,7 +55,9 @@ public class Players {
      * @param packet the packet
      * @throws ReflectiveOperationException if the object is not a packet
      */
-    public static void sendPacket(@NotNull Player player, @NotNull Packet<?> packet) throws ReflectiveOperationException {
-        getPlayerConnection(player).sendPacket(packet);
+    public static void sendPacket(@NotNull Player player, @NotNull Object packet) throws ReflectiveOperationException {
+        Validate.isTrue(packetClass.isAssignableFrom(packet.getClass()));
+
+        MethodUtils.invokeMethod(getPlayerConnection(player), "sendPacket", packet);
     }
 }

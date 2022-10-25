@@ -79,7 +79,7 @@ public class UTFConfigTest {
 
     @Test
     public void shouldNotLoadFromInvalidInputStream() throws FileNotFoundException {
-        UTFConfig config = new UTFConfig(new FileInputStream(Paths.get("src", "test", "resources", "config.dat").toFile()));
+        UTFConfig config = new UTFConfig(new FileInputStream(Paths.get("src", "test", "resources", "storage", "compressed.dat").toFile()));
 
         assertNotNull(config);
         assertTrue(config.getKeys(true).isEmpty());

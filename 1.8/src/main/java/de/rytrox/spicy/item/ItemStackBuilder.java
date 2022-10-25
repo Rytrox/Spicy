@@ -2,6 +2,8 @@ package de.rytrox.spicy.item;
 
 import java.util.*;
 
+import de.rytrox.spicy.reflect.ItemStacks;
+
 import org.apache.commons.lang.Validate;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;

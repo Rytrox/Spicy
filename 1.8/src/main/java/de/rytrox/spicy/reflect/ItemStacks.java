@@ -1,4 +1,4 @@
-package de.rytrox.spicy.item;
+package de.rytrox.spicy.reflect;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -10,6 +10,7 @@ import java.util.logging.Level;
 
 import de.rytrox.spicy.reflect.Reflections;
 import org.apache.commons.lang.WordUtils;
+import org.apache.commons.lang3.reflect.MethodUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;

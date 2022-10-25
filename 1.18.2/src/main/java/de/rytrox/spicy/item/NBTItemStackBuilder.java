@@ -1,6 +1,8 @@
 package de.rytrox.spicy.item;
 
-import de.rytrox.spicy.config.NBTConfig;
+import de.rytrox.spicy.nbt.NBTStorage;
+
+import de.rytrox.spicy.reflect.ItemStacks;
 
 import net.minecraft.nbt.CompoundTag;
 
@@ -80,23 +82,98 @@ public class NBTItemStackBuilder extends ItemStackBuilder {
     }
 
     @NotNull
-    public NBTItemStackBuilder withNBTData(@NotNull NBTConfig config) {
+    public NBTItemStackBuilder withNBTData(@NotNull NBTStorage config) {
         return this.withNBTData(config.save());
     }
 
     /**
-     * This Method writes the NBT-Tag with an Int as value in a certain key
+     * This Method writes the NBT-Tag with a byte as value in a certain key
      * @param key the key of the tag
-     * @param value the value you want to write in this key
+     * @param value the byte you want to write in this key
      * @return the builder to continue
      */
-    @NotNull
-    public <T> NBTItemStackBuilder withNBTData(@NotNull String key, @NotNull T value) {
-        NBTConfig config = new NBTConfig(NBTItemStacks.getNBTTagCompound(this.currentBuilding));
+    public NBTItemStackBuilder withNBTData(@NotNull String key, byte value) {
+        NBTStorage storage = new NBTStorage(ItemStacks.getNBTTagCompound(this.currentBuilding));
+        storage.setByte(key, value);
 
-        config.set(key, value);
+        return this.withNBTData(storage);
+    }
 
-        // Set Compound in itemStack
-        return this.withNBTData(config);
+    /**
+     * This Method writes the NBT-Tag with a short as value in a certain key
+     * @param key the key of the tag
+     * @param value the short you want to write in this key
+     * @return the builder to continue
+     */
+    public NBTItemStackBuilder withNBTData(@NotNull String key, short value) {
+        NBTStorage storage = new NBTStorage(ItemStacks.getNBTTagCompound(this.currentBuilding));
+        storage.setShort(key, value);
+
+        return this.withNBTData(storage);
+    }
+
+    /**
+     * This Method writes the NBT-Tag with an integer as value in a certain key
+     * @param key the key of the tag
+     * @param value the integer you want to write in this key
+     * @return the builder to continue
+     */
+    public NBTItemStackBuilder withNBTData(@NotNull String key, int value) {
+        NBTStorage storage = new NBTStorage(ItemStacks.getNBTTagCompound(this.currentBuilding));
+        storage.setInt(key, value);
+
+        return this.withNBTData(storage);
+    }
+
+    /**
+     * This Method writes the NBT-Tag with a long as value in a certain key
+     * @param key the key of the tag
+     * @param value the long you want to write in this key
+     * @return the builder to continue
+     */
+    public NBTItemStackBuilder withNBTData(@NotNull String key, long value) {
+        NBTStorage storage = new NBTStorage(ItemStacks.getNBTTagCompound(this.currentBuilding));
+        storage.setLong(key, value);
+
+        return this.withNBTData(storage);
+    }
+
+    /**
+     * This Method writes the NBT-Tag with a float as value in a certain key
+     * @param key the key of the tag
+     * @param value the float you want to write in this key
+     * @return the builder to continue
+     */
+    public NBTItemStackBuilder withNBTData(@NotNull String key, float value) {
+        NBTStorage storage = new NBTStorage(ItemStacks.getNBTTagCompound(this.currentBuilding));
+        storage.setFloat(key, value);
+
+        return this.withNBTData(storage);
+    }
+
+    /**
+     * This Method writes the NBT-Tag with a double as value in a certain key
+     * @param key the key of the tag
+     * @param value the double you want to write in this key
+     * @return the builder to continue
+     */
+    public NBTItemStackBuilder withNBTData(@NotNull String key, double value) {
+        NBTStorage storage = new NBTStorage(ItemStacks.getNBTTagCompound(this.currentBuilding));
+        storage.setDouble(key, value);
+
+        return this.withNBTData(storage);
+    }
+
+    /**
+     * This Method writes the NBT-Tag with a string as value in a certain key
+     * @param key the key of the tag
+     * @param value the string you want to write in this key
+     * @return the builder to continue
+     */
+    public NBTItemStackBuilder withNBTData(@NotNull String key, @Nullable String value) {
+        NBTStorage storage = new NBTStorage(ItemStacks.getNBTTagCompound(this.currentBuilding));
+        storage.setString(key, value);
+
+        return this.withNBTData(storage);
     }
 }
