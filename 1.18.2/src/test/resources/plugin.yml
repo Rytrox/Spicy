@@ -1,6 +1,0 @@
-name: Spicy
-version: 1.0
-author: Timeout
-description: 'Ein Test-Plugin für Spicy'
-
-main: de.rytrox.spicy.SpicyTestPlugin
